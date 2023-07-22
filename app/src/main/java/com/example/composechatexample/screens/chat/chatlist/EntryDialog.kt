@@ -19,6 +19,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -36,12 +37,12 @@ fun EntryDialog() {
             .padding(horizontal = 15.dp),
         properties = DialogProperties(usePlatformDefaultWidth = false),
         onDismissRequest = { viewModel.showAlertDialog(null) },
-        title = { Text(text = "Chat is private") },
+        title = { Text(text = stringResource(id = R.string.private_chat_lable)) },
         text = {
             Column() {
                 Text(
                     modifier = Modifier.padding(PaddingValues(bottom = 8.dp)),
-                    text = "Enter your password, if you don't know it, ask the owner of the chat room."
+                    text = stringResource(id = R.string.fill_password_for_enter)
                 )
                 OutlinedTextField(
                     modifier = Modifier
@@ -50,7 +51,7 @@ fun EntryDialog() {
                     onValueChange = viewModel::updatePassword,
                     placeholder = {
                         Text(
-                            text = "Enter password",
+                            text = stringResource(id = R.string.enter_password),
                             color = Color.LightGray
                         )
                     },
@@ -75,7 +76,7 @@ fun EntryDialog() {
                     isError = uiState.value.errors.entryPasswordError,
                     supportingText = {
                         if (uiState.value.errors.entryPasswordError)
-                            Text(text = "Incorrect password entered")
+                            Text(text = stringResource(id = R.string.incorrect_password_label))
                     },
                     singleLine = true,
                 )
@@ -84,12 +85,12 @@ fun EntryDialog() {
         confirmButton = {
             Button(
                 onClick = viewModel::checkPassword
-            ) { Text("Accept") }
+            ) { Text(stringResource(id = R.string.accept_label)) }
         },
         dismissButton = {
             Button(
                 onClick = { viewModel.showAlertDialog(null) }
-            ) { Text("Cancel") }
+            ) { Text(stringResource(id = R.string.cancel_label)) }
         }
     )
 }

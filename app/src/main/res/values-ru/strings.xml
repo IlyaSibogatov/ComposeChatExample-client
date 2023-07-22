@@ -26,6 +26,18 @@
     <string name="owner_label">владелец: %1$s</string>
     <string name="date_label">дата: %1$s</string>
 
+    <string name="public_chat_lable">Открытый чат</string>
+    <string name="private_chat_lable">Приватный чат</string>
+    <string name="enter_room_name_label">Введите название чата</string>
+    <string name="empty_chat_name">Название не можеть быть пустым</string>
+    <string name="enter_password">Введите пароль</string>
+    <string name="fill_password">Заполните пароль</string>
+    <string name="create_label">Создать</string>
+    <string name="cancel_label">Отменить</string>
+    <string name="fill_password_for_enter">Введите пароль, если не знаете, спросите у владельца</string>
+    <string name="incorrect_password_label">Неверный пароль</string>
+    <string name="accept_label">Подтвердить</string>
+
     <!--  Chat Screen  -->
     <string name="edit_message">Изменить</string>
     <string name="remove_message">Удалить</string>

@@ -25,6 +25,18 @@
     <string name="owner_label">owner: %1$s</string>
     <string name="date_label">date: %1$s</string>
 
+    <string name="public_chat_lable">Public chat</string>
+    <string name="private_chat_lable">Private chat</string>
+    <string name="enter_room_name_label">Enter room name</string>
+    <string name="empty_chat_name">Chat name can`t be blank</string>
+    <string name="enter_password">Enter password</string>
+    <string name="fill_password">Fill out the password</string>
+    <string name="create_label">Create</string>
+    <string name="cancel_label">Cancel</string>
+    <string name="fill_password_for_enter">Enter your password, if you don`t know it, ask the owner of the chat room</string>
+    <string name="incorrect_password_label">Incorrect password entered</string>
+    <string name="accept_label">Accept</string>
+
     <!--  Chat Screen  -->
     <string name="edit_message">Edit</string>
     <string name="remove_message">Remove</string>
