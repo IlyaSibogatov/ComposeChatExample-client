@@ -1,0 +1,50 @@
+<resources>
+    <string name="app_name">ComposeChatExample</string>
+
+    <!--  Onboard Screen  -->
+    <string name="username_hint">Username</string>
+    <string name="check_username">Check your username</string>
+    <string name="username_cant_be_empty">Username can`t be empty</string>
+    <string name="password_hint">Password</string>
+    <string name="check_password">Check your password</string>
+    <string name="password_cant_be_empty">Password can`t be empty</string>
+    <string name="login_label">Login</string>
+    <string name="signup_label">Signup</string>
+    <string name="havent_account">Don`t have an account?</string>
+
+    <!--  Profile Screen  -->
+    <string name="account_information">Account information</string>
+    <string name="name_label">Name: </string>
+    <string name="number_label">Number: </string>
+    <string name="email_label">Email: </string>
+    <string name="friend_list">Friend`s list</string>
+    <string name="string_open">Open</string>
+
+    <!--  Chat List Screen  -->
+    <string name="find_chat">Find chat</string>
+    <string name="owner_label">owner: %1$s</string>
+    <string name="date_label">date: %1$s</string>
+
+    <!--  Chat Screen  -->
+    <string name="edit_message">Edit</string>
+    <string name="remove_message">Remove</string>
+    <string name="message_was_edit">was edited</string>
+    <string name="edit_message_label">Message edite</string>
+    <string name="enter_message">Enter a message</string>
+
+    <!--  Settings Screen  -->
+    <string name="languages_settings">Language</string>
+    <string name="theme_settings">Theme</string>
+    <string name="privacy_settings">Privacy</string>
+    <string name="notifications_settings">Notification</string>
+    <string name="change_password_settings">Change password</string>
+    <string name="bug_report_label">Bug report</string>
+    <string name="send_report_label">Send report email</string>
+    <string name="tech_support_label">Tech.Support</string>
+    <string name="exit_label">Exit</string>
+
+    <!--  BottomBar  -->
+    <string name="chat_list_title">Chats</string>
+    <string name="profile_title">Profile</string>
+    <string name="settings_title">Settings</string>
+</resources>
