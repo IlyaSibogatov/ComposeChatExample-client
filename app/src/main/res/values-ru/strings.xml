@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ComposeChatExample</string>
+
+    <!--  Onboard Screen  -->
+    <string name="username_hint">Имя пользователя</string>
+    <string name="check_username">Проверьте имя пользователя</string>
+    <string name="username_cant_be_empty">Имя пользователя не может быть пустым</string>
+    <string name="password_hint">Пароль</string>
+    <string name="check_password">Проверьте пароль</string>
+    <string name="password_cant_be_empty">Пароль не может быть пустым</string>
+    <string name="login_label">Войти</string>
+    <string name="signup_label">Зарегистрироваться</string>
+    <string name="havent_account">У вас нет аккаунта?</string>
+
+    <!--  Profile Screen  -->
+    <string name="account_information">Информация об аккаунте</string>
+    <string name="name_label">Имя: </string>
+    <string name="number_label">Номер: </string>
+    <string name="email_label">Email: </string>
+    <string name="friend_list">Список друзей</string>
+    <string name="string_open">Открыть</string>
+
+    <!--  Chat List Screen  -->
+    <string name="find_chat">Найти чат</string>
+    <string name="owner_label">владелец: %1$s</string>
+    <string name="date_label">дата: %1$s</string>
+
+    <!--  Chat Screen  -->
+    <string name="edit_message">Изменить</string>
+    <string name="remove_message">Удалить</string>
+    <string name="message_was_edit">изменено</string>
+    <string name="edit_message_label">Изменение сообщения</string>
+    <string name="enter_message">Введите сообщение</string>
+
+    <!--  Settings Screen  -->
+    <string name="languages_settings">Язык</string>
+    <string name="theme_settings">Тема</string>
+    <string name="privacy_settings">Конфиденциальность</string>
+    <string name="notifications_settings">Уведомления</string>
+    <string name="change_password_settings">Изменить пароль</string>
+    <string name="bug_report_label">Сообщение об ошибке</string>
+    <string name="send_report_label">Отправить отчет на почту</string>
+    <string name="tech_support_label">Тех.поддержка</string>
+    <string name="exit_label">Выход</string>
+
+    <!--  BottomBar  -->
+    <string name="chat_list_title">Чаты</string>
+    <string name="profile_title">Профиль</string>
+    <string name="settings_title">Настройки</string>
+</resources>
