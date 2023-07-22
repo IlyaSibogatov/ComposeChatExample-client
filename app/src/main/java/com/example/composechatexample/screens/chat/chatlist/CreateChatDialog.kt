@@ -20,6 +20,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -41,8 +42,8 @@ fun CreateChatDialog() {
         title = {
             Text(
                 text =
-                if (!uiState.value.createdChat.passEnable) "Public chat"
-                else ("Private chat")
+                if (!uiState.value.createdChat.passEnable) stringResource(id = R.string.public_chat_lable)
+                else (stringResource(id = R.string.private_chat_lable))
             )
         },
         text = {
@@ -60,7 +61,7 @@ fun CreateChatDialog() {
                     onValueChange = viewModel::updateOwnChatName,
                     placeholder = {
                         Text(
-                            text = "Enter room name",
+                            text = stringResource(id = R.string.enter_room_name_label),
                             color = Color.LightGray
                         )
                     },
@@ -85,7 +86,7 @@ fun CreateChatDialog() {
                     isError = uiState.value.errors.emptyChatName,
                     supportingText = {
                         if (uiState.value.errors.emptyChatName)
-                            Text(text = "Chat name can't be blank")
+                            Text(text = stringResource(id = R.string.empty_chat_name))
                     },
                     singleLine = true,
                 )
@@ -102,7 +103,7 @@ fun CreateChatDialog() {
                         onValueChange = viewModel::updateOwnChatPass,
                         placeholder = {
                             Text(
-                                text = "Chat password",
+                                text = stringResource(id = R.string.enter_password),
                                 color = Color.LightGray
                             )
                         },
@@ -126,7 +127,7 @@ fun CreateChatDialog() {
                         isError = uiState.value.errors.emptyChatPass,
                         supportingText = {
                             if (uiState.value.errors.emptyChatPass)
-                                Text(text = "Fill out the password")
+                                Text(text = stringResource(id = R.string.fill_password))
                         },
                         shape = MaterialTheme.shapes.small,
                         singleLine = true,
@@ -150,12 +151,12 @@ fun CreateChatDialog() {
         confirmButton = {
             Button(
                 onClick = viewModel::createChat
-            ) { Text("Create") }
+            ) { Text(stringResource(id = R.string.create_label)) }
         },
         dismissButton = {
             Button(
                 onClick = viewModel::showCreateDialog
-            ) { Text("Cancel") }
+            ) { Text(stringResource(id = R.string.cancel_label)) }
         }
     )
 }
