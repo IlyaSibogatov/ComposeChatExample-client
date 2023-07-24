@@ -1,12 +1,14 @@
 package com.example.composechatexample.screens.profile
 
 import com.example.composechatexample.domain.model.Friend
+import com.example.composechatexample.utils.Constants.SelfInfo
 
 data class ProfileUIState(
     val username: String = "",
     val name: String = "___",
     val number: String = "+# (###) ###-##-##",
     val email: String = "___@gmail.com",
+    val selfInfo: String = SelfInfo,
     val canEditProfile: Boolean = false,
     val friendList: List<Friend> = listOf(
         Friend(

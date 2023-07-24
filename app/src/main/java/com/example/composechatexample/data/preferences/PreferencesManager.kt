@@ -32,6 +32,9 @@ class PreferencesManager @Inject constructor(
         get() = sharedPreferences.getString(SUPPORT, "___@gmail.com").toString()
         set(value) = sharedPreferences.edit().putString(SUPPORT, value).apply()
 
+    var uuid: String?
+        get() = sharedPreferences.getString(UUID, null).toString()
+        set(value) = sharedPreferences.edit().putString(UUID, value).apply()
 
     var language: LanguageEntity?
         get() = Gson().fromJson(
@@ -51,6 +54,7 @@ class PreferencesManager @Inject constructor(
         private const val PRIVACY = "privacy"
         private const val NOTIFICATION = "notification"
         private const val SUPPORT = "support"
+        private const val UUID = "uuid"
         private const val LANGUAGE_ARG = "user_language_arg"
     }
 }
