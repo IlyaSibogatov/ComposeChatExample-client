@@ -6,11 +6,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -20,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -72,38 +75,50 @@ fun MainEntryPoint() {
                                 }) {
                                     Icon(
                                         painter = painterResource(id = R.drawable.ic_arrow_back),
-                                        contentDescription = Constants.CONTENT_DESCRIPTION
+                                        contentDescription = Constants.CONTENT_DESCRIPTION,
+                                        tint = MaterialTheme.colorScheme.onPrimary
                                     )
                                 }
                             }
-                            Text(text = screens.find {
+                            Text(
+                                text = screens.find {
                                 currentDestination?.route.toString() == (it.route)
-                            }!!.title)
+                            }!!.title,
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
                         }
                     },
                     colors = TopAppBarDefaults.smallTopAppBarColors(
-                        containerColor = Color.LightGray
+                        containerColor = MaterialTheme.colorScheme.primary
                     )
                 )
             }
         },
         bottomBar = {
             if (showBottomBar) {
-                NavigationBar {
+                NavigationBar(
+                    containerColor = MaterialTheme.colorScheme.primary
+                ) {
                     screensToShowBottomBar.forEach { screen ->
                         NavigationBarItem(
                             label = {
-                                Text(text = stringResource(id = screen.title))
+                                Text(
+                                    text = stringResource(id = screen.title),
+                                    color = if (isCurrentDestination(currentDestination, screen.route))
+                                        MaterialTheme.colorScheme.onPrimary
+                                    else MaterialTheme.colorScheme.onSurfaceVariant
+                                )
                             },
                             icon = {
                                 Icon(
                                     painterResource(id = screen.icon),
                                     contentDescription = Constants.CONTENT_DESCRIPTION,
+                                    tint = if (isCurrentDestination(currentDestination, screen.route))
+                                        MaterialTheme.colorScheme.onPrimaryContainer
+                                    else MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             },
-                            selected = currentDestination?.hierarchy?.any {
-                                it.route == screen.route
-                            } == true,
+                            selected = isCurrentDestination(currentDestination, screen.route),
                             onClick = {
                                 navController.navigate(screen.route) {
                                     popUpTo(navController.graph.findStartDestination().id)
@@ -126,4 +141,8 @@ fun MainEntryPoint() {
             )
         }
     }
+}
+
+private fun isCurrentDestination(currentDestination: NavDestination?, route: String) : Boolean {
+    return currentDestination?.hierarchy?.any{ it.route == route} == true
 }

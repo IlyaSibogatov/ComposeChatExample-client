@@ -23,8 +23,8 @@
 
     <!--  Chat List Screen  -->
     <string name="find_chat">Найти чат</string>
-    <string name="owner_label">владелец: %1$s</string>
-    <string name="date_label">дата: %1$s</string>
+    <string name="owner_label">Владелец: %1$s</string>
+    <string name="date_label">Дата: %1$s</string>
 
     <string name="public_chat_lable">Открытый чат</string>
     <string name="private_chat_lable">Приватный чат</string>

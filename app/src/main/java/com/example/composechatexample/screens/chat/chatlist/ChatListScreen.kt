@@ -13,6 +13,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -24,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,6 +40,8 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -46,6 +51,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavHostController
 import com.example.composechatexample.R
+import com.example.composechatexample.domain.model.Chat
 import com.example.composechatexample.screens.chat.chatlist.model.ChatListScreenEvent
 import com.example.composechatexample.utils.CircularLoader
 import com.example.composechatexample.utils.Constants
@@ -70,9 +76,7 @@ fun ChatListScreen(
                 .onGloballyPositioned {
                 },
         ) {
-            val (
-                lcChats, searchRow, createChatBtn, chatName, chatOwner, createDate, privateIcon,
-            ) = createRefs()
+            val (lcChats, searchRow, createChatBtn ) = createRefs()
             when {
                 uiState.value.dialogs.passDialog -> EntryDialog()
                 uiState.value.dialogs.createDialog -> CreateChatDialog()
@@ -81,7 +85,7 @@ fun ChatListScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(color = Color.LightGray)
+                    .background(MaterialTheme.colorScheme.primary)
                     .padding(15.dp)
                     .constrainAs(searchRow) {
                         top.linkTo(parent.top)
@@ -92,7 +96,6 @@ fun ChatListScreen(
             ) {
                 OutlinedTextField(
                     modifier = Modifier
-                        .background(Color.Transparent)
                         .fillMaxWidth(),
                     value = uiState.value.searchQuery,
                     onValueChange = { newText ->
@@ -101,12 +104,11 @@ fun ChatListScreen(
                     placeholder = {
                         Text(
                             text = stringResource(id = R.string.find_chat),
-                            color = Color.LightGray
+                            style = MaterialTheme.typography.labelLarge
                         )
                     },
                     colors = TextFieldDefaults.outlinedTextFieldColors(
-                        containerColor = Color.White,
-                        placeholderColor = Color.White,
+                        containerColor = MaterialTheme.colorScheme.background
                     ),
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
@@ -124,79 +126,13 @@ fun ChatListScreen(
                     },
             ) {
                 items(uiState.value.newChats) { item ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp)
-                            .background(Color.Transparent),
-                        shape = MaterialTheme.shapes.small,
-                        onClick = {
+                    ItemChat(
+                        data = item,
+                        modifier = Modifier.padding(start = 8.dp, end = 8.dp),
+                        onChatClick = {
                             viewModel.checkChat(item)
                         }
-                    ) {
-                        ConstraintLayout(
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .fillMaxWidth()
-                        ) {
-                            Text(
-                                modifier = Modifier
-                                    .padding(bottom = 8.dp)
-                                    .constrainAs(chatName) {
-                                        start.linkTo(parent.start)
-                                        top.linkTo(parent.top)
-                                        end.linkTo(privateIcon.start)
-                                        width = Dimension.fillToConstraints
-                                    },
-                                text = item.name,
-                                textAlign = TextAlign.Start,
-                                fontSize = 22.sp,
-                                color = Color.Black,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Text(
-                                modifier = Modifier
-                                    .padding(bottom = 16.dp)
-                                    .constrainAs(chatOwner) {
-                                        start.linkTo(parent.start)
-                                        end.linkTo(chatName.end)
-                                        top.linkTo(chatName.bottom)
-                                        width = Dimension.fillToConstraints
-                                    },
-                                text = stringResource(id = R.string.owner_label, item.owner),
-                                textAlign = TextAlign.Start,
-                                fontSize = 22.sp,
-                                color = Color.Black,
-                            )
-                            Text(
-                                modifier = Modifier
-                                    .constrainAs(createDate) {
-                                        start.linkTo(parent.start)
-                                        end.linkTo(chatName.end)
-                                        top.linkTo(chatOwner.bottom)
-                                        width = Dimension.fillToConstraints
-                                    },
-                                text = stringResource(id = R.string.date_label, item.formattedTime),
-                                textAlign = TextAlign.Start,
-                                fontSize = 18.sp,
-                                color = Color.Black,
-                                fontStyle = FontStyle.Italic
-                            )
-                            Icon(
-                                modifier = Modifier
-                                    .constrainAs(privateIcon) {
-                                        top.linkTo(chatName.top)
-                                        end.linkTo(parent.end)
-                                    },
-                                painter = painterResource(
-                                    id =
-                                    if (item.password.isBlank()) R.drawable.ic_not_a_private
-                                    else R.drawable.ic_private
-                                ),
-                                contentDescription = Constants.CONTENT_DESCRIPTION,
-                            )
-                        }
-                    }
+                    )
                 }
             }
             OutlinedButton(
@@ -237,4 +173,94 @@ fun ChatListScreen(
             lifeCycleOwner.lifecycle.removeObserver(observer)
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ItemChat(
+    data: Chat,
+    onChatClick: () -> Unit,
+    modifier: Modifier
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        shape = MaterialTheme.shapes.small,
+        onClick = { onChatClick() },
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer
+        )
+    ) {
+        Row(
+            modifier = modifier.padding(top = 16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Top
+        ) {
+            TextChatItem(
+                text = data.name,
+                modifier = Modifier.weight(1f),
+                size = 18.sp,
+                weight = FontWeight.Bold
+            )
+            Icon(
+                painter = painterResource(
+                    id = if (data.password.isEmpty()) R.drawable.ic_not_a_private
+                    else R.drawable.ic_private
+                ),
+                tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                contentDescription = Constants.CONTENT_DESCRIPTION
+            )
+        }
+        TextChatItem(
+            modifier = modifier.padding(bottom = 4.dp),
+            text = stringResource(id = R.string.owner_label, data.owner),
+            size = 16.sp
+        )
+        Divider(
+            modifier = modifier,
+            thickness = 1.dp,
+            color = MaterialTheme.colorScheme.outline
+        )
+        TextChatItem(
+            modifier = modifier.padding(bottom = 8.dp),
+            text = stringResource(id = R.string.date_label, data.formattedTime),
+            style = FontStyle.Italic,
+            size = 10.sp
+        )
+    }
+}
+
+@Composable
+private fun TextChatItem(
+    text: String,
+    modifier: Modifier,
+    size: TextUnit,
+    style: FontStyle = FontStyle.Normal,
+    weight: FontWeight = FontWeight.Normal
+){
+    Text(
+        modifier = modifier,
+        text = text,
+        textAlign = TextAlign.Start,
+        fontSize = size,
+        color = MaterialTheme.colorScheme.onPrimaryContainer,
+        fontStyle = style,
+        fontWeight = weight
+    )
+}
+
+@Preview
+@Composable
+fun PreviewCardChat() {
+    ItemChat(data = Chat(
+        name = "Test",
+        password = "",
+        owner = "Person",
+        formattedTime = "24.07.2023 19 12",
+        id = "ibdifbaibfa"
+    ),
+        modifier = Modifier.padding(start = 16.dp, end = 16.dp),
+        onChatClick = { /*TODO*/ }
+    )
 }
