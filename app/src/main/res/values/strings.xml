@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">ComposeChatExample</string>
 
+    <string name="development">Option in development</string>
+
     <!--  Onboard Screen  -->
     <string name="username_hint">Username</string>
     <string name="check_username">Check your username</string>
@@ -14,11 +16,14 @@
 
     <!--  Profile Screen  -->
     <string name="account_information">Account information</string>
+    <string name="user_info_label">About me:</string>
     <string name="name_label">Name: </string>
     <string name="number_label">Number: </string>
     <string name="email_label">Email: </string>
     <string name="friend_list">Friend`s list</string>
     <string name="string_open">Open</string>
+    <string name="add_to_friend">Add to friend</string>
+    <string name="show_more">Show more</string>
 
     <!--  Chat List Screen  -->
     <string name="find_chat">Find chat</string>
@@ -54,6 +59,10 @@
     <string name="send_report_label">Send report email</string>
     <string name="tech_support_label">Tech.Support</string>
     <string name="exit_label">Exit</string>
+
+    <string name="application_label">Application</string>
+    <string name="account_label">Account</string>
+    <string name="personal_data">Personal data</string>
 
     <!--  BottomBar  -->
     <string name="chat_list_title">Chats</string>

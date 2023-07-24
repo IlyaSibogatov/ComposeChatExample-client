@@ -114,7 +114,7 @@ fun ChatScreen(
                     ConstraintLayout(
                         modifier = Modifier
                             .fillParentMaxWidth()
-                            .padding(12.dp),
+                            .padding(vertical = 12.dp),
                     ) {
                         val (
                             messageCard, nameTV, messageTV, dateTV, menuDots, editedTV
@@ -122,7 +122,6 @@ fun ChatScreen(
                         IconButton(
                             modifier = Modifier
                                 .size(48.dp)
-                                .padding()
                                 .constrainAs(image) {
                                     if (item.myMessage) end.linkTo(parent.end)
                                     else start.linkTo(parent.start)

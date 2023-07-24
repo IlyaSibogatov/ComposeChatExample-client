@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -17,8 +18,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -26,11 +25,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -42,6 +42,7 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.example.composechatexample.R
 import com.example.composechatexample.screens.profile.model.ProfileScreenEvent
 import com.example.composechatexample.utils.Constants
+import com.example.composechatexample.utils.Ext.showToast
 import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalGlideComposeApi::class, ExperimentalMaterial3Api::class)
@@ -49,6 +50,7 @@ import kotlinx.coroutines.flow.collectLatest
 fun ProfileScreen(
     navController: NavHostController,
 ) {
+    val context = LocalContext.current
     val viewModel: ProfileViewModel = hiltViewModel()
     val uiState = viewModel.uiState.collectAsState()
 
@@ -58,8 +60,8 @@ fun ProfileScreen(
             .padding(16.dp),
     ) {
         val (
-            photo, username, accountTw, nameET, numberET, emailET,
-            friendListEt, friendListLc, editBtn,
+            photo, username, friendListEt, friendListLc, selfInfoPreview,
+            editBtn, userOfflineTime, showMore, selfInfo, addToFriend
         ) = createRefs()
         Card(
             modifier = Modifier
@@ -77,9 +79,40 @@ fun ProfileScreen(
                 contentDescription = Constants.CONTENT_DESCRIPTION
             )
         }
+        /**Online Status*/
+//        GlideImage(
+//            modifier = Modifier
+//                .padding(top = 25.dp, end = 25.dp)
+//                .size(16.dp)
+//                .border(2.dp, Color.Gray, CircleShape)
+//                .constrainAs(userStatus) {
+//                    top.linkTo(photo.top)
+//                    end.linkTo(photo.end)
+//                },
+//            model = if (true) R.drawable.ic_user_online
+//            else R.drawable.ic_user_offline,
+//            contentDescription = Constants.CONTENT_DESCRIPTION
+//        )
+
+        /**Offline Status*/
+//        Card(
+//            modifier = Modifier
+//                .constrainAs(userOfflineTime) {
+//                    top.linkTo(photo.top)
+//                    end.linkTo(photo.end)
+//                }
+//                .padding(top = 15.dp),
+//            shape = MaterialTheme.shapes.small,
+//        ) {
+//            Text(
+//                modifier = Modifier
+//                    .padding(horizontal = 5.dp),
+//                text = "25 min."
+//            )
+//        }
+
         Text(
             modifier = Modifier
-                .fillMaxWidth()
                 .padding(8.dp)
                 .constrainAs(username) {
                     top.linkTo(photo.bottom)
@@ -91,83 +124,48 @@ fun ProfileScreen(
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
         )
+
         Text(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 8.dp)
-                .constrainAs(accountTw) {
+                .constrainAs(selfInfoPreview) {
                     top.linkTo(username.bottom)
                     start.linkTo(parent.start)
-                    end.linkTo(parent.end)
                 },
-            text = stringResource(id = R.string.account_information),
+            text = stringResource(id = R.string.user_info_label),
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
         )
 
-        TextField(
+        Text(
             modifier = Modifier
                 .padding(bottom = 8.dp)
-                .fillMaxWidth()
-                .constrainAs(nameET) {
-                    top.linkTo(accountTw.bottom)
+                .wrapContentWidth()
+                .constrainAs(selfInfo) {
+                    top.linkTo(selfInfoPreview.bottom)
                     start.linkTo(parent.start)
                 },
-            value = uiState.value.name,
-            onValueChange = viewModel::changeName,
-            enabled = uiState.value.canEditProfile,
-            leadingIcon = {
-                Text(text = stringResource(id = R.string.name_label))
-            },
-            textStyle = TextStyle.Default.copy(fontSize = 16.sp),
-            colors = TextFieldDefaults.textFieldColors(
-                containerColor = Color.Transparent,
-                textColor = Color.Black,
-            ),
-            singleLine = true,
+            text = uiState.value.selfInfo,
+            fontSize = 16.sp,
+            maxLines = 3,
+            overflow = TextOverflow.Ellipsis,
         )
-        TextField(
+
+        Text(
             modifier = Modifier
-                .padding(bottom = 8.dp)
-                .fillMaxWidth()
-                .constrainAs(numberET) {
+                .clickable {
+                    showToast(
+                        context = context,
+                        context.resources.getString(R.string.development)
+                    )
+                }
+                .constrainAs(showMore) {
+                    top.linkTo(selfInfo.bottom)
                     start.linkTo(parent.start)
-                    top.linkTo(nameET.bottom)
                 },
-            value = uiState.value.number,
-            onValueChange = viewModel::changeNumber,
-            enabled = uiState.value.canEditProfile,
-            leadingIcon = {
-                Text(text = stringResource(id = R.string.number_label))
-            },
-            textStyle = TextStyle.Default.copy(fontSize = 16.sp),
-            colors = TextFieldDefaults.textFieldColors(
-                containerColor = Color.Transparent,
-                textColor = Color.Black,
-            ),
-            singleLine = true,
-        )
-        TextField(
-            modifier = Modifier
-                .padding(bottom = 8.dp)
-                .fillMaxWidth()
-                .constrainAs(emailET) {
-                    start.linkTo(parent.start)
-                    top.linkTo(numberET.bottom)
-                },
-            value = uiState.value.email,
-            onValueChange = viewModel::changeEmail,
-            enabled = uiState.value.canEditProfile,
-            leadingIcon = {
-                Text(text = stringResource(id = R.string.email_label))
-            },
-            textStyle = TextStyle.Default.copy(fontSize = 16.sp),
-            colors = TextFieldDefaults.textFieldColors(
-                containerColor = Color.Transparent,
-                textColor = Color.Black,
-            ),
-            singleLine = true,
+            color = Color.Blue,
+            text = stringResource(id = R.string.show_more),
         )
         Row(
             modifier = Modifier
@@ -175,7 +173,7 @@ fun ProfileScreen(
                 .padding(bottom = 8.dp)
                 .constrainAs(friendListEt) {
                     start.linkTo(parent.start)
-                    top.linkTo(emailET.bottom)
+                    top.linkTo(showMore.bottom)
                 },
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
@@ -213,9 +211,12 @@ fun ProfileScreen(
                     modifier = Modifier
                         .padding(bottom = 5.dp),
                     onClick = {
-                        /**
-                        Переход на профиль друга
-                         */
+                        showToast(
+                            context = context,
+                            context.resources.getString(
+                                R.string.development
+                            )
+                        )
                     }
                 ) {
                     ConstraintLayout(
@@ -262,7 +263,12 @@ fun ProfileScreen(
                             modifier = Modifier
                                 .padding(start = 4.dp)
                                 .clipToBounds()
-                                .clickable(onClick = { /*TODO*/ })
+                                .clickable(onClick = {
+                                    showToast(
+                                        context = context,
+                                        context.resources.getString(R.string.development)
+                                    )
+                                })
                                 .padding(horizontal = 8.dp)
                                 .constrainAs(chatWithFriend) {
                                     top.linkTo(parent.top)
@@ -279,11 +285,34 @@ fun ProfileScreen(
         }
         IconButton(
             modifier = Modifier
+                .constrainAs(addToFriend) {
+                    top.linkTo(parent.top)
+                    start.linkTo(parent.start)
+                },
+            onClick = {
+                showToast(
+                    context = context,
+                    context.resources.getString(R.string.development)
+                )
+            }
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_person_add),
+                contentDescription = Constants.CONTENT_DESCRIPTION
+            )
+        }
+        IconButton(
+            modifier = Modifier
                 .constrainAs(editBtn) {
                     top.linkTo(parent.top)
                     end.linkTo(parent.end)
                 },
-            onClick = viewModel::allowCorrection
+            onClick = {
+                showToast(
+                    context = context,
+                    context.resources.getString(R.string.development)
+                )
+            }
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_edit_data),
