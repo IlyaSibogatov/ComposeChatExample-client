@@ -43,7 +43,8 @@ fun CreateChatDialog() {
             Text(
                 text =
                 if (!uiState.value.createdChat.passEnable) stringResource(id = R.string.public_chat_lable)
-                else (stringResource(id = R.string.private_chat_lable))
+                else (stringResource(id = R.string.private_chat_lable)),
+                color = MaterialTheme.colorScheme.onPrimaryContainer
             )
         },
         text = {
@@ -51,7 +52,6 @@ fun CreateChatDialog() {
                 val (chatName, chatPass, passCheckBox, passRow) = createRefs()
                 OutlinedTextField(
                     modifier = Modifier
-                        .background(Color.Transparent)
                         .constrainAs(chatName) {
                             top.linkTo(parent.top)
                             start.linkTo(parent.start)
@@ -62,7 +62,7 @@ fun CreateChatDialog() {
                     placeholder = {
                         Text(
                             text = stringResource(id = R.string.enter_room_name_label),
-                            color = Color.LightGray
+                            style = MaterialTheme.typography.labelLarge
                         )
                     },
                     trailingIcon = {
@@ -79,8 +79,7 @@ fun CreateChatDialog() {
                         }
                     },
                     colors = TextFieldDefaults.outlinedTextFieldColors(
-                        containerColor = Color.White,
-                        placeholderColor = Color.White,
+                        containerColor = MaterialTheme.colorScheme.background
                     ),
                     shape = MaterialTheme.shapes.small,
                     isError = uiState.value.errors.emptyChatName,
@@ -104,7 +103,7 @@ fun CreateChatDialog() {
                         placeholder = {
                             Text(
                                 text = stringResource(id = R.string.enter_password),
-                                color = Color.LightGray
+                                style = MaterialTheme.typography.labelLarge
                             )
                         },
                         trailingIcon = {
@@ -121,8 +120,7 @@ fun CreateChatDialog() {
                             }
                         },
                         colors = TextFieldDefaults.outlinedTextFieldColors(
-                            containerColor = Color.White,
-                            placeholderColor = Color.White,
+                            containerColor = MaterialTheme.colorScheme.background
                         ),
                         isError = uiState.value.errors.emptyChatPass,
                         supportingText = {
@@ -151,12 +149,22 @@ fun CreateChatDialog() {
         confirmButton = {
             Button(
                 onClick = viewModel::createChat
-            ) { Text(stringResource(id = R.string.create_label)) }
+            ) {
+                Text(
+                    text = stringResource(id = R.string.create_label),
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            }
         },
         dismissButton = {
             Button(
                 onClick = viewModel::showCreateDialog
-            ) { Text(stringResource(id = R.string.cancel_label)) }
+            ) {
+                Text(
+                    text = stringResource(id = R.string.cancel_label),
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            }
         }
     )
 }

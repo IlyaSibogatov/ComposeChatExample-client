@@ -22,8 +22,8 @@
 
     <!--  Chat List Screen  -->
     <string name="find_chat">Find chat</string>
-    <string name="owner_label">owner: %1$s</string>
-    <string name="date_label">date: %1$s</string>
+    <string name="owner_label">Owner: %1$s</string>
+    <string name="date_label">Date: %1$s</string>
 
     <string name="public_chat_lable">Public chat</string>
     <string name="private_chat_lable">Private chat</string>
