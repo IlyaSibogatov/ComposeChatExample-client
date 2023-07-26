@@ -2,6 +2,8 @@
 <resources>
     <string name="app_name">ComposeChatExample</string>
 
+    <string name="development">Опция в разработке</string>
+
     <!--  Onboard Screen  -->
     <string name="username_hint">Имя пользователя</string>
     <string name="check_username">Проверьте имя пользователя</string>
@@ -15,11 +17,14 @@
 
     <!--  Profile Screen  -->
     <string name="account_information">Информация об аккаунте</string>
+    <string name="user_info_label">Обо мне:</string>
     <string name="name_label">Имя: </string>
     <string name="number_label">Номер: </string>
     <string name="email_label">Email: </string>
     <string name="friend_list">Список друзей</string>
     <string name="string_open">Открыть</string>
+    <string name="add_to_friend">Добавить в друзья</string>
+    <string name="show_more">Показать больше</string>
 
     <!--  Chat List Screen  -->
     <string name="find_chat">Найти чат</string>
@@ -55,6 +60,10 @@
     <string name="send_report_label">Отправить отчет на почту</string>
     <string name="tech_support_label">Тех.поддержка</string>
     <string name="exit_label">Выход</string>
+
+    <string name="application_label">Приложение</string>
+    <string name="account_label">Аккаунт</string>
+    <string name="personal_data">Личные данные</string>
 
     <!--  BottomBar  -->
     <string name="chat_list_title">Чаты</string>

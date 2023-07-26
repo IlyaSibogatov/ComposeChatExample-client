@@ -35,6 +35,12 @@ object Constants {
         LanguageEntity("English", "en"),
     )
 
+    const val SelfInfo =
+        "Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum" +
+                " Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem" +
+                " Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum " +
+                "Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum "
+
     // Use 10.0.2.2:8080 if emulator is used
     const val BASE_URL = "http://10.0.2.2:8080"
     const val BASE_SOCKET_URL = "ws://10.0.2.2:8080"
