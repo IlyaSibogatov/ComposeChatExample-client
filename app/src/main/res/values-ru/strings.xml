@@ -41,7 +41,7 @@
     <!--  Chat Screen  -->
     <string name="edit_message">Изменить</string>
     <string name="remove_message">Удалить</string>
-    <string name="message_was_edit">изменено</string>
+    <string name="message_was_edit">изменено </string>
     <string name="edit_message_label">Изменение сообщения</string>
     <string name="enter_message">Введите сообщение</string>
 

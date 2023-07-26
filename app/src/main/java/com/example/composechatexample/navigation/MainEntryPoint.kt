@@ -106,7 +106,7 @@ fun MainEntryPoint() {
                                     text = stringResource(id = screen.title),
                                     color = if (isCurrentDestination(currentDestination, screen.route))
                                         MaterialTheme.colorScheme.onPrimary
-                                    else MaterialTheme.colorScheme.onSurfaceVariant
+                                    else MaterialTheme.colorScheme.surface
                                 )
                             },
                             icon = {
@@ -115,7 +115,7 @@ fun MainEntryPoint() {
                                     contentDescription = Constants.CONTENT_DESCRIPTION,
                                     tint = if (isCurrentDestination(currentDestination, screen.route))
                                         MaterialTheme.colorScheme.onPrimaryContainer
-                                    else MaterialTheme.colorScheme.onSurfaceVariant
+                                    else MaterialTheme.colorScheme.surface
                                 )
                             },
                             selected = isCurrentDestination(currentDestination, screen.route),

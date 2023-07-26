@@ -165,6 +165,7 @@ class ChatViewModel @Inject constructor(
                 SendType.REMOVE -> {
                     socketService.sendMessage(REMOVE_MESSAGE_ROUTE + uiState.value.selectedMsgId)
                 }
+                else -> {}
             }
             updateTypedMessage("")
             _uiState.value = uiState.value.copy(

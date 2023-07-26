@@ -40,7 +40,7 @@
     <!--  Chat Screen  -->
     <string name="edit_message">Edit</string>
     <string name="remove_message">Remove</string>
-    <string name="message_was_edit">was edited</string>
+    <string name="message_was_edit">was edited </string>
     <string name="edit_message_label">Message edite</string>
     <string name="enter_message">Enter a message</string>
 
