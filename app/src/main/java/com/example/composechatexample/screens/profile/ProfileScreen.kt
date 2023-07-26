@@ -49,10 +49,13 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun ProfileScreen(
     navController: NavHostController,
+    uid: String? = null,
 ) {
     val context = LocalContext.current
     val viewModel: ProfileViewModel = hiltViewModel()
     val uiState = viewModel.uiState.collectAsState()
+
+    viewModel.getProfile(uid?.removePrefix(Constants.USER_UID))
 
     ConstraintLayout(
         modifier = Modifier
@@ -61,7 +64,7 @@ fun ProfileScreen(
     ) {
         val (
             photo, username, friendListEt, friendListLc, selfInfoPreview,
-            editBtn, userOfflineTime, showMore, selfInfo, addToFriend
+            editBtn, userOfflineTime, showMore, selfInfo, addToFriend, userStatus
         ) = createRefs()
         Card(
             modifier = Modifier
@@ -79,37 +82,35 @@ fun ProfileScreen(
                 contentDescription = Constants.CONTENT_DESCRIPTION
             )
         }
-        /**Online Status*/
-//        GlideImage(
-//            modifier = Modifier
-//                .padding(top = 25.dp, end = 25.dp)
-//                .size(16.dp)
-//                .border(2.dp, Color.Gray, CircleShape)
-//                .constrainAs(userStatus) {
-//                    top.linkTo(photo.top)
-//                    end.linkTo(photo.end)
-//                },
-//            model = if (true) R.drawable.ic_user_online
-//            else R.drawable.ic_user_offline,
-//            contentDescription = Constants.CONTENT_DESCRIPTION
-//        )
-
-        /**Offline Status*/
-//        Card(
-//            modifier = Modifier
-//                .constrainAs(userOfflineTime) {
-//                    top.linkTo(photo.top)
-//                    end.linkTo(photo.end)
-//                }
-//                .padding(top = 15.dp),
-//            shape = MaterialTheme.shapes.small,
-//        ) {
-//            Text(
+        GlideImage(
+            modifier = Modifier
+                .padding(top = 25.dp, end = 25.dp)
+                .size(16.dp)
+                .border(2.dp, Color.Gray, CircleShape)
+                .constrainAs(userStatus) {
+                    top.linkTo(photo.top)
+                    end.linkTo(photo.end)
+                },
+            model = if (uiState.value.onlineStatus) R.drawable.ic_user_online
+            else R.drawable.ic_user_offline,
+            contentDescription = Constants.CONTENT_DESCRIPTION
+        )
+        /** Offline timer */
+//            Card(
 //                modifier = Modifier
-//                    .padding(horizontal = 5.dp),
-//                text = "25 min."
-//            )
-//        }
+//                    .constrainAs(userOfflineTime) {
+//                        top.linkTo(photo.top)
+//                        end.linkTo(photo.end)
+//                    }
+//                    .padding(top = 15.dp),
+//                shape = MaterialTheme.shapes.small,
+//            ) {
+//                Text(
+//                    modifier = Modifier
+//                        .padding(horizontal = 5.dp),
+//                    text = "25 min."
+//                )
+//            }
 
         Text(
             modifier = Modifier
@@ -283,41 +284,44 @@ fun ProfileScreen(
                 }
             }
         }
-        IconButton(
-            modifier = Modifier
-                .constrainAs(addToFriend) {
-                    top.linkTo(parent.top)
-                    start.linkTo(parent.start)
-                },
-            onClick = {
-                showToast(
-                    context = context,
-                    context.resources.getString(R.string.development)
+        if (viewModel.isMyProfile()) {
+            IconButton(
+                modifier = Modifier
+                    .constrainAs(editBtn) {
+                        top.linkTo(parent.top)
+                        end.linkTo(parent.end)
+                    },
+                onClick = {
+                    showToast(
+                        context = context,
+                        context.resources.getString(R.string.development)
+                    )
+                }
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_edit_data),
+                    contentDescription = Constants.CONTENT_DESCRIPTION
                 )
             }
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_person_add),
-                contentDescription = Constants.CONTENT_DESCRIPTION
-            )
-        }
-        IconButton(
-            modifier = Modifier
-                .constrainAs(editBtn) {
-                    top.linkTo(parent.top)
-                    end.linkTo(parent.end)
-                },
-            onClick = {
-                showToast(
-                    context = context,
-                    context.resources.getString(R.string.development)
+        } else {
+            IconButton(
+                modifier = Modifier
+                    .constrainAs(addToFriend) {
+                        top.linkTo(parent.top)
+                        start.linkTo(parent.start)
+                    },
+                onClick = {
+                    showToast(
+                        context = context,
+                        context.resources.getString(R.string.development)
+                    )
+                }
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_person_add),
+                    contentDescription = Constants.CONTENT_DESCRIPTION
                 )
             }
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_edit_data),
-                contentDescription = Constants.CONTENT_DESCRIPTION
-            )
         }
     }
     LaunchedEffect(key1 = Unit) {

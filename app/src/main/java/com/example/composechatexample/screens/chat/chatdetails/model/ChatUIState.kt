@@ -10,5 +10,6 @@ data class ChatUIState(
     val selectedMsgId: String = "",
     val message: String = "",
     val username: String = "",
+    val userId: String = "",
     val chatId: String = "",
 )

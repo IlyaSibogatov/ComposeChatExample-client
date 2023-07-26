@@ -83,6 +83,7 @@ class OnBoardingViewModel @Inject constructor(
                     when (it.status) {
                         HttpStatusCode.OK.value -> {
                             sendEvent(OnboardScreenEvent.NavigateTo(Constants.CHAT_LIST_ROUTE))
+                            preferencesManager.uuid = it.msg
                             preferencesManager.userName = uiState.value.username
                             preferencesManager.userLogged = true
                         }
@@ -124,6 +125,7 @@ class OnBoardingViewModel @Inject constructor(
                     when (it.status) {
                         HttpStatusCode.OK.value -> {
                             sendEvent(OnboardScreenEvent.NavigateTo(Constants.CHAT_LIST_ROUTE))
+                            preferencesManager.uuid = it.msg
                             preferencesManager.userName = uiState.value.username
                             preferencesManager.userLogged = true
                         }

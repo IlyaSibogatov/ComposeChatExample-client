@@ -3,11 +3,13 @@ package com.example.composechatexample.screens.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.composechatexample.data.preferences.PreferencesManager
+import com.example.composechatexample.data.remote.OnboardingService
 import com.example.composechatexample.screens.settings.model.SettingsScreenEvent
 import com.example.composechatexample.screens.settings.model.SettingsUIState
 import com.example.composechatexample.utils.Constants
 import com.example.composechatexample.utils.Constants.listLanguages
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,6 +20,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
+    private val onboardingService: OnboardingService,
     private val preferencesManager: PreferencesManager
 ) : ViewModel() {
 
@@ -51,8 +54,20 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun userLogOut() {
-        preferencesManager.clearData()
-        sendEvent(SettingsScreenEvent.NavigateTo(Constants.ONBOARD_ROUTE))
+        viewModelScope.launch {
+            onboardingService.logout(preferencesManager.uuid!!)?.let {
+                when (it.status) {
+                    HttpStatusCode.OK.value -> {
+                        preferencesManager.clearData()
+                        sendEvent(SettingsScreenEvent.NavigateTo(Constants.ONBOARD_ROUTE))
+                    }
+
+                    HttpStatusCode.NoContent.value -> {
+                        /** Show error */
+                    }
+                }
+            }
+        }
     }
 
     private fun sendEvent(event: SettingsScreenEvent) {
