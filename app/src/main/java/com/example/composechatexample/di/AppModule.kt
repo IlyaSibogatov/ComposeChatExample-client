@@ -8,6 +8,8 @@ import com.example.composechatexample.data.remote.MessageService
 import com.example.composechatexample.data.remote.MessageServiceImpl
 import com.example.composechatexample.data.remote.OnboardingService
 import com.example.composechatexample.data.remote.OnboardingServiceImpl
+import com.example.composechatexample.data.remote.UserService
+import com.example.composechatexample.data.remote.UserServiceImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -58,5 +60,11 @@ object AppModule {
     @Singleton
     fun provideOnboardingService(client: HttpClient): OnboardingService {
         return OnboardingServiceImpl(client)
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserService(client: HttpClient): UserService {
+        return UserServiceImpl(client)
     }
 }

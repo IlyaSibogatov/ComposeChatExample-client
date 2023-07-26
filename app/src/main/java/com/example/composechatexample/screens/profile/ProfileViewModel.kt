@@ -3,6 +3,8 @@ package com.example.composechatexample.screens.profile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.composechatexample.data.preferences.PreferencesManager
+import com.example.composechatexample.data.remote.UserService
+import com.example.composechatexample.domain.model.User
 import com.example.composechatexample.screens.profile.model.ProfileScreenEvent
 import com.example.composechatexample.utils.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,6 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
+    private val userService: UserService,
     private val preferencesManager: PreferencesManager
 ) : ViewModel() {
 
@@ -24,34 +27,35 @@ class ProfileViewModel @Inject constructor(
     private val eventChannel = Channel<ProfileScreenEvent>(Channel.BUFFERED)
     val eventsFlow = eventChannel.receiveAsFlow()
 
-    init {
-        _uiState.value = uiState.value.copy(
-            username = preferencesManager.userName
-        )
+    fun getProfile(uid: String?) {
+        viewModelScope.launch {
+            _uiState.value = uiState.value.copy(
+                loadingStatus = true
+            )
+            val response: User? =
+                userService.getUserById(uid ?: preferencesManager.uuid!!)
+            if (response != null) {
+                _uiState.value = uiState.value.copy(
+                    uid = response.id,
+                    username = response.username,
+                    selfInfo = response.selfInfo,
+                    onlineStatus = response.onlineStatus,
+                    lastActionTime = response.lastActionTime,
+                    gettingUserError = false,
+                )
+            } else {
+                _uiState.value = uiState.value.copy(
+                    gettingUserError = true,
+                )
+            }
+            _uiState.value = uiState.value.copy(
+                loadingStatus = false
+            )
+        }
     }
 
-    fun changeName(name: String) {
-        _uiState.value = uiState.value.copy(
-            name = name
-        )
-    }
-
-    fun changeNumber(number: String) {
-        _uiState.value = uiState.value.copy(
-            number = number
-        )
-    }
-
-    fun changeEmail(email: String) {
-        _uiState.value = uiState.value.copy(
-            email = email
-        )
-    }
-
-    fun allowCorrection() {
-        _uiState.value = uiState.value.copy(
-            canEditProfile = !uiState.value.canEditProfile
-        )
+    fun isMyProfile(): Boolean {
+        return uiState.value.uid == preferencesManager.uuid
     }
 
     fun openFriendList() {

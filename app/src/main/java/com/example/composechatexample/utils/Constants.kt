@@ -30,16 +30,12 @@ object Constants {
     const val CONTENT_DESCRIPTION = "Content description"
     const val CHAT_ID = "chat_id"
 
+    const val USER_UID = "user_uid"
+
     val listLanguages = listOf<LanguageEntity>(
         LanguageEntity("Русский", "ru"),
         LanguageEntity("English", "en"),
     )
-
-    const val SelfInfo =
-        "Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum" +
-                " Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem" +
-                " Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum " +
-                "Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum "
 
     // Use 10.0.2.2:8080 if emulator is used
     const val BASE_URL = "http://10.0.2.2:8080"

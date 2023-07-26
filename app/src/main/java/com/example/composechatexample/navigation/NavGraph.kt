@@ -32,6 +32,16 @@ fun NavGraph(
         composable(route = BottomNavBar.Profile.route) {
             ProfileScreen(navController)
         }
+        composable(
+            route = "${Constants.PROFILE_ROUTE}/{${Constants.USER_UID}}",
+            arguments = listOf(
+                navArgument(Constants.USER_UID) { type = NavType.StringType })
+        ) { backStackEntry ->
+            ProfileScreen(
+                navController,
+                backStackEntry.arguments?.getString(Constants.USER_UID)
+            )
+        }
         composable(route = Constants.ONBOARD_ROUTE) {
             OnBoardingScreen(navController)
         }

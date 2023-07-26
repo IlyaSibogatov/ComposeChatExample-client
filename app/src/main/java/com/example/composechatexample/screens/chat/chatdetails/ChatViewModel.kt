@@ -49,7 +49,11 @@ class ChatViewModel @Inject constructor(
         )
         viewModelScope.launch {
             when (val result =
-                socketService.initSession(preferencesManager.userName, uiState.value.chatId)) {
+                socketService.initSession(
+                    preferencesManager.userName,
+                    preferencesManager.uuid!!,
+                    uiState.value.chatId
+                )) {
                 is Resources.Success -> {
                     socketService.observeMessages(uiState.value.username)
                         .onEach { message ->
@@ -75,6 +79,7 @@ class ChatViewModel @Inject constructor(
                                                 id = it.id,
                                                 message = msg,
                                                 username = it.username,
+                                                userId = it.userId,
                                                 myMessage = it.myMessage,
                                                 wasEdit = it.message != msg,
                                                 formattedTime = it.formattedTime,
@@ -165,6 +170,7 @@ class ChatViewModel @Inject constructor(
                 SendType.REMOVE -> {
                     socketService.sendMessage(REMOVE_MESSAGE_ROUTE + uiState.value.selectedMsgId)
                 }
+
                 else -> {}
             }
             updateTypedMessage("")
@@ -182,8 +188,11 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    fun navigateToProfile() {
-        sendEvent(ChatScreenEvent.NavigateTo(Constants.PROFILE_ROUTE))
+    fun navigateToProfile(uid: String? = null) {
+        if (uid == null)
+            sendEvent(ChatScreenEvent.NavigateTo(Constants.PROFILE_ROUTE))
+        else
+            sendEvent(ChatScreenEvent.NavigateTo("${Constants.PROFILE_ROUTE}/${Constants.USER_UID}${uid}"))
     }
 
     private fun sendEvent(event: ChatScreenEvent) {

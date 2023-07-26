@@ -7,10 +7,14 @@ import com.example.composechatexample.utils.Constants
 interface OnboardingService {
     suspend fun login(userCredentials: UserCredentials): DefaultResponse?
 
-    suspend fun signup(userCredentials: UserCredentials):DefaultResponse?
+    suspend fun signup(userCredentials: UserCredentials): DefaultResponse?
+
+    suspend fun logout(uid: String): DefaultResponse?
 
     sealed class EndPoint(val url: String) {
         object Login : EndPoint("${Constants.BASE_URL}/login")
         object SignUp : EndPoint("${Constants.BASE_URL}/signup")
+
+        object Logout : EndPoint("${Constants.BASE_URL}/logout")
     }
 }

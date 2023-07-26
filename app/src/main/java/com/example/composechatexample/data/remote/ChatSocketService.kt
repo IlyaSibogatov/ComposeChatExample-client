@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.Flow
 interface ChatSocketService {
     suspend fun initSession(
         username: String,
+        userId: String,
         chatId: String,
     ): Resources<Unit>
 
