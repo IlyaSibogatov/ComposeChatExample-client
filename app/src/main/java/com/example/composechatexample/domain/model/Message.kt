@@ -13,5 +13,5 @@ data class Message(
 )
 
 enum class SendType {
-    REMOVE, SEND
+    REMOVE, SEND, EDIT
 }
