@@ -53,7 +53,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -61,7 +60,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavHostController
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.example.composechatexample.R
 import com.example.composechatexample.domain.model.Message
 import com.example.composechatexample.domain.model.SendType
@@ -73,7 +71,7 @@ import kotlinx.coroutines.flow.collectLatest
 @SuppressLint("UnrememberedMutableState")
 @RequiresApi(Build.VERSION_CODES.N)
 @OptIn(
-    ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class,
+    ExperimentalMaterial3Api::class,
     ExperimentalFoundationApi::class
 )
 @Composable
@@ -162,13 +160,11 @@ fun ChatScreen(
                                     }
                                 )
                             },
-                            onAvatarCLick = { /** navigate to profile owner */  }
-                        ) {
-                            expandedMenu.value = !expandedMenu.value
-                        }
+                            onAvatarCLick = { viewModel.navigateToProfile() }
+                        ) { expandedMenu.value = !expandedMenu.value }
                     } else {
                         GuestMessage(
-                            onAvatarCLick = { /** navigate to profile guest */ }
+                            onAvatarCLick = { viewModel.navigateToProfile(item.userId) }
                         ) {
                             ContentMessage(
                                 data = item,
@@ -290,7 +286,8 @@ private fun MyMessage(
         }
         menu()
         Icon(
-            modifier = Modifier.padding(bottom = 8.dp)
+            modifier = Modifier
+                .padding(bottom = 8.dp)
                 .clickable { onAvatarCLick() },
             painter = painterResource(id = R.drawable.ic_user),
             contentDescription = ""
@@ -313,7 +310,8 @@ private fun GuestMessage(
             horizontalArrangement = Arrangement.Start
         ) {
             Icon(
-                modifier = Modifier.padding(bottom = 8.dp)
+                modifier = Modifier
+                    .padding(bottom = 8.dp)
                     .clickable { onAvatarCLick() },
                 painter = painterResource(id = R.drawable.ic_user),
                 contentDescription = ""
@@ -408,10 +406,12 @@ private fun MenuItem(
     onCLick: () -> Unit
 ) {
     DropdownMenuItem(
-        text = { Text(
-            text = name,
-            color = MaterialTheme.colorScheme.onBackground
-        ) },
+        text = {
+            Text(
+                text = name,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        },
         onClick = {
             expanded.value = false
             onCLick()
@@ -451,15 +451,10 @@ private fun PreviewItemMy() {
 }
 
 val FakeMessage = Message(
-    id = "sdbfobsof",
-    message = "" + "YES"
-//           + "kdsfhbjhfdjgbshdbfgjhbsfhldfhgbsdf" +
-//            "sdf jsd fjjhds fgsdfbg;bg;s" +
-//            "fdsj jbsdfghbdfskgbk;dsfg;ndflnlg'ldsfg" +
-//            "dfbsdkfbgkbdfkbgkdsbfgbsdfkgbksbfgkbdsfb" +
-//            "kdfbkdbgfksbdfkgbdsgk"
-                   ,
-    username = "Krash",
+    id = "123",
+    message = "message",
+    userId = "",
+    username = "user",
     formattedTime = "22.03.12 12.35",
     myMessage = true,
     wasEdit = true,

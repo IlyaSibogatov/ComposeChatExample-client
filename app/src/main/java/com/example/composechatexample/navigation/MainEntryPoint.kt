@@ -1,5 +1,7 @@
 package com.example.composechatexample.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -12,13 +14,11 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -30,6 +30,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.composechatexample.R
 import com.example.composechatexample.utils.Constants
 
+@RequiresApi(Build.VERSION_CODES.N)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainEntryPoint() {
@@ -52,8 +53,9 @@ fun MainEntryPoint() {
     val newBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = newBackStackEntry?.destination
 
-    val showBottomBar = navController
-        .currentBackStackEntryAsState().value?.destination?.route in screensToShowBottomBar.map { it.route }
+    val showBottomBar =
+        navController.currentBackStackEntryAsState()
+            .value?.destination?.route in screensToShowBottomBar.map { it.route }
 
     Scaffold(
         topBar = {
@@ -82,8 +84,8 @@ fun MainEntryPoint() {
                             }
                             Text(
                                 text = screens.find {
-                                currentDestination?.route.toString() == (it.route)
-                            }!!.title,
+                                    currentDestination?.route.toString() == (it.route)
+                                }!!.title,
                                 color = MaterialTheme.colorScheme.onPrimary
                             )
                         }

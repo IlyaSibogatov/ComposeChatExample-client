@@ -31,4 +31,12 @@ class OnboardingServiceImpl(
             null
         }
     }
+
+    override suspend fun logout(uid: String): DefaultResponse? {
+        return try {
+            client.post<DefaultResponse>("${OnboardingService.EndPoint.Logout.url}?uid=$uid")
+        } catch (e: Exception) {
+            null
+        }
+    }
 }

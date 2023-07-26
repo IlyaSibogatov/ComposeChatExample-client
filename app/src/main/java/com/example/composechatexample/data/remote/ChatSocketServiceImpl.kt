@@ -24,10 +24,14 @@ class ChatSocketServiceImpl(
 ) : ChatSocketService {
 
     private var socket: WebSocketSession? = null
-    override suspend fun initSession(username: String, chatId: String): Resources<Unit> {
+    override suspend fun initSession(
+        username: String,
+        userId: String,
+        chatId: String
+    ): Resources<Unit> {
         return try {
             socket = client.webSocketSession {
-                url("${ChatSocketService.EndPoint.ChatSocketRoute.url}?username=$username&chatId=$chatId")
+                url("${ChatSocketService.EndPoint.ChatSocketRoute.url}?username=$username&userId=$userId&chatId=$chatId")
             }
             if (socket?.isActive == true) Resources.Success(Unit)
             else Resources.Error("Couldn't establish connection")
