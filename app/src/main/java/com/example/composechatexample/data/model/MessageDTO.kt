@@ -10,6 +10,7 @@ data class MessageDTO(
     val timestamp: Long,
     val message: String,
     val username: String,
+    val userId: String,
     val wasEdit: Boolean,
 ) {
     fun toMessage(myName: String): Message {
@@ -22,6 +23,7 @@ data class MessageDTO(
             message = message,
             formattedTime = fd,
             username = username,
+            userId = userId,
             wasEdit = wasEdit,
             myMessage = username == myName
         )
