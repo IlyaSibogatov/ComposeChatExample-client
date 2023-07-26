@@ -2,33 +2,38 @@ package com.example.composechatexample.screens.onboarding
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.composechatexample.R
+import com.example.composechatexample.screens.onboarding.model.OnBoardingUIState
 import com.example.composechatexample.screens.onboarding.model.OnboardScreenEvent
 import com.example.composechatexample.utils.Constants
 import kotlinx.coroutines.flow.collectLatest
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OnBoardingScreen(
     navController: NavHostController,
@@ -47,80 +52,34 @@ fun OnBoardingScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        OutlinedTextField(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+        SignUpField(
             value = uiState.value.username,
-            onValueChange = { newText ->
-                viewModel.updateUsername(newText)
-            },
-            colors = TextFieldDefaults.textFieldColors(
-                containerColor = Color.White,
-                disabledIndicatorColor = Color.Transparent,
-            ),
-            label = { Text(stringResource(id = R.string.username_hint)) },
-            shape = MaterialTheme.shapes.small,
+            text = stringResource(id = R.string.username_hint),
             isError = uiState.value.errors.usernameError,
-            supportingText = {
-                if (uiState.value.errors.usernameError) {
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = stringResource(id = R.string.check_username),
-                        color = MaterialTheme.colorScheme.error
-                    )
-                } else if (uiState.value.errors.usernameEmptyError) {
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = stringResource(id = R.string.username_cant_be_empty),
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
-            },
-            singleLine = true,
+            checkError = { CheckUserName(uiState = uiState) },
+            onValueChange = viewModel::updateUsername
         )
-        OutlinedTextField(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+        SignUpField(
             value = uiState.value.password,
-            onValueChange = { newText ->
-                viewModel.updatePassword(newText)
-            },
-            colors = TextFieldDefaults.textFieldColors(
-                containerColor = Color.White,
-                disabledIndicatorColor = Color.Transparent,
-            ),
-            label = { Text(stringResource(id = R.string.password_hint)) },
-            shape = MaterialTheme.shapes.small,
+            text = stringResource(id = R.string.password_hint),
             isError = uiState.value.errors.passwordError,
-            supportingText = {
-                if (uiState.value.errors.passwordError) {
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = stringResource(id = R.string.check_password),
-                        color = MaterialTheme.colorScheme.error
-                    )
-                } else if (uiState.value.errors.passwordEmptyError) {
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = stringResource(id = R.string.password_cant_be_empty),
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
-            },
-            singleLine = true,
+            checkError = { CheckPassword(uiState = uiState) },
+            onValueChange = viewModel::updatePassword
         )
         Button(
             onClick = {
                 if (!uiState.value.showSignUp) viewModel.login() else viewModel.signup()
             }
         ) {
-            Text(text = stringResource(id = if (!uiState.value.showSignUp) R.string.login_label else R.string.signup_label))
+            Text(
+                text = stringResource(id = if (!uiState.value.showSignUp) R.string.login_label else R.string.signup_label),
+                style = MaterialTheme.typography.headlineLarge
+            )
         }
         if (!uiState.value.showSignUp) {
             Text(
-                text = stringResource(id = R.string.havent_account)
+                text = stringResource(id = R.string.havent_account),
+                style = MaterialTheme.typography.labelLarge
             )
             Text(
                 modifier = Modifier
@@ -128,7 +87,7 @@ fun OnBoardingScreen(
                         onClick = viewModel::changeState
                     ),
                 text = stringResource(id = R.string.signup_label),
-                color = Color.Gray
+                style = MaterialTheme.typography.bodyMedium
             )
         }
     }
@@ -143,4 +102,55 @@ fun OnBoardingScreen(
             }
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SignUpField(
+    value: String,
+    text: String,
+    isError: Boolean,
+    checkError: @Composable () -> Unit,
+    onValueChange: (String) -> Unit
+) {
+    OutlinedTextField(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(text = text) },
+        shape = MaterialTheme.shapes.small,
+        isError = isError,
+        supportingText = { checkError() },
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
+    )
+}
+
+@Composable
+fun CheckUserName(uiState: State<OnBoardingUIState>) {
+    if (uiState.value.errors.usernameError) {
+        ErrorText(text = stringResource(id = R.string.check_username))
+    } else if (uiState.value.errors.usernameEmptyError) {
+        ErrorText(text = stringResource(id = R.string.username_cant_be_empty))
+    }
+}
+
+@Composable
+fun CheckPassword(uiState: State<OnBoardingUIState>) {
+    if (uiState.value.errors.passwordError) {
+        ErrorText(text = stringResource(id = R.string.check_password))
+    } else if (uiState.value.errors.passwordEmptyError) {
+        ErrorText(text = stringResource(id = R.string.password_cant_be_empty))
+    }
+}
+
+@Composable
+fun ErrorText(text: String) {
+    Text(
+        modifier = Modifier.fillMaxWidth(),
+        text = text,
+        color = MaterialTheme.colorScheme.error
+    )
 }

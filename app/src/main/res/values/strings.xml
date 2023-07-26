@@ -27,8 +27,8 @@
 
     <!--  Chat List Screen  -->
     <string name="find_chat">Find chat</string>
-    <string name="owner_label">owner: %1$s</string>
-    <string name="date_label">date: %1$s</string>
+    <string name="owner_label">Owner: %1$s</string>
+    <string name="date_label">Date: %1$s</string>
 
     <string name="public_chat_lable">Public chat</string>
     <string name="private_chat_lable">Private chat</string>
@@ -45,7 +45,7 @@
     <!--  Chat Screen  -->
     <string name="edit_message">Edit</string>
     <string name="remove_message">Remove</string>
-    <string name="message_was_edit">was edited</string>
+    <string name="message_was_edit">was edited </string>
     <string name="edit_message_label">Message edite</string>
     <string name="enter_message">Enter a message</string>
 
