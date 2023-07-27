@@ -62,6 +62,12 @@ class ProfileViewModel @Inject constructor(
         sendEvent(ProfileScreenEvent.NavigateTo(Constants.FRIENDS_LIST_ROUTE))
     }
 
+    fun selfInfoOverflowed(overflowed: Boolean) {
+        _uiState.value = uiState.value.copy(
+            infoOverflowed = overflowed
+        )
+    }
+
     private fun sendEvent(event: ProfileScreenEvent) {
         viewModelScope.launch {
             eventChannel.send(event)

@@ -1,5 +1,7 @@
 package com.example.composechatexample.screens.profile
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -12,11 +14,12 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -64,7 +67,7 @@ fun ProfileScreen(
     ) {
         val (
             photo, username, friendListEt, friendListLc, selfInfoPreview,
-            editBtn, userOfflineTime, showMore, selfInfo, addToFriend, userStatus
+            editBtn, showMore, selfInfo, addToFriend, userStatus,
         ) = createRefs()
         Card(
             modifier = Modifier
@@ -147,34 +150,41 @@ fun ProfileScreen(
                     top.linkTo(selfInfoPreview.bottom)
                     start.linkTo(parent.start)
                 },
-            text = uiState.value.selfInfo,
+            text = uiState.value.selfInfo.ifEmpty {
+                stringResource(id = R.string.info_dont_filled)
+            },
             fontSize = 16.sp,
             maxLines = 3,
             overflow = TextOverflow.Ellipsis,
+            onTextLayout = {
+                viewModel.selfInfoOverflowed(it.hasVisualOverflow)
+            }
         )
-
-        Text(
-            modifier = Modifier
-                .clickable {
-                    showToast(
-                        context = context,
-                        context.resources.getString(R.string.development)
-                    )
-                }
-                .constrainAs(showMore) {
-                    top.linkTo(selfInfo.bottom)
-                    start.linkTo(parent.start)
-                },
-            color = Color.Blue,
-            text = stringResource(id = R.string.show_more),
-        )
+        if (uiState.value.infoOverflowed) {
+            Text(
+                modifier = Modifier
+                    .background(MaterialTheme.colorScheme.background)
+                    .clickable {
+                        showToast(
+                            context = context,
+                            context.resources.getString(R.string.development)
+                        )
+                    }
+                    .constrainAs(showMore) {
+                        bottom.linkTo(selfInfo.bottom)
+                        end.linkTo(selfInfo.end)
+                    },
+                color = Color.Blue,
+                text = stringResource(id = R.string.show_more),
+            )
+        }
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 8.dp)
                 .constrainAs(friendListEt) {
                     start.linkTo(parent.start)
-                    top.linkTo(showMore.bottom)
+                    top.linkTo(selfInfo.bottom)
                 },
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
@@ -185,16 +195,6 @@ fun ProfileScreen(
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
             )
-            Button(
-                onClick = viewModel::openFriendList
-            ) {
-                Text(
-                    text = stringResource(id = R.string.string_open),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
-                )
-            }
         }
         LazyColumn(
             modifier = Modifier
@@ -207,10 +207,14 @@ fun ProfileScreen(
                     height = Dimension.fillToConstraints
                 }
         ) {
-            items(uiState.value.friendList.take(3)) { item ->
+            items(uiState.value.friendList.take(5)) { item ->
                 Card(
                     modifier = Modifier
-                        .padding(bottom = 5.dp),
+                        .padding(bottom = 1.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor =
+                        MaterialTheme.colorScheme.primaryContainer
+                    ),
                     onClick = {
                         showToast(
                             context = context,
@@ -218,7 +222,7 @@ fun ProfileScreen(
                                 R.string.development
                             )
                         )
-                    }
+                    },
                 ) {
                     ConstraintLayout(
                         modifier = Modifier.fillMaxWidth()
@@ -281,6 +285,28 @@ fun ProfileScreen(
                             contentDescription = Constants.CONTENT_DESCRIPTION
                         )
                     }
+                }
+            }
+            item {
+                Card(
+                    modifier = Modifier
+                        .padding(bottom = 5.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer
+                    ),
+                    onClick = viewModel::openFriendList,
+                    elevation = CardDefaults.cardElevation(3.dp),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground)
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        text = stringResource(id = R.string.view_friends),
+                        textAlign = TextAlign.Center,
+                        fontSize = 16.sp,
+                        maxLines = 1,
+                    )
                 }
             }
         }
