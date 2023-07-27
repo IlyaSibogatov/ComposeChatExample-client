@@ -17,3 +17,7 @@ data class NewChat(
     val password: String,
     val owner: String,
 )
+
+enum class ChatEvent {
+    EDIT, REMOVE
+}

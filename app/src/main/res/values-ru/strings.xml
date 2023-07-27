@@ -24,7 +24,10 @@
     <string name="friend_list">Список друзей</string>
     <string name="string_open">Открыть</string>
     <string name="add_to_friend">Добавить в друзья</string>
+    <string name="info_dont_filled">Информация не заполнена</string>
     <string name="show_more">Показать больше</string>
+
+    <string name="view_friends">Все друзья</string>
 
     <!--  Chat List Screen  -->
     <string name="find_chat">Найти чат</string>
@@ -44,8 +47,8 @@
     <string name="accept_label">Подтвердить</string>
 
     <!--  Chat Screen  -->
-    <string name="edit_message">Изменить</string>
-    <string name="remove_message">Удалить</string>
+    <string name="edit">Изменить</string>
+    <string name="remove">Удалить</string>
     <string name="message_was_edit">изменено </string>
     <string name="edit_message_label">Изменение сообщения</string>
     <string name="enter_message">Введите сообщение</string>
@@ -69,4 +72,8 @@
     <string name="chat_list_title">Чаты</string>
     <string name="profile_title">Профиль</string>
     <string name="settings_title">Настройки</string>
+
+    <!--  Exception message  -->
+    <string name="error_toast">Не удалось обработать запрос</string>
+    <string name="exception_toast">Непредвиденная ошибка</string>
 </resources>

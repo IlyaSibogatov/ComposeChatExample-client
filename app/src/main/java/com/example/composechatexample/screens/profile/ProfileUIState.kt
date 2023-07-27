@@ -6,6 +6,7 @@ data class ProfileUIState(
     val uid: String = "",
     val username: String = "",
     val selfInfo: String = "",
+    val infoOverflowed: Boolean = false,
     val onlineStatus: Boolean = false,
     val loadingStatus: Boolean = false,
     val gettingUserError: Boolean = false,
