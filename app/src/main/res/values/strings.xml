@@ -23,7 +23,9 @@
     <string name="friend_list">Friend`s list</string>
     <string name="string_open">Open</string>
     <string name="add_to_friend">Add to friend</string>
+    <string name="info_dont_filled">The information is not filled out</string>
     <string name="show_more">Show more</string>
+    <string name="view_friends">All friends</string>
 
     <!--  Chat List Screen  -->
     <string name="find_chat">Find chat</string>
@@ -43,8 +45,8 @@
     <string name="accept_label">Accept</string>
 
     <!--  Chat Screen  -->
-    <string name="edit_message">Edit</string>
-    <string name="remove_message">Remove</string>
+    <string name="edit">Edit</string>
+    <string name="remove">Remove</string>
     <string name="message_was_edit">was edited </string>
     <string name="edit_message_label">Message edite</string>
     <string name="enter_message">Enter a message</string>
@@ -68,4 +70,8 @@
     <string name="chat_list_title">Chats</string>
     <string name="profile_title">Profile</string>
     <string name="settings_title">Settings</string>
+
+    <!--  Exception message  -->
+    <string name="error_toast">Failed to process request</string>
+    <string name="exception_toast">Unforeseen error</string>
 </resources>

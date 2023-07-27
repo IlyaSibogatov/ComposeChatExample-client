@@ -1,9 +1,7 @@
 package com.example.composechatexample.screens.chat.chatdetails
 
 import android.annotation.SuppressLint
-import android.os.Build
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.LocalOverscrollConfiguration
 import androidx.compose.foundation.background
@@ -25,11 +23,9 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -64,12 +60,12 @@ import com.example.composechatexample.R
 import com.example.composechatexample.domain.model.Message
 import com.example.composechatexample.domain.model.SendType
 import com.example.composechatexample.screens.chat.chatdetails.model.ChatScreenEvent
-import com.example.composechatexample.utils.CircularLoader
+import com.example.composechatexample.utils.components.CircularLoader
 import com.example.composechatexample.utils.Constants
+import com.example.composechatexample.utils.components.MenuItem
 import kotlinx.coroutines.flow.collectLatest
 
 @SuppressLint("UnrememberedMutableState")
-@RequiresApi(Build.VERSION_CODES.N)
 @OptIn(
     ExperimentalMaterial3Api::class,
     ExperimentalFoundationApi::class
@@ -383,43 +379,20 @@ private fun ShowMenuMessage(
             }
         ) {
             MenuItem(
-                name = stringResource(id = R.string.edit_message),
+                name = stringResource(id = R.string.edit),
                 expanded = expanded
             ) {
                 onCLick(SendType.EDIT)
             }
 
             MenuItem(
-                name = stringResource(id = R.string.remove_message),
+                name = stringResource(id = R.string.remove),
                 expanded = expanded
             ) {
                 onCLick(SendType.REMOVE)
             }
         }
     }
-}
-
-@Composable
-private fun MenuItem(
-    name: String,
-    expanded: MutableState<Boolean>,
-    onCLick: () -> Unit
-) {
-    DropdownMenuItem(
-        text = {
-            Text(
-                text = name,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-        },
-        onClick = {
-            expanded.value = false
-            onCLick()
-        },
-        colors = MenuDefaults.itemColors(
-            textColor = MaterialTheme.colorScheme.onBackground
-        )
-    )
 }
 
 @Preview

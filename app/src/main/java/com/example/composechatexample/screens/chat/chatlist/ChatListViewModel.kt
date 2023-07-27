@@ -60,7 +60,8 @@ class ChatListViewModel @Inject constructor(
         _uiState.value = uiState.value.copy(
             chatInfo = item
         )
-        if (uiState.value.chatInfo!!.password.isBlank() || uiState.value.username == uiState.value.chatInfo!!.owner)
+        if (uiState.value.chatInfo!!.password.isBlank() ||
+            uiState.value.username == uiState.value.chatInfo!!.owner)
             navigateToRoom()
         else _uiState.value = uiState.value.copy(
             dialogs = DisplayDialog(
@@ -68,6 +69,40 @@ class ChatListViewModel @Inject constructor(
             )
         )
         return item.owner == uiState.value.username || item.password.isBlank()
+    }
+
+    fun deleteChat() {
+        uiState.value.chatInfo?.id?.let {
+            viewModelScope.launch {
+                messageService.deleteChat(it).let {
+                    when (it) {
+                        true -> {
+                            loadChatList()
+                        }
+                        false -> {
+                            sendEvent(ChatListScreenEvent.ToastEvent(ERROR))
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun chatLongClick(item: Chat): Boolean? {
+        return if (item.owner == preferencesManager.userName) {
+            _uiState.value = uiState.value.copy(
+                chatInfo = item,
+            )
+            true
+        } else null
+    }
+
+    fun showEditChatDialog() {
+        _uiState.value = uiState.value.copy(
+            dialogs = DisplayDialog(
+                editDialog = !uiState.value.dialogs.createDialog
+            )
+        )
     }
 
     fun showAlertDialog(chat: Chat?) {
@@ -231,5 +266,9 @@ class ChatListViewModel @Inject constructor(
         viewModelScope.launch {
             eventChannel.send(event)
         }
+    }
+
+    companion object {
+        const val ERROR = "error"
     }
 }

@@ -48,4 +48,15 @@ class MessageServiceImpl(
             null
         }
     }
+
+    override suspend fun deleteChat(chatId: String): Boolean {
+        return try {
+            client.post<Boolean>(MessageService.EndPoint.DeleteChat.url){
+                url.parameters.append("chatId", chatId)
+            }
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
 }

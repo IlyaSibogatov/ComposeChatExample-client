@@ -1,7 +1,5 @@
 package com.example.composechatexample.screens.chat.chatdetails
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.composechatexample.data.preferences.PreferencesManager
@@ -41,7 +39,6 @@ class ChatViewModel @Inject constructor(
         )
     }
 
-    @RequiresApi(Build.VERSION_CODES.N)
     fun connectToChat() {
         _uiState.value = uiState.value.copy(
             username = preferencesManager.userName,

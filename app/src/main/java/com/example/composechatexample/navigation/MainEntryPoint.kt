@@ -1,7 +1,5 @@
 package com.example.composechatexample.navigation
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -30,7 +28,6 @@ import androidx.navigation.compose.rememberNavController
 import com.example.composechatexample.R
 import com.example.composechatexample.utils.Constants
 
-@RequiresApi(Build.VERSION_CODES.N)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainEntryPoint() {
@@ -106,7 +103,11 @@ fun MainEntryPoint() {
                             label = {
                                 Text(
                                     text = stringResource(id = screen.title),
-                                    color = if (isCurrentDestination(currentDestination, screen.route))
+                                    color = if (isCurrentDestination(
+                                            currentDestination,
+                                            screen.route
+                                        )
+                                    )
                                         MaterialTheme.colorScheme.onPrimary
                                     else MaterialTheme.colorScheme.surface
                                 )
@@ -115,16 +116,22 @@ fun MainEntryPoint() {
                                 Icon(
                                     painterResource(id = screen.icon),
                                     contentDescription = Constants.CONTENT_DESCRIPTION,
-                                    tint = if (isCurrentDestination(currentDestination, screen.route))
+                                    tint = if (isCurrentDestination(
+                                            currentDestination,
+                                            screen.route
+                                        )
+                                    )
                                         MaterialTheme.colorScheme.onPrimaryContainer
                                     else MaterialTheme.colorScheme.surface
                                 )
                             },
                             selected = isCurrentDestination(currentDestination, screen.route),
                             onClick = {
-                                navController.navigate(screen.route) {
-                                    popUpTo(navController.graph.findStartDestination().id)
-                                    launchSingleTop = true
+                                if (navController.currentDestination?.route != screen.route) {
+                                    navController.navigate(screen.route) {
+                                        popUpTo(navController.graph.findStartDestination().id)
+                                        launchSingleTop = true
+                                    }
                                 }
                             },
                         )
@@ -145,6 +152,6 @@ fun MainEntryPoint() {
     }
 }
 
-private fun isCurrentDestination(currentDestination: NavDestination?, route: String) : Boolean {
-    return currentDestination?.hierarchy?.any{ it.route == route} == true
+private fun isCurrentDestination(currentDestination: NavDestination?, route: String): Boolean {
+    return currentDestination?.hierarchy?.any { it.route == route } == true
 }
