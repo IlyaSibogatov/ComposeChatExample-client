@@ -18,6 +18,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,10 +35,13 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavHostController
 import com.example.composechatexample.R
+import com.example.composechatexample.components.ShowMenu
+import com.example.composechatexample.utils.TypeTheme
 import com.example.composechatexample.screens.settings.model.SettingsScreenEvent
 import com.example.composechatexample.screens.settings.model.SettingsUIState
 import com.example.composechatexample.utils.Constants
 import com.example.composechatexample.utils.Ext
+import com.example.composechatexample.utils.Type
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 
@@ -139,16 +144,15 @@ fun ApplicationSettings(
                 contentDescription = Constants.CONTENT_DESCRIPTION
             )
         }
-
+        val expandedMenu = remember {
+            mutableStateOf(false)
+        }
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable(
                     onClick = {
-                        Ext.showToast(
-                            context = context,
-                            context.resources.getString(R.string.development)
-                        )
+                        expandedMenu.value = true
                     }
                 )
                 .padding(vertical = 8.dp),
@@ -156,14 +160,30 @@ fun ApplicationSettings(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column() {
+
                 Text(
                     text = stringResource(id = R.string.theme_settings),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                 )
                 Text(
-                    text = uiState.value.theme,
+                    text = when (uiState.value.theme) {
+                        TypeTheme.SYSTEM.name -> stringResource(id = R.string.theme_text_system)
+                        TypeTheme.LIGHT.name -> stringResource(id = R.string.theme_text_light)
+                        else -> stringResource(id = R.string.theme_text_dark)
+                    },
                     fontSize = 16.sp,
+                )
+                ShowMenu(
+                    expanded = expandedMenu,
+                    data = listOf(
+                        Type(nameType = TypeTheme.SYSTEM, str = R.string.theme_text_system),
+                        Type(nameType = TypeTheme.DARK, str = R.string.theme_text_dark),
+                        Type(nameType = TypeTheme.LIGHT, str = R.string.theme_text_light),
+                    ),
+                    onCLick = {
+                        viewModel.saveTheme(it)
+                    }
                 )
             }
             Image(

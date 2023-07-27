@@ -2,6 +2,7 @@ package com.example.composechatexample.data.preferences
 
 import android.content.SharedPreferences
 import com.example.composechatexample.data.model.LanguageEntity
+import com.example.composechatexample.utils.TypeTheme
 import com.google.gson.Gson
 import javax.inject.Inject
 
@@ -17,7 +18,7 @@ class PreferencesManager @Inject constructor(
         set(value) = sharedPreferences.edit().putString(USER_NAME, value).apply()
 
     var theme: String
-        get() = sharedPreferences.getString(THEME, "Light").toString()
+        get() = sharedPreferences.getString(THEME, TypeTheme.SYSTEM.name).toString()
         set(value) = sharedPreferences.edit().putString(THEME, value).apply()
 
     var privacy: String

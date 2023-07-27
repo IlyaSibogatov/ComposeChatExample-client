@@ -8,6 +8,7 @@ import com.example.composechatexample.screens.settings.model.SettingsScreenEvent
 import com.example.composechatexample.screens.settings.model.SettingsUIState
 import com.example.composechatexample.utils.Constants
 import com.example.composechatexample.utils.Constants.listLanguages
+import com.example.composechatexample.utils.TypeTheme
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.channels.Channel
@@ -68,6 +69,10 @@ class SettingsViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun saveTheme(type: TypeTheme) {
+        preferencesManager.theme = type.name
     }
 
     private fun sendEvent(event: SettingsScreenEvent) {

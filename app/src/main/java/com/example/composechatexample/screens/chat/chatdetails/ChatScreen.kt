@@ -22,7 +22,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -34,7 +33,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -57,12 +55,14 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavHostController
 import com.example.composechatexample.R
+import com.example.composechatexample.components.CircularLoader
+import com.example.composechatexample.components.CustomIconButton
+import com.example.composechatexample.components.ShowMenu
 import com.example.composechatexample.domain.model.Message
-import com.example.composechatexample.domain.model.SendType
 import com.example.composechatexample.screens.chat.chatdetails.model.ChatScreenEvent
-import com.example.composechatexample.utils.components.CircularLoader
 import com.example.composechatexample.utils.Constants
-import com.example.composechatexample.utils.components.MenuItem
+import com.example.composechatexample.utils.SendType
+import com.example.composechatexample.utils.Type
 import kotlinx.coroutines.flow.collectLatest
 
 @SuppressLint("UnrememberedMutableState")
@@ -91,8 +91,7 @@ fun ChatScreen(
                             modifier = Modifier
                                 .height(28.dp)
                                 .fillMaxWidth()
-                                .background(MaterialTheme.colorScheme.primaryContainer)
-                                .clickable(onClick = { viewModel.editSelect(false) }),
+                                .background(MaterialTheme.colorScheme.primaryContainer),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = CenterVertically
                         ) {
@@ -103,12 +102,11 @@ fun ChatScreen(
                                 fontSize = 18.sp,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer
                             )
-                            Icon(
-                                modifier = Modifier
-                                    .align(CenterVertically),
-                                painter = painterResource(R.drawable.ic_clear),
-                                contentDescription = Constants.CONTENT_DESCRIPTION,
-                                tint = MaterialTheme.colorScheme.primary
+                            CustomIconButton(
+                                modifier = Modifier.align(CenterVertically),
+                                imageId = R.drawable.ic_clear,
+                                color = MaterialTheme.colorScheme.primary,
+                                onClick = { viewModel.editSelect(false) }
                             )
                         }
                         Divider(
@@ -144,8 +142,12 @@ fun ChatScreen(
                                 )
                             },
                             menu = {
-                                ShowMenuMessage(
+                                ShowMenu(
                                     expanded = expandedMenu,
+                                    data = listOf(
+                                        Type(nameType = SendType.EDIT, str = R.string.edit),
+                                        Type(nameType = SendType.REMOVE, str = R.string.remove),
+                                    ),
                                     onCLick = { type ->
                                         viewModel.updateSelectedItem(item.id)
                                         when (type) {
@@ -215,21 +217,20 @@ private fun SendingField(
             label = {
                 Text(
                     text = stringResource(id = R.string.enter_message),
-                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             },
             trailingIcon = {
-                Icon(
-                    modifier = Modifier
-                        .clickable { onSendClick() },
-                    painter = painterResource(R.drawable.ic_send_message),
-                    contentDescription = Constants.CONTENT_DESCRIPTION,
-                    tint = MaterialTheme.colorScheme.primary
+                CustomIconButton(
+                    imageId = R.drawable.ic_send_message,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    onClick = { onSendClick() }
                 )
             },
             maxLines = 5,
             colors = TextFieldDefaults.textFieldColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer
+                containerColor = MaterialTheme.colorScheme.primary,
+                textColor = MaterialTheme.colorScheme.onPrimary
             )
         )
     }
@@ -286,7 +287,7 @@ private fun MyMessage(
                 .padding(bottom = 8.dp)
                 .clickable { onAvatarCLick() },
             painter = painterResource(id = R.drawable.ic_user),
-            contentDescription = ""
+            contentDescription = Constants.CONTENT_DESCRIPTION
         )
     }
 }
@@ -360,39 +361,6 @@ private fun ContentMessage(
         color = colorText,
         style = MaterialTheme.typography.bodyMedium
     )
-}
-
-@Composable
-private fun ShowMenuMessage(
-    expanded: MutableState<Boolean>,
-    onCLick: (type: SendType) -> Unit,
-) {
-    Column(
-        horizontalAlignment = Alignment.End
-    ) {
-        DropdownMenu(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.background),
-            expanded = expanded.value,
-            onDismissRequest = {
-                expanded.value = false
-            }
-        ) {
-            MenuItem(
-                name = stringResource(id = R.string.edit),
-                expanded = expanded
-            ) {
-                onCLick(SendType.EDIT)
-            }
-
-            MenuItem(
-                name = stringResource(id = R.string.remove),
-                expanded = expanded
-            ) {
-                onCLick(SendType.REMOVE)
-            }
-        }
-    }
 }
 
 @Preview
