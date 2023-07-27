@@ -23,6 +23,10 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    fun getTheme(): String {
+        return preferencesManager.theme
+    }
+
     companion object {
         private const val ENGLISH_LANGUAGE_CODE = "en"
     }
