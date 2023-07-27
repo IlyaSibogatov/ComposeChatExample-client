@@ -1,4 +1,4 @@
-package com.example.composechatexample.utils
+package com.example.composechatexample.utils.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize

@@ -1,7 +1,5 @@
 package com.example.composechatexample.navigation
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -17,7 +15,6 @@ import com.example.composechatexample.screens.settings.SettingsScreen
 import com.example.composechatexample.screens.settings.languages.LanguageScreen
 import com.example.composechatexample.utils.Constants
 
-@RequiresApi(Build.VERSION_CODES.N)
 @Composable
 fun NavGraph(
     navController: NavHostController,
