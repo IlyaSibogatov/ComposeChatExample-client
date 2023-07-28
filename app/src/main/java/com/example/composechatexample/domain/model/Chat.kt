@@ -13,6 +13,7 @@ data class Chat(
 
 @Serializable
 data class NewChat(
+    val id: String,
     val name: String,
     val password: String,
     val owner: String,

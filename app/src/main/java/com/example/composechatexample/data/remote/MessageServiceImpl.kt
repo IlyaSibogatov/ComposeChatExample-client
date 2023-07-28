@@ -49,9 +49,21 @@ class MessageServiceImpl(
         }
     }
 
+    override suspend fun updateChat(chat: NewChat): DefaultResponse? {
+        return try {
+            client.post<DefaultResponse>(MessageService.EndPoint.UpdateChat.url) {
+                body = chat
+                contentType(ContentType.Application.Json)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
     override suspend fun deleteChat(chatId: String): Boolean {
         return try {
-            client.post<Boolean>(MessageService.EndPoint.DeleteChat.url){
+            client.post<Boolean>(MessageService.EndPoint.DeleteChat.url) {
                 url.parameters.append("chatId", chatId)
             }
         } catch (e: java.lang.Exception) {

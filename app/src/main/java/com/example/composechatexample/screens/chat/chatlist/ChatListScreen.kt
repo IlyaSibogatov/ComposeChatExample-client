@@ -153,7 +153,7 @@ fun ChatListScreen(
                                 onClick = { type ->
                                     when (type) {
                                         ChatEvent.EDIT -> {
-                                            viewModel.showEditChatDialog()
+                                            viewModel.showCreateDialog(true)
                                             expandedMenu.value = !expandedMenu.value
                                         }
 
