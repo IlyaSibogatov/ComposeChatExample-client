@@ -157,6 +157,7 @@ class ChatListViewModel @Inject constructor(
 
     fun showCreateDialog(editChat: Boolean = false) {
         _uiState.value = uiState.value.copy(
+            updateChat = editChat,
             dialogs = DisplayDialog(
                 createDialog = !uiState.value.dialogs.createDialog
             )
@@ -238,12 +239,14 @@ class ChatListViewModel @Inject constructor(
             )
         } else {
             viewModelScope.launch {
-                if (uiState.value.chatInfo != null) {
+                if (uiState.value.updateChat) {
                     messageService.updateChat(
                         NewChat(
-                            id = uiState.value.chatInfo!!.id,
                             name = uiState.value.createdChat.chatName,
-                            password = uiState.value.createdChat.chatPass,
+                            password = if (
+                                uiState.value.createdChat.passEnable
+                            ) uiState.value.createdChat.chatPass
+                            else "",
                             owner = uiState.value.username,
                         )
                     )?.let {
@@ -252,9 +255,11 @@ class ChatListViewModel @Inject constructor(
                 } else {
                     messageService.createChat(
                         NewChat(
-                            id = uiState.value.chatInfo?.id ?: "",
                             name = uiState.value.createdChat.chatName,
-                            password = uiState.value.createdChat.chatPass,
+                            password = if (
+                                uiState.value.createdChat.passEnable
+                            ) uiState.value.createdChat.chatPass
+                            else "",
                             owner = uiState.value.username,
                         )
                     )?.let {
