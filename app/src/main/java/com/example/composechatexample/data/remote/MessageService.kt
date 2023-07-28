@@ -13,12 +13,15 @@ interface MessageService {
 
     suspend fun createChat(chat: NewChat): DefaultResponse?
 
+    suspend fun updateChat(chat: NewChat): DefaultResponse?
+
     suspend fun deleteChat(chatId: String): Boolean
 
     sealed class EndPoint(val url: String) {
         object GetAllMessages : EndPoint("$BASE_URL/messages")
         object GetAllChats : EndPoint("$BASE_URL/chats")
         object CreateChat : EndPoint("$BASE_URL/create")
+        object UpdateChat : EndPoint("$BASE_URL/update")
         object DeleteChat : EndPoint("$BASE_URL/delete")
     }
 }
