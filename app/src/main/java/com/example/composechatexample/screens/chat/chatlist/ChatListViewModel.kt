@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.composechatexample.data.preferences.PreferencesManager
 import com.example.composechatexample.data.remote.MessageService
+import com.example.composechatexample.data.response.DefaultResponse
 import com.example.composechatexample.domain.model.Chat
 import com.example.composechatexample.domain.model.NewChat
 import com.example.composechatexample.screens.chat.chatlist.model.ChatListErrors
@@ -61,7 +62,8 @@ class ChatListViewModel @Inject constructor(
             chatInfo = item
         )
         if (uiState.value.chatInfo!!.password.isBlank() ||
-            uiState.value.username == uiState.value.chatInfo!!.owner)
+            uiState.value.username == uiState.value.chatInfo!!.owner
+        )
             navigateToRoom()
         else _uiState.value = uiState.value.copy(
             dialogs = DisplayDialog(
@@ -79,6 +81,7 @@ class ChatListViewModel @Inject constructor(
                         true -> {
                             loadChatList()
                         }
+
                         false -> {
                             sendEvent(ChatListScreenEvent.ToastEvent(ERROR))
                         }
@@ -95,14 +98,6 @@ class ChatListViewModel @Inject constructor(
             )
             true
         } else null
-    }
-
-    fun showEditChatDialog() {
-        _uiState.value = uiState.value.copy(
-            dialogs = DisplayDialog(
-                editDialog = !uiState.value.dialogs.createDialog
-            )
-        )
     }
 
     fun showAlertDialog(chat: Chat?) {
@@ -160,8 +155,9 @@ class ChatListViewModel @Inject constructor(
         )
     }
 
-    fun showCreateDialog() {
+    fun showCreateDialog(editChat: Boolean = false) {
         _uiState.value = uiState.value.copy(
+            updateChat = editChat,
             dialogs = DisplayDialog(
                 createDialog = !uiState.value.dialogs.createDialog
             )
@@ -170,6 +166,15 @@ class ChatListViewModel @Inject constructor(
             _uiState.value = uiState.value.copy(
                 errors = ChatListErrors(),
                 createdChat = CreatedChat(),
+            )
+        }
+        if (editChat) {
+            _uiState.value = uiState.value.copy(
+                createdChat = CreatedChat(
+                    chatName = uiState.value.chatInfo!!.name,
+                    passEnable = uiState.value.chatInfo!!.password.isNotEmpty(),
+                    chatPass = uiState.value.chatInfo!!.password
+                )
             )
         }
     }
@@ -234,23 +239,45 @@ class ChatListViewModel @Inject constructor(
             )
         } else {
             viewModelScope.launch {
-                messageService.createChat(
-                    NewChat(
-                        name = uiState.value.createdChat.chatName,
-                        password = uiState.value.createdChat.chatPass,
-                        owner = uiState.value.username,
-                    )
-                )?.let {
-                    when (it.status) {
-                        HttpStatusCode.OK.value -> {
-                            showCreateDialog()
-                            loadChatList()
-                        }
-                    }
-                    sendEvent(ChatListScreenEvent.ToastEvent(it.msg))
-                } ?: sendEvent(ChatListScreenEvent.ToastEvent("Exception"))
+                if (uiState.value.updateChat) {
+                    messageService.updateChat(
+                        NewChat(
+                            name = uiState.value.createdChat.chatName,
+                            password = if (
+                                uiState.value.createdChat.passEnable
+                            ) uiState.value.createdChat.chatPass
+                            else "",
+                            owner = uiState.value.username,
+                        )
+                    )?.let {
+                        createOrEditSuccess(it)
+                    } ?: sendEvent(ChatListScreenEvent.ToastEvent("Exception"))
+                } else {
+                    messageService.createChat(
+                        NewChat(
+                            name = uiState.value.createdChat.chatName,
+                            password = if (
+                                uiState.value.createdChat.passEnable
+                            ) uiState.value.createdChat.chatPass
+                            else "",
+                            owner = uiState.value.username,
+                        )
+                    )?.let {
+                        createOrEditSuccess(it)
+                    } ?: sendEvent(ChatListScreenEvent.ToastEvent("Exception"))
+                }
             }
         }
+    }
+
+    private fun createOrEditSuccess(response: DefaultResponse) {
+        when (response.status) {
+            HttpStatusCode.OK.value -> {
+                showCreateDialog()
+                loadChatList()
+            }
+        }
+        sendEvent(ChatListScreenEvent.ToastEvent(response.msg))
     }
 
     fun updateSearchQuery(search: String) {

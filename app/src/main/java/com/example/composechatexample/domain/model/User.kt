@@ -10,5 +10,19 @@ data class User(
     var onlineStatus: Boolean,
     var lastActionTime: Long,
     val timestamp: Long,
+    val friendsList: List<Friend> = listOf(),
     val id: String,
+)
+
+@Serializable
+data class Friend(
+    val id: String = "",
+    val username: String = "",
+    var onlineStatus: Boolean = false,
+)
+
+@Serializable
+data class UserCredentials(
+    val username: String,
+    val password: String,
 )

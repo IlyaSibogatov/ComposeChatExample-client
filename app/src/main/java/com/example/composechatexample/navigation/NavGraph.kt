@@ -10,7 +10,7 @@ import com.example.composechatexample.screens.chat.chatdetails.ChatScreen
 import com.example.composechatexample.screens.chat.chatlist.ChatListScreen
 import com.example.composechatexample.screens.onboarding.OnBoardingScreen
 import com.example.composechatexample.screens.profile.ProfileScreen
-import com.example.composechatexample.screens.profile.friendslist.FriendsListScreen
+import com.example.composechatexample.screens.profile.userlist.UsersListScreen
 import com.example.composechatexample.screens.settings.SettingsScreen
 import com.example.composechatexample.screens.settings.languages.LanguageScreen
 import com.example.composechatexample.utils.Constants
@@ -45,8 +45,18 @@ fun NavGraph(
         composable(route = Constants.SETTINGS_ROUTE) {
             SettingsScreen(navController)
         }
-        composable(route = Constants.FRIENDS_LIST_ROUTE) {
-            FriendsListScreen(navController)
+        composable(
+            route = "${Constants.FRIENDS_LIST_ROUTE}/{${Constants.USER_UID}}/{${Constants.USERS_TYPE}}",
+            arguments = listOf(
+                navArgument(Constants.USER_UID) { type = NavType.StringType },
+                navArgument(Constants.USERS_TYPE) { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            UsersListScreen(
+                navController,
+                backStackEntry.arguments?.getString(Constants.USER_UID),
+                backStackEntry.arguments?.getString(Constants.USERS_TYPE)
+            )
         }
         composable(
             route = "${Constants.CHAT_ROUTE}/{${Constants.CHAT_ID}}",
