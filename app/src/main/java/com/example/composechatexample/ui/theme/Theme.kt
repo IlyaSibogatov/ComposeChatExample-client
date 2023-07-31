@@ -6,7 +6,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import com.example.composechatexample.utils.TypeTheme
@@ -59,14 +63,15 @@ private val LightColorScheme = lightColorScheme(
     error = Error
 )
 
+lateinit var themeState: MutableState<TypeTheme>
+
 @Composable
 fun ComposeChatExampleTheme(
-    themeUser: String,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when(themeUser) {
-        TypeTheme.DARK.name -> DarkColorScheme
-        TypeTheme.LIGHT.name -> LightColorScheme
+    val colorScheme = when(themeState.value) {
+        TypeTheme.DARK -> DarkColorScheme
+        TypeTheme.LIGHT -> LightColorScheme
         else -> if (isSystemInDarkTheme()) DarkColorScheme else LightColorScheme
     }
     val view = LocalView.current

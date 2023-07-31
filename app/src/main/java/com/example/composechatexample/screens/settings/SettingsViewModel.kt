@@ -73,6 +73,10 @@ class SettingsViewModel @Inject constructor(
 
     fun saveTheme(type: TypeTheme) {
         preferencesManager.theme = type.name
+        _uiState.value = uiState.value.copy(
+            theme = type.name
+        )
+        sendEvent(SettingsScreenEvent.ThemeEvent(type))
     }
 
     private fun sendEvent(event: SettingsScreenEvent) {
