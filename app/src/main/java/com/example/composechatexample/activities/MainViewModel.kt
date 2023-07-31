@@ -3,6 +3,7 @@ package com.example.composechatexample.activities
 import androidx.lifecycle.ViewModel
 import com.example.composechatexample.data.preferences.PreferencesManager
 import com.example.composechatexample.utils.Constants.listLanguages
+import com.example.composechatexample.utils.TypeTheme
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -23,8 +24,12 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun getTheme(): String {
-        return preferencesManager.theme
+    fun getTheme(): TypeTheme {
+        return when (preferencesManager.theme) {
+            TypeTheme.DARK.name -> TypeTheme.DARK
+            TypeTheme.LIGHT.name -> TypeTheme.LIGHT
+            else -> TypeTheme.SYSTEM
+        }
     }
 
     companion object {
