@@ -6,11 +6,11 @@ import com.example.composechatexample.data.preferences.PreferencesManager
 import com.example.composechatexample.data.remote.ChatSocketService
 import com.example.composechatexample.data.remote.MessageService
 import com.example.composechatexample.domain.model.Message
-import com.example.composechatexample.domain.model.SendType
 import com.example.composechatexample.screens.chat.chatdetails.model.ChatScreenEvent
 import com.example.composechatexample.screens.chat.chatdetails.model.ChatUIState
 import com.example.composechatexample.utils.Constants
 import com.example.composechatexample.utils.Resources
+import com.example.composechatexample.utils.SendType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow

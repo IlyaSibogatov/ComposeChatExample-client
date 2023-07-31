@@ -18,6 +18,3 @@ data class NewChat(
     val owner: String,
 )
 
-enum class ChatEvent {
-    EDIT, REMOVE
-}

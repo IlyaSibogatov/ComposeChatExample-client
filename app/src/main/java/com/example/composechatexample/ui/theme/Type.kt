@@ -10,7 +10,6 @@ import androidx.compose.ui.unit.sp
 val LightTypography = Typography(
     /** primary text */
     bodyLarge = TextStyle(
-        color = OnBackground,
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
@@ -35,7 +34,7 @@ val LightTypography = Typography(
     ),
     /** text button */
     headlineLarge = TextStyle(
-        color = White,
+        color = OnPrimary,
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,

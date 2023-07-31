@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -26,6 +25,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.composechatexample.R
+import com.example.composechatexample.components.CustomIconButton
 import com.example.composechatexample.utils.Constants
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -69,15 +69,11 @@ fun MainEntryPoint() {
                                 currentDestination?.route.toString() !=
                                 Constants.CHAT_LIST_ROUTE
                             ) {
-                                IconButton(onClick = {
-                                    navController.popBackStack()
-                                }) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.ic_arrow_back),
-                                        contentDescription = Constants.CONTENT_DESCRIPTION,
-                                        tint = MaterialTheme.colorScheme.onPrimary
-                                    )
-                                }
+                                CustomIconButton(
+                                    imageId = R.drawable.ic_arrow_back,
+                                    color = MaterialTheme.colorScheme.onPrimary,
+                                    onClick = { navController.popBackStack() }
+                                )
                             }
                             Text(
                                 text = screens.find {

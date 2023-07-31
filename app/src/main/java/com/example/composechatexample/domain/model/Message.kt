@@ -12,7 +12,3 @@ data class Message(
     var wasEdit: Boolean = false,
     val formattedTime: String,
 )
-
-enum class SendType {
-    REMOVE, SEND, EDIT
-}

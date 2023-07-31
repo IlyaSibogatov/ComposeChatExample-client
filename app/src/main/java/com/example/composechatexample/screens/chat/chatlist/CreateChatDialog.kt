@@ -1,38 +1,40 @@
 package com.example.composechatexample.screens.chat.chatlist
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.composechatexample.R
-import com.example.composechatexample.utils.Constants
+import com.example.composechatexample.components.ActionButton
+import com.example.composechatexample.components.CustomIconButton
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun CreateChatDialog() {
     val viewModel: ChatListViewModel = hiltViewModel()
     val uiState = viewModel.uiState.collectAsState()
+    val interactionSource = remember {
+        MutableInteractionSource()
+    }
 
     AlertDialog(
         modifier = Modifier
@@ -66,21 +68,22 @@ fun CreateChatDialog() {
                         )
                     },
                     trailingIcon = {
-                        IconButton(
+                        CustomIconButton(
+                            imageId = R.drawable.ic_clear,
+                            color = when {
+                                interactionSource.collectIsFocusedAsState().value -> MaterialTheme.colorScheme.onSurfaceVariant
+                                else -> MaterialTheme.colorScheme.onSurfaceVariant
+                            },
                             onClick = {
                                 if (uiState.value.createdChat.chatName.isNotBlank())
                                     viewModel.updateOwnChatName("")
                             }
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_clear),
-                                contentDescription = Constants.CONTENT_DESCRIPTION
-                            )
-                        }
+                        )
                     },
                     colors = TextFieldDefaults.outlinedTextFieldColors(
                         containerColor = MaterialTheme.colorScheme.background
                     ),
+                    interactionSource = interactionSource,
                     shape = MaterialTheme.shapes.small,
                     isError = uiState.value.errors.emptyChatName,
                     supportingText = {
@@ -107,17 +110,17 @@ fun CreateChatDialog() {
                             )
                         },
                         trailingIcon = {
-                            IconButton(
+                            CustomIconButton(
+                                imageId = R.drawable.ic_clear,
+                                color = when {
+                                    interactionSource.collectIsFocusedAsState().value -> MaterialTheme.colorScheme.onSurfaceVariant
+                                    else -> MaterialTheme.colorScheme.onSurfaceVariant
+                                },
                                 onClick = {
                                     if (uiState.value.createdChat.chatPass.isNotBlank())
                                         viewModel.updateOwnChatPass("")
                                 }
-                            ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_clear),
-                                    contentDescription = Constants.CONTENT_DESCRIPTION
-                                )
-                            }
+                            )
                         },
                         colors = TextFieldDefaults.outlinedTextFieldColors(
                             containerColor = MaterialTheme.colorScheme.background
@@ -147,24 +150,16 @@ fun CreateChatDialog() {
             }
         },
         confirmButton = {
-            Button(
+            ActionButton(
+                text = stringResource(id = R.string.create_label),
                 onClick = viewModel::createChat
-            ) {
-                Text(
-                    text = stringResource(id = R.string.create_label),
-                    color = MaterialTheme.colorScheme.onPrimary
-                )
-            }
+            )
         },
         dismissButton = {
-            Button(
+            ActionButton(
+                text = stringResource(id = R.string.cancel_label),
                 onClick = viewModel::showCreateDialog
-            ) {
-                Text(
-                    text = stringResource(id = R.string.cancel_label),
-                    color = MaterialTheme.colorScheme.onPrimary
-                )
-            }
+            )
         }
     )
 }
