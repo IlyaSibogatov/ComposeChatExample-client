@@ -18,6 +18,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,11 +37,14 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavHostController
 import com.example.composechatexample.R
+import com.example.composechatexample.components.ShowMenu
 import com.example.composechatexample.screens.settings.model.SettingsScreenEvent
 import com.example.composechatexample.screens.settings.model.SettingsUIState
+import com.example.composechatexample.ui.theme.themeState
 import com.example.composechatexample.utils.Constants
 import com.example.composechatexample.utils.Ext
-import kotlinx.coroutines.flow.StateFlow
+import com.example.composechatexample.utils.Type
+import com.example.composechatexample.utils.TypeTheme
 import kotlinx.coroutines.flow.collectLatest
 
 @SuppressLint("StateFlowValueCalledInComposition")
@@ -47,7 +54,7 @@ fun SettingsScreen(
 ) {
     val context = LocalContext.current
     val viewModel: SettingsViewModel = hiltViewModel()
-    val uiState = viewModel.uiState
+    val uiState = viewModel.uiState.collectAsState()
 
     Column() {
         ApplicationSettings(uiState, viewModel, context)
@@ -75,6 +82,10 @@ fun SettingsScreen(
                 is SettingsScreenEvent.ToastEvent -> {
                     Toast.makeText(context, value.msg, Toast.LENGTH_SHORT).show()
                 }
+
+                is SettingsScreenEvent.ThemeEvent -> {
+                    themeState.value = value.theme
+                }
             }
         }
     }
@@ -93,7 +104,7 @@ fun SettingsScreen(
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun ApplicationSettings(
-    uiState: StateFlow<SettingsUIState>,
+    uiState: State<SettingsUIState>,
     viewModel: SettingsViewModel,
     context: Context
 ) {
@@ -123,7 +134,7 @@ fun ApplicationSettings(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column() {
+            Column {
                 Text(
                     text = stringResource(id = R.string.languages_settings),
                     fontSize = 18.sp,
@@ -139,31 +150,45 @@ fun ApplicationSettings(
                 contentDescription = Constants.CONTENT_DESCRIPTION
             )
         }
-
+        val expandedMenu = remember {
+            mutableStateOf(false)
+        }
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable(
                     onClick = {
-                        Ext.showToast(
-                            context = context,
-                            context.resources.getString(R.string.development)
-                        )
+                        expandedMenu.value = true
                     }
                 )
                 .padding(vertical = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column() {
+            Column {
                 Text(
                     text = stringResource(id = R.string.theme_settings),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                 )
                 Text(
-                    text = uiState.value.theme,
+                    text = when (uiState.value.theme) {
+                        TypeTheme.SYSTEM.name -> stringResource(id = R.string.theme_text_system)
+                        TypeTheme.LIGHT.name -> stringResource(id = R.string.theme_text_light)
+                        else -> stringResource(id = R.string.theme_text_dark)
+                    },
                     fontSize = 16.sp,
+                )
+                ShowMenu(
+                    expanded = expandedMenu,
+                    data = listOf(
+                        Type(nameType = TypeTheme.SYSTEM, str = R.string.theme_text_system),
+                        Type(nameType = TypeTheme.DARK, str = R.string.theme_text_dark),
+                        Type(nameType = TypeTheme.LIGHT, str = R.string.theme_text_light),
+                    ),
+                    onCLick = {
+                        viewModel.saveTheme(it)
+                    }
                 )
             }
             Image(
@@ -208,7 +233,7 @@ fun ApplicationSettings(
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun AccountSettings(
-    uiState: StateFlow<SettingsUIState>,
+    uiState: State<SettingsUIState>,
     viewModel: SettingsViewModel,
     context: Context
 ) {
@@ -310,7 +335,7 @@ fun AccountSettings(
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun SupportAndExit(
-    uiState: StateFlow<SettingsUIState>,
+    uiState: State<SettingsUIState>,
     viewModel: SettingsViewModel,
     context: Context
 ) {

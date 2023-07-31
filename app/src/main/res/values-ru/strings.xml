@@ -56,6 +56,9 @@
     <!--  Settings Screen  -->
     <string name="languages_settings">Язык</string>
     <string name="theme_settings">Тема</string>
+    <string name="theme_text_dark">Темная</string>
+    <string name="theme_text_light">Светлая</string>
+    <string name="theme_text_system">Системная</string>
     <string name="privacy_settings">Конфиденциальность</string>
     <string name="notifications_settings">Уведомления</string>
     <string name="change_password_settings">Изменить пароль</string>

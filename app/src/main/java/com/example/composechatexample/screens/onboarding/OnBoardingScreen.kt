@@ -2,20 +2,16 @@ package com.example.composechatexample.screens.onboarding
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.focusable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -29,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.composechatexample.R
+import com.example.composechatexample.components.ActionButton
 import com.example.composechatexample.screens.onboarding.model.OnBoardingUIState
 import com.example.composechatexample.screens.onboarding.model.OnboardScreenEvent
 import com.example.composechatexample.utils.Constants
@@ -66,16 +63,10 @@ fun OnBoardingScreen(
             checkError = { CheckPassword(uiState = uiState) },
             onValueChange = viewModel::updatePassword
         )
-        Button(
-            onClick = {
-                if (!uiState.value.showSignUp) viewModel.login() else viewModel.signup()
-            }
-        ) {
-            Text(
-                text = stringResource(id = if (!uiState.value.showSignUp) R.string.login_label else R.string.signup_label),
-                style = MaterialTheme.typography.headlineLarge
-            )
-        }
+        ActionButton(
+            text = stringResource(id = if (!uiState.value.showSignUp) R.string.login_label else R.string.signup_label),
+            onClick = {  if (!uiState.value.showSignUp) viewModel.login() else viewModel.signup() }
+        )
         if (!uiState.value.showSignUp) {
             Text(
                 text = stringResource(id = R.string.havent_account),
@@ -124,7 +115,11 @@ fun SignUpField(
         isError = isError,
         supportingText = { checkError() },
         singleLine = true,
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            focusedBorderColor = MaterialTheme.colorScheme.onPrimaryContainer ,
+            focusedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
+        )
     )
 }
 

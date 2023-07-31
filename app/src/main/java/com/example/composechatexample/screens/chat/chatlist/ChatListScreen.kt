@@ -56,13 +56,15 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavHostController
 import com.example.composechatexample.R
+import com.example.composechatexample.components.CircularLoader
+import com.example.composechatexample.components.MenuItem
+import com.example.composechatexample.components.ShowMenu
 import com.example.composechatexample.domain.model.Chat
-import com.example.composechatexample.domain.model.ChatEvent
 import com.example.composechatexample.screens.chat.chatlist.ChatListViewModel.Companion.ERROR
 import com.example.composechatexample.screens.chat.chatlist.model.ChatListScreenEvent
+import com.example.composechatexample.utils.ChatEvent
 import com.example.composechatexample.utils.Constants
-import com.example.composechatexample.utils.components.CircularLoader
-import com.example.composechatexample.utils.components.MenuItem
+import com.example.composechatexample.utils.Type
 import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
@@ -148,9 +150,13 @@ fun ChatListScreen(
                             }
                         },
                         menu = {
-                            ShowChatMenu(
+                            ShowMenu(
                                 expanded = expandedMenu,
-                                onClick = { type ->
+                                data = listOf(
+                                    Type(nameType = ChatEvent.EDIT, str = R.string.edit),
+                                    Type(nameType = ChatEvent.REMOVE, str = R.string.remove),
+                                ),
+                                onCLick = { type ->
                                     when (type) {
                                         ChatEvent.EDIT -> {
                                             viewModel.showCreateDialog(true)
@@ -162,7 +168,8 @@ fun ChatListScreen(
                                             expandedMenu.value = !expandedMenu.value
                                         }
                                     }
-                                })
+                                }
+                            )
                         }
                     )
                 }
@@ -179,7 +186,8 @@ fun ChatListScreen(
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_new_chat),
-                    contentDescription = Constants.CONTENT_DESCRIPTION
+                    contentDescription = Constants.CONTENT_DESCRIPTION,
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             }
         }
@@ -272,32 +280,6 @@ private fun ItemChat(
             style = FontStyle.Italic,
             size = 10.sp
         )
-    }
-}
-
-@Composable
-fun ShowChatMenu(
-    expanded: MutableState<Boolean>,
-    onClick: (event: ChatEvent) -> Unit,
-) {
-    DropdownMenu(
-        expanded = expanded.value,
-        onDismissRequest = {
-            expanded.value = false
-        }
-    ) {
-        MenuItem(
-            name = stringResource(id = R.string.edit),
-            expanded = expanded
-        ) {
-            onClick(ChatEvent.EDIT)
-        }
-        MenuItem(
-            name = stringResource(id = R.string.remove),
-            expanded = expanded
-        ) {
-            onClick(ChatEvent.REMOVE)
-        }
     }
 }
 

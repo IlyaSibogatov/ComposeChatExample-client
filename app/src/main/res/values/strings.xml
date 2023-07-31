@@ -55,6 +55,9 @@
     <!--  Settings Screen  -->
     <string name="languages_settings">Language</string>
     <string name="theme_settings">Theme</string>
+    <string name="theme_text_dark">Dark</string>
+    <string name="theme_text_light">Light</string>
+    <string name="theme_text_system">Systemic</string>
     <string name="privacy_settings">Privacy</string>
     <string name="notifications_settings">Notification</string>
     <string name="change_password_settings">Change password</string>
