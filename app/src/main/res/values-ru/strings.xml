@@ -26,8 +26,10 @@
     <string name="add_to_friend">Добавить в друзья</string>
     <string name="info_dont_filled">Информация не заполнена</string>
     <string name="show_more">Показать больше</string>
-
     <string name="view_friends">Все друзья</string>
+
+    <string name="success_friend_request">Заявка в друзья отправлена</string>
+    <string name="failed_friend_request">Не удалсь отправить заявку в друзья</string>
 
     <!--  Chat List Screen  -->
     <string name="find_chat">Найти чат</string>
@@ -41,10 +43,8 @@
     <string name="enter_password">Введите пароль</string>
     <string name="fill_password">Заполните пароль</string>
     <string name="create_label">Создать</string>
-    <string name="cancel_label">Отменить</string>
     <string name="fill_password_for_enter">Введите пароль, если не знаете, спросите у владельца</string>
     <string name="incorrect_password_label">Неверный пароль</string>
-    <string name="accept_label">Подтвердить</string>
 
     <!--  Chat Screen  -->
     <string name="edit">Изменить</string>
@@ -76,4 +76,10 @@
     <!--  Exception message  -->
     <string name="error_toast">Не удалось обработать запрос</string>
     <string name="exception_toast">Непредвиденная ошибка</string>
+
+    <!--  Actions  -->
+    <string name="decline">Отклонить</string>
+    <string name="accept_label">Подтвердить</string>
+    <string name="cancel_label">Отменить</string>
+
 </resources>
