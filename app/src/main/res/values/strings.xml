@@ -27,6 +27,9 @@
     <string name="show_more">Show more</string>
     <string name="view_friends">All friends</string>
 
+    <string name="success_friend_request">Friend request sent</string>
+    <string name="failed_friend_request">Failed to send friend request</string>
+
     <!--  Chat List Screen  -->
     <string name="find_chat">Find chat</string>
     <string name="owner_label">Owner: %1$s</string>
@@ -39,10 +42,8 @@
     <string name="enter_password">Enter password</string>
     <string name="fill_password">Fill out the password</string>
     <string name="create_label">Create</string>
-    <string name="cancel_label">Cancel</string>
     <string name="fill_password_for_enter">Enter your password, if you don`t know it, ask the owner of the chat room</string>
     <string name="incorrect_password_label">Incorrect password entered</string>
-    <string name="accept_label">Accept</string>
 
     <!--  Chat Screen  -->
     <string name="edit">Edit</string>
@@ -77,4 +78,10 @@
     <!--  Exception message  -->
     <string name="error_toast">Failed to process request</string>
     <string name="exception_toast">Unforeseen error</string>
+
+    <!--  Actions  -->
+    <string name="decline">Decline</string>
+    <string name="accept_label">Accept</string>
+    <string name="cancel_label">Cancel</string>
+
 </resources>

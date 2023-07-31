@@ -159,8 +159,8 @@ fun ChatListScreen(
                                 onCLick = { type ->
                                     when (type) {
                                         ChatEvent.EDIT -> {
-                                            viewModel.showEditChatDialog()
-                                            expandedMenu.value = !expandedMenu.value
+                                            viewModel.showCreateDialog(true)
+                                            expandedMenu.value = false
                                         }
 
                                         ChatEvent.REMOVE -> {
@@ -256,7 +256,7 @@ private fun ItemChat(
             )
             Icon(
                 painter = painterResource(
-                    id = if (data.password.isEmpty()) R.drawable.ic_not_a_private
+                    id = if (data.password.isBlank()) R.drawable.ic_not_a_private
                     else R.drawable.ic_private
                 ),
                 tint = MaterialTheme.colorScheme.onPrimaryContainer,

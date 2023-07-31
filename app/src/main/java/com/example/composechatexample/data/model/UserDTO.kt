@@ -1,5 +1,6 @@
 package com.example.composechatexample.data.model
 
+import com.example.composechatexample.domain.model.Friend
 import com.example.composechatexample.domain.model.User
 import kotlinx.serialization.Serializable
 
@@ -11,6 +12,7 @@ data class UserDTO(
     var onlineStatus: Boolean,
     var lastActionTime: Long,
     val timestamp: Long,
+    val friendsList: ArrayList<Friend> = ArrayList(),
     val id: String,
 ) {
     fun toUser(): User {
@@ -25,3 +27,15 @@ data class UserDTO(
         )
     }
 }
+
+@Serializable
+data class UserFromId(
+    val id: String,
+    val username: String,
+    val selfInfo: String,
+    var onlineStatus: Boolean,
+    var lastActionTime: Long,
+    val friends: List<Friend>,
+    val followers: List<String>,
+    val friendshipRequests: List<String>,
+)

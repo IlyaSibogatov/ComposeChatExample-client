@@ -5,6 +5,7 @@ import com.example.composechatexample.domain.model.Chat
 data class ChatListUIState(
     val isLoading: Boolean = false,
     val userLogged: Boolean = false,
+    val updateChat: Boolean = false,
     val roomPassword: String = "",
     val searchQuery: String = "",
     var username: String = "",
