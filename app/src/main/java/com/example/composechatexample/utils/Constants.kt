@@ -31,8 +31,17 @@ object Constants {
     const val CHAT_ID = "chat_id"
 
     const val USER_UID = "user_uid"
+    const val USERS_TYPE = "users_type"
 
-    val listLanguages = listOf<LanguageEntity>(
+    const val SUCCESS = "success"
+    const val FAILED = "failed"
+    const val ERROR = "error"
+
+    const val FOLLOWERS = "followers"
+    const val FRIENDSHIPS_REQUESTS = "friendship_requests"
+    const val FRIENDS = "friends"
+
+    val listLanguages = listOf(
         LanguageEntity("Русский", "ru"),
         LanguageEntity("English", "en"),
     )

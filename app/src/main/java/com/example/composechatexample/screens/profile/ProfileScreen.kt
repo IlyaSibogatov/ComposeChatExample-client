@@ -6,10 +6,12 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -45,6 +47,12 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.example.composechatexample.R
 import com.example.composechatexample.screens.profile.model.ProfileScreenEvent
 import com.example.composechatexample.utils.Constants
+import com.example.composechatexample.utils.Constants.ERROR
+import com.example.composechatexample.utils.Constants.FAILED
+import com.example.composechatexample.utils.Constants.FOLLOWERS
+import com.example.composechatexample.utils.Constants.FRIENDS
+import com.example.composechatexample.utils.Constants.FRIENDSHIPS_REQUESTS
+import com.example.composechatexample.utils.Constants.SUCCESS
 import com.example.composechatexample.utils.Ext.showToast
 import kotlinx.coroutines.flow.collectLatest
 
@@ -67,7 +75,7 @@ fun ProfileScreen(
     ) {
         val (
             photo, username, friendListEt, friendListLc, selfInfoPreview,
-            editBtn, showMore, selfInfo, addToFriend, userStatus,
+            editBtn, showMore, selfInfo, addToFriend, userStatus, followerAndRequests
         ) = createRefs()
         Card(
             modifier = Modifier
@@ -184,7 +192,7 @@ fun ProfileScreen(
                 .padding(bottom = 8.dp)
                 .constrainAs(friendListEt) {
                     start.linkTo(parent.start)
-                    top.linkTo(selfInfo.bottom)
+                    top.linkTo(followerAndRequests.bottom)
                 },
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
@@ -195,6 +203,59 @@ fun ProfileScreen(
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
             )
+        }
+        Row(
+            modifier = Modifier
+                .constrainAs(followerAndRequests) {
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    top.linkTo(selfInfo.bottom)
+                }
+        ) {
+            if (uiState.value.followers.isNotEmpty())
+                Card(
+                    modifier = Modifier
+                        .weight(1f),
+                    colors = CardDefaults.cardColors(
+                        containerColor =
+                        MaterialTheme.colorScheme.primaryContainer
+                    ),
+                    onClick = {
+                        if (uiState.value.followers.isNotEmpty()) viewModel.openUsersList(
+                            FOLLOWERS
+                        )
+                    },
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .padding(8.dp),
+                        text = "${uiState.value.followers.size} followers",
+                        textAlign = TextAlign.Center,
+                    )
+                }
+            if (uiState.value.friendshipRequests.isNotEmpty() && viewModel.isMyProfile()) {
+                Spacer(modifier = Modifier.width(8.dp))
+                Card(
+                    modifier = Modifier
+                        .weight(1f),
+                    colors = CardDefaults.cardColors(
+                        containerColor =
+                        MaterialTheme.colorScheme.primaryContainer
+                    ),
+                    onClick = {
+                        if (uiState.value.friendshipRequests.isNotEmpty()) viewModel.openUsersList(
+                            FRIENDSHIPS_REQUESTS
+                        )
+                    },
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .padding(8.dp),
+                        text = "${uiState.value.friendshipRequests.size} requests",
+                        textAlign = TextAlign.Center,
+                    )
+                }
+            }
         }
         LazyColumn(
             modifier = Modifier
@@ -207,7 +268,7 @@ fun ProfileScreen(
                     height = Dimension.fillToConstraints
                 }
         ) {
-            items(uiState.value.friendList.take(5)) { item ->
+            items(uiState.value.friends.take(5)) { item ->
                 Card(
                     modifier = Modifier
                         .padding(bottom = 1.dp),
@@ -216,12 +277,7 @@ fun ProfileScreen(
                         MaterialTheme.colorScheme.primaryContainer
                     ),
                     onClick = {
-                        showToast(
-                            context = context,
-                            context.resources.getString(
-                                R.string.development
-                            )
-                        )
+                        viewModel.openProfile(item.id)
                     },
                 ) {
                     ConstraintLayout(
@@ -260,7 +316,7 @@ fun ProfileScreen(
                                     start.linkTo(friendName.end)
                                     end.linkTo(chatWithFriend.start)
                                 },
-                            model = if (item.isOnline) R.drawable.ic_user_online
+                            model = if (item.onlineStatus) R.drawable.ic_user_online
                             else R.drawable.ic_user_offline,
                             contentDescription = Constants.CONTENT_DESCRIPTION
                         )
@@ -294,7 +350,9 @@ fun ProfileScreen(
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.primaryContainer
                     ),
-                    onClick = viewModel::openFriendList,
+                    onClick = {
+                        if (uiState.value.friends.isNotEmpty()) viewModel.openUsersList(FRIENDS)
+                    },
                     elevation = CardDefaults.cardElevation(3.dp),
                     border = BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground)
                 ) {
@@ -329,19 +387,15 @@ fun ProfileScreen(
                     contentDescription = Constants.CONTENT_DESCRIPTION
                 )
             }
-        } else {
+        }
+        if (!viewModel.isFriend()) {
             IconButton(
                 modifier = Modifier
                     .constrainAs(addToFriend) {
                         top.linkTo(parent.top)
                         start.linkTo(parent.start)
                     },
-                onClick = {
-                    showToast(
-                        context = context,
-                        context.resources.getString(R.string.development)
-                    )
-                }
+                onClick = { viewModel.friendshipRequest() }
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_person_add),
@@ -354,14 +408,19 @@ fun ProfileScreen(
         viewModel.eventsFlow.collectLatest { value ->
             when (value) {
                 is ProfileScreenEvent.NavigateTo -> {
-                    if (value.route == Constants.ONBOARD_ROUTE) {
-                        navController.navigate(value.route) {
-                            popUpTo(0)
+                    navController.navigate(value.route)
+                }
+
+                is ProfileScreenEvent.ToastEvent -> {
+                    showToast(
+                        context,
+                        when (value.msg) {
+                            SUCCESS -> context.resources.getString(R.string.success_friend_request)
+                            ERROR -> context.resources.getString(R.string.failed_friend_request)
+                            FAILED -> context.resources.getString(R.string.exception_toast)
+                            else -> context.resources.getString(R.string.exception_toast)
                         }
-                    }
-                    if (value.route == Constants.FRIENDS_LIST_ROUTE) {
-                        navController.navigate(value.route)
-                    }
+                    )
                 }
             }
         }
