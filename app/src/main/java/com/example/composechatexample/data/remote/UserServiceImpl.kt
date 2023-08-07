@@ -3,10 +3,13 @@ package com.example.composechatexample.data.remote
 import com.example.composechatexample.data.model.UserFromId
 import com.example.composechatexample.data.response.DefaultResponse
 import com.example.composechatexample.domain.model.Friend
+import com.example.composechatexample.domain.model.NewUserInfo
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.post
+import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.contentType
 
 class UserServiceImpl(
     private val client: HttpClient
@@ -57,6 +60,20 @@ class UserServiceImpl(
         } catch (e: Exception) {
             e.printStackTrace()
             null
+        }
+    }
+
+    override suspend fun updateUserInfo(newInfo: NewUserInfo): Boolean {
+        return try {
+            client.post<DefaultResponse>(UserService.EndPoint.UpdateUser.url) {
+                body = newInfo
+                contentType(ContentType.Application.Json)
+            }.let {
+                it.status == HttpStatusCode.OK.value
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
         }
     }
 

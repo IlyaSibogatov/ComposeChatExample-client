@@ -17,7 +17,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -28,7 +27,6 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -57,11 +55,12 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavHostController
 import com.example.composechatexample.R
 import com.example.composechatexample.components.CircularLoader
-import com.example.composechatexample.components.MenuItem
 import com.example.composechatexample.components.ShowMenu
 import com.example.composechatexample.domain.model.Chat
 import com.example.composechatexample.screens.chat.chatlist.ChatListViewModel.Companion.ERROR
 import com.example.composechatexample.screens.chat.chatlist.model.ChatListScreenEvent
+import com.example.composechatexample.screens.dialogs.CreateChatDialog
+import com.example.composechatexample.screens.dialogs.EntryDialog
 import com.example.composechatexample.utils.ChatEvent
 import com.example.composechatexample.utils.Constants
 import com.example.composechatexample.utils.Type
@@ -90,7 +89,6 @@ fun ChatListScreen(
             when {
                 uiState.value.dialogs.passDialog -> EntryDialog()
                 uiState.value.dialogs.createDialog -> CreateChatDialog()
-                uiState.value.dialogs.editDialog -> EditChatDialog()
                 else -> {}
             }
             Row(
