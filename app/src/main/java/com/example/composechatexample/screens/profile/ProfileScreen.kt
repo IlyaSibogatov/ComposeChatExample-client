@@ -45,6 +45,7 @@ import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.composechatexample.R
+import com.example.composechatexample.screens.dialogs.EditInfoDialog
 import com.example.composechatexample.screens.profile.model.ProfileScreenEvent
 import com.example.composechatexample.utils.Constants
 import com.example.composechatexample.utils.Constants.ERROR
@@ -73,6 +74,9 @@ fun ProfileScreen(
             .fillMaxSize()
             .padding(16.dp),
     ) {
+        if (uiState.value.showEditDialog) {
+            EditInfoDialog()
+        }
         val (
             photo, username, friendListEt, friendListLc, selfInfoPreview,
             editBtn, showMore, selfInfo, addToFriend, userStatus, followerAndRequests
@@ -376,10 +380,7 @@ fun ProfileScreen(
                         end.linkTo(parent.end)
                     },
                 onClick = {
-                    showToast(
-                        context = context,
-                        context.resources.getString(R.string.development)
-                    )
+                    viewModel.showEditDialog()
                 }
             ) {
                 Icon(
@@ -421,6 +422,12 @@ fun ProfileScreen(
                             else -> context.resources.getString(R.string.exception_toast)
                         }
                     )
+                }
+
+                is ProfileScreenEvent.ToastEvent -> {
+                    if (value.msg == "error")
+                        showToast(context, context.resources.getString(R.string.error_toast))
+                    else showToast(context, context.resources.getString(R.string.success_message))
                 }
             }
         }

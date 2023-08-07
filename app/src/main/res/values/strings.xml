@@ -15,7 +15,7 @@
     <string name="havent_account">Don`t have an account?</string>
 
     <!--  Profile Screen  -->
-    <string name="account_information">Account information</string>
+    <string name="user_information">User information</string>
     <string name="user_info_label">About me:</string>
     <string name="name_label">Name: </string>
     <string name="number_label">Number: </string>
@@ -26,6 +26,9 @@
     <string name="info_dont_filled">The information is not filled out</string>
     <string name="show_more">Show more</string>
     <string name="view_friends">All friends</string>
+    <string name="nickname">Username</string>
+    <string name="username_empty">Username can`t be epmty</string>
+    <string name="info_dont_changes">No change in data</string>
 
     <string name="success_friend_request">Friend request sent</string>
     <string name="failed_friend_request">Failed to send friend request</string>
@@ -74,6 +77,9 @@
     <string name="chat_list_title">Chats</string>
     <string name="profile_title">Profile</string>
     <string name="settings_title">Settings</string>
+
+    <!--  Success messages  -->
+    <string name="success_message">Success</string>
 
     <!--  Exception message  -->
     <string name="error_toast">Failed to process request</string>

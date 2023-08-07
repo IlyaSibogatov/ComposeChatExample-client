@@ -1,4 +1,4 @@
-package com.example.composechatexample.screens.chat.chatlist
+package com.example.composechatexample.screens.dialogs
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
@@ -26,6 +26,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.composechatexample.R
 import com.example.composechatexample.components.ActionButton
 import com.example.composechatexample.components.CustomIconButton
+import com.example.composechatexample.screens.chat.chatlist.ChatListViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.composechatexample.data.model.UserFromId
 import com.example.composechatexample.data.preferences.PreferencesManager
 import com.example.composechatexample.data.remote.UserService
+import com.example.composechatexample.domain.model.NewUserInfo
 import com.example.composechatexample.screens.profile.model.ProfileScreenEvent
 import com.example.composechatexample.utils.Constants
 import com.example.composechatexample.utils.Constants.ERROR
@@ -53,6 +54,10 @@ class ProfileViewModel @Inject constructor(
                     followers = response.followers,
                     friendshipRequests = response.friendshipRequests,
                     gettingUserError = false,
+                    newInfo = NewUserInfo(
+                        username = response.username,
+                        selfInfo = response.selfInfo,
+                    )
                 )
             } else {
                 _uiState.value = uiState.value.copy(
@@ -62,6 +67,80 @@ class ProfileViewModel @Inject constructor(
             _uiState.value = uiState.value.copy(
                 loadingStatus = false
             )
+        }
+    }
+
+    fun showEditDialog() {
+        _uiState.value = uiState.value.copy(
+            showEditDialog = !uiState.value.showEditDialog
+        )
+        if (!uiState.value.showEditDialog) {
+            _uiState.value = uiState.value.copy(
+                newInfo = NewUserInfo(
+                    username = uiState.value.username,
+                    selfInfo = uiState.value.selfInfo,
+                ),
+                errors = ProfileErrors()
+            )
+        }
+    }
+
+    fun updateNameValue(username: String) {
+        _uiState.value = uiState.value.copy(
+            newInfo = NewUserInfo(
+                username = username,
+                selfInfo = uiState.value.newInfo.selfInfo,
+            ),
+            errors = ProfileErrors()
+        )
+    }
+
+    fun updateInfoValue(newInfo: String) {
+        _uiState.value = uiState.value.copy(
+            newInfo = NewUserInfo(
+                username = uiState.value.newInfo.username,
+                selfInfo = newInfo,
+            ),
+            errors = ProfileErrors()
+        )
+    }
+
+    fun updateInfo() {
+        viewModelScope.launch {
+            if (uiState.value.newInfo.username.isEmpty()) {
+                _uiState.value = uiState.value.copy(
+                    errors = ProfileErrors(
+                        emptyUsername = true
+                    )
+                )
+            } else if (
+                uiState.value.newInfo.username == uiState.value.username &&
+                uiState.value.newInfo.selfInfo == uiState.value.selfInfo
+            ) {
+                _uiState.value = uiState.value.copy(
+                    errors = ProfileErrors(
+                        newInfoNotChanged = true
+                    )
+                )
+            } else {
+                val newInfo = uiState.value.newInfo
+                _uiState.value = uiState.value.copy(
+                    newInfo = NewUserInfo(
+                        id = uiState.value.uid,
+                        username = newInfo.username,
+                        selfInfo = newInfo.selfInfo,
+                    )
+                )
+                userService.updateUserInfo(uiState.value.newInfo).let {
+                    if (it) {
+                        showEditDialog()
+                        sendEvent(ProfileScreenEvent.ToastEvent(msg = "success"))
+                        getProfile(uiState.value.uid)
+                    } else {
+                        sendEvent(ProfileScreenEvent.ToastEvent(msg = "error"))
+                    }
+                }
+            }
         }
     }
 

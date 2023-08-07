@@ -15,6 +15,13 @@ data class User(
 )
 
 @Serializable
+data class NewUserInfo(
+    var id: String = "",
+    val username: String = "",
+    val selfInfo: String = "",
+)
+
+@Serializable
 data class Friend(
     val id: String = "",
     val username: String = "",
