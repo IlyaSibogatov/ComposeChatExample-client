@@ -1,4 +1,4 @@
-package com.example.composechatexample.screens.chat.chatlist
+package com.example.composechatexample.screens.dialogs
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.composechatexample.R
+import com.example.composechatexample.screens.chat.chatlist.ChatListViewModel
 import com.example.composechatexample.utils.Constants
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)

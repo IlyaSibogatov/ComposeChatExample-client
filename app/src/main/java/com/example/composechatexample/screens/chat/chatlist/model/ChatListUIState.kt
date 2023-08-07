@@ -20,7 +20,6 @@ data class ChatListUIState(
 data class DisplayDialog(
     val passDialog: Boolean = false,
     val createDialog: Boolean = false,
-    val editDialog: Boolean = false,
 )
 
 data class ChatListErrors(
