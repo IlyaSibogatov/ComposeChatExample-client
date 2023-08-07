@@ -16,7 +16,7 @@
     <string name="havent_account">У вас нет аккаунта?</string>
 
     <!--  Profile Screen  -->
-    <string name="account_information">Информация об аккаунте</string>
+    <string name="user_information">Информация о пользователе</string>
     <string name="user_info_label">Обо мне:</string>
     <string name="name_label">Имя: </string>
     <string name="number_label">Номер: </string>
@@ -27,6 +27,9 @@
     <string name="info_dont_filled">Информация не заполнена</string>
     <string name="show_more">Показать больше</string>
     <string name="view_friends">Все друзья</string>
+    <string name="nickname">Никнейм</string>
+    <string name="username_empty">Никнейм должен быть заполнен</string>
+    <string name="info_dont_changes">Данные не изменились</string>
 
     <string name="success_friend_request">Заявка в друзья отправлена</string>
     <string name="failed_friend_request">Не удалсь отправить заявку в друзья</string>
@@ -75,6 +78,9 @@
     <string name="chat_list_title">Чаты</string>
     <string name="profile_title">Профиль</string>
     <string name="settings_title">Настройки</string>
+
+    <!--  Success messages  -->
+    <string name="success_message">Успешно</string>
 
     <!--  Exception message  -->
     <string name="error_toast">Не удалось обработать запрос</string>
