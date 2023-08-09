@@ -62,7 +62,7 @@ class ChatListViewModel @Inject constructor(
             chatInfo = item
         )
         if (uiState.value.chatInfo!!.password.isBlank() ||
-            uiState.value.username == uiState.value.chatInfo!!.owner
+            preferencesManager.uuid == uiState.value.chatInfo!!.ownerId
         )
             navigateToRoom()
         else _uiState.value = uiState.value.copy(
@@ -92,7 +92,7 @@ class ChatListViewModel @Inject constructor(
     }
 
     fun chatLongClick(item: Chat): Boolean? {
-        return if (item.owner == preferencesManager.userName) {
+        return if (item.ownerId == preferencesManager.uuid) {
             _uiState.value = uiState.value.copy(
                 chatInfo = item,
             )
@@ -248,6 +248,7 @@ class ChatListViewModel @Inject constructor(
                             ) uiState.value.createdChat.chatPass
                             else "",
                             owner = uiState.value.username,
+                            ownerId = preferencesManager.uuid!!,
                         )
                     )?.let {
                         createOrEditSuccess(it)
@@ -261,6 +262,7 @@ class ChatListViewModel @Inject constructor(
                             ) uiState.value.createdChat.chatPass
                             else "",
                             owner = uiState.value.username,
+                            ownerId = preferencesManager.uuid!!,
                         )
                     )?.let {
                         createOrEditSuccess(it)

@@ -11,6 +11,7 @@ data class ChatDTO(
     val name: String,
     val password: String = "",
     val owner: String,
+    val ownerId: String,
 ) {
     fun toChat(): Chat {
         val date = Date(timestamp)
@@ -22,7 +23,8 @@ data class ChatDTO(
             password = password,
             owner = owner,
             formattedTime = fd,
-            id = id
+            id = id,
+            ownerId = ownerId,
         )
     }
 }

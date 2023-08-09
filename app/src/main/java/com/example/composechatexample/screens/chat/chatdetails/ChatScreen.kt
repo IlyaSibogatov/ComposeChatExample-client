@@ -58,6 +58,7 @@ import com.example.composechatexample.R
 import com.example.composechatexample.components.CircularLoader
 import com.example.composechatexample.components.CustomIconButton
 import com.example.composechatexample.components.ShowMenu
+import com.example.composechatexample.data.model.UserChatInfo
 import com.example.composechatexample.domain.model.Message
 import com.example.composechatexample.screens.chat.chatdetails.model.ChatScreenEvent
 import com.example.composechatexample.utils.Constants
@@ -138,7 +139,8 @@ fun ChatScreen(
                             content = {
                                 ContentMessage(
                                     colorText = MaterialTheme.colorScheme.onTertiaryContainer,
-                                    data = item
+                                    data = item,
+                                    user = uiState.value.usersInfo.find { it.uuid == item.userId }
                                 )
                             },
                             menu = {
@@ -167,6 +169,7 @@ fun ChatScreen(
                             ContentMessage(
                                 data = item,
                                 colorText = MaterialTheme.colorScheme.onSecondaryContainer,
+                                user = uiState.value.usersInfo.find { it.uuid == item.userId }
                             )
                         }
                     }
@@ -334,11 +337,12 @@ private fun GuestMessage(
 private fun ContentMessage(
     modifier: Modifier = Modifier.padding(horizontal = 8.dp),
     data: Message,
+    user: UserChatInfo?,
     colorText: Color
 ) {
     Text(
         modifier = modifier.padding(top = 4.dp),
-        text = data.username,
+        text = user?.username ?: "",
         fontSize = 16.sp,
         color = colorText
     )
@@ -371,7 +375,10 @@ private fun PreviewItemGuest() {
     ) {
         ContentMessage(
             data = FakeMessage,
-            colorText = MaterialTheme.colorScheme.onTertiaryContainer
+            colorText = MaterialTheme.colorScheme.onTertiaryContainer,
+            user = UserChatInfo(
+                "", ""
+            )
         )
     }
 }
@@ -384,6 +391,9 @@ private fun PreviewItemMy() {
             ContentMessage(
                 data = FakeMessage,
                 colorText = MaterialTheme.colorScheme.onSecondaryContainer,
+                user = UserChatInfo(
+                    "", ""
+                )
             )
         },
         menu = {},
@@ -395,7 +405,6 @@ val FakeMessage = Message(
     id = "123",
     message = "message",
     userId = "",
-    username = "user",
     formattedTime = "22.03.12 12.35",
     myMessage = true,
     wasEdit = true,
