@@ -1,24 +1,37 @@
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
+
 package com.example.composechatexample.screens.settings
 
 import android.annotation.SuppressLint
-import android.content.Context
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
-import androidx.compose.foundation.Image
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,11 +52,11 @@ import androidx.navigation.NavHostController
 import com.example.composechatexample.R
 import com.example.composechatexample.components.ShowMenu
 import com.example.composechatexample.screens.settings.model.SettingsScreenEvent
-import com.example.composechatexample.screens.settings.model.SettingsUIState
 import com.example.composechatexample.ui.theme.themeState
 import com.example.composechatexample.utils.Constants
 import com.example.composechatexample.utils.Ext
-import com.example.composechatexample.utils.Type
+import com.example.composechatexample.utils.SettingType
+import com.example.composechatexample.utils.SettingType.*
 import com.example.composechatexample.utils.TypeTheme
 import kotlinx.coroutines.flow.collectLatest
 
@@ -56,14 +69,117 @@ fun SettingsScreen(
     val viewModel: SettingsViewModel = hiltViewModel()
     val uiState = viewModel.uiState.collectAsState()
 
-    Column() {
-        ApplicationSettings(uiState, viewModel, context)
-        AccountSettings(uiState, viewModel, context)
-        Spacer(
-            modifier = Modifier
-                .weight(1f)
-        )
-        SupportAndExit(uiState, viewModel, context)
+    Scaffold(
+        bottomBar = {
+            Column {
+                SettingItem(
+                    title = R.string.tech_support_label,
+                    value = uiState.value.support
+                ) {
+                    val intent = Intent(Intent.ACTION_SENDTO)
+                    intent.data = Uri.parse("mailto:" + uiState.value.support)
+                    intent.putExtra(
+                        Intent.EXTRA_SUBJECT,
+                        context.resources.getString(R.string.bug_report_label)
+                    )
+                    context.startActivity(
+                        Intent.createChooser(
+                            intent,
+                            context.resources.getString(R.string.send_report_label)
+                        )
+                    )
+                }
+                SettingItem(
+                    title = R.string.exit_label,
+                    icon = { SettingIcon(id = R.drawable.ic_logout) },
+                    onClick = viewModel::userLogOut
+                )
+            }
+        }
+    ) { padding ->
+        LazyColumn(
+            modifier = Modifier.fillMaxHeight(),
+            contentPadding = padding
+        ) {
+            item {
+                HeaderSetting(
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                    id = R.string.application_label,
+                    colorContainer = MaterialTheme.colorScheme.primaryContainer,
+                    colorText = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            }
+            items(viewModel.listAppSetting) {
+                val expandedMenu = remember {
+                    mutableStateOf(false)
+                }
+                val result = when (it) {
+                    LANG -> {
+                        Pair(R.string.languages_settings, uiState.value.language)
+                    }
+                    THEME -> {
+                        Pair(
+                            R.string.theme_settings, when (uiState.value.theme) {
+                                TypeTheme.SYSTEM.name -> stringResource(id = R.string.theme_text_system)
+                                TypeTheme.LIGHT.name -> stringResource(id = R.string.theme_text_light)
+                                else -> stringResource(id = R.string.theme_text_dark)
+                            }
+                        )
+                    }
+                    NOTIFICATION -> {
+                        Pair(R.string.notifications_settings, uiState.value.notification)
+                    }
+
+                    else -> Pair(0, "")
+                }
+                SettingItem(
+                    title = result.first,
+                    value = result.second,
+                    onClick = { expandedMenu.value = true },
+                    menu = {
+                        ShowMenuSetting(
+                            expanded = expandedMenu,
+                            type = it,
+                            onClick = viewModel::onClickItem
+                        )
+                    }
+                )
+            }
+            item {
+                HeaderSetting(
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                    id = R.string.account_label,
+                    colorContainer = MaterialTheme.colorScheme.primaryContainer,
+                    colorText = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            }
+            items(viewModel.listAccSetting) {
+                val result = when (it) {
+                    CONFIDENTIALITY -> {
+                        Pair(R.string.privacy_settings, uiState.value.privacy)
+                    }
+
+                    PERS_DATA -> {
+                        Pair(R.string.personal_data, "")
+                    }
+
+                    EDIT_PASSWORD -> {
+                        Pair(R.string.theme_settings, "")
+                    }
+
+                    else -> Pair(0, "")
+                }
+                SettingItem(
+                    title = result.first,
+                    value = result.second
+                ) {
+
+                }
+            }
+            item {
+
+            }
+        }
     }
 
     LaunchedEffect(key1 = Unit) {
@@ -86,6 +202,11 @@ fun SettingsScreen(
                 is SettingsScreenEvent.ThemeEvent -> {
                     themeState.value = value.theme
                 }
+
+                is SettingsScreenEvent.SetLanguage -> {
+                    Ext.setLanguage(context = context, language = value.language.languageCode)
+                    ( context as Activity).recreate()
+                }
             }
         }
     }
@@ -101,307 +222,118 @@ fun SettingsScreen(
     }
 }
 
-@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
-fun ApplicationSettings(
-    uiState: State<SettingsUIState>,
-    viewModel: SettingsViewModel,
-    context: Context
+private fun SettingIcon(
+    @DrawableRes id : Int
 ) {
-    Row(
+    Icon(
+        painter = painterResource(id = id),
+        contentDescription = Constants.CONTENT_DESCRIPTION,
+        tint = MaterialTheme.colorScheme.onBackground
+    )
+}
+
+@Composable
+private fun HeaderSetting(
+    modifier: Modifier = Modifier,
+    @StringRes id : Int,
+    colorContainer: Color = Color.Transparent,
+    colorText: Color = MaterialTheme.colorScheme.onBackground,
+) {
+    Box(
         modifier = Modifier
+            .background(color = colorContainer)
             .fillMaxWidth()
-            .background(Color.LightGray)
-            .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
         Text(
-            text = stringResource(id = R.string.application_label),
+            modifier = modifier,
+            text = stringResource(id = id),
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
+            color = colorText
         )
-    }
-    Column(
-        modifier = Modifier
-            .padding(horizontal = 16.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(
-                    onClick = { viewModel.onLanguageClick() }
-                )
-                .padding(vertical = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column {
-                Text(
-                    text = stringResource(id = R.string.languages_settings),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                )
-                Text(
-                    text = uiState.value.language,
-                    fontSize = 16.sp,
-                )
-            }
-            Image(
-                painter = painterResource(id = R.drawable.ic_arrow_right),
-                contentDescription = Constants.CONTENT_DESCRIPTION
-            )
-        }
-        val expandedMenu = remember {
-            mutableStateOf(false)
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(
-                    onClick = {
-                        expandedMenu.value = true
-                    }
-                )
-                .padding(vertical = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column {
-                Text(
-                    text = stringResource(id = R.string.theme_settings),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                )
-                Text(
-                    text = when (uiState.value.theme) {
-                        TypeTheme.SYSTEM.name -> stringResource(id = R.string.theme_text_system)
-                        TypeTheme.LIGHT.name -> stringResource(id = R.string.theme_text_light)
-                        else -> stringResource(id = R.string.theme_text_dark)
-                    },
-                    fontSize = 16.sp,
-                )
-                ShowMenu(
-                    expanded = expandedMenu,
-                    data = listOf(
-                        Type(nameType = TypeTheme.SYSTEM, str = R.string.theme_text_system),
-                        Type(nameType = TypeTheme.DARK, str = R.string.theme_text_dark),
-                        Type(nameType = TypeTheme.LIGHT, str = R.string.theme_text_light),
-                    ),
-                    onCLick = {
-                        viewModel.saveTheme(it)
-                    }
-                )
-            }
-            Image(
-                painter = painterResource(id = R.drawable.ic_arrow_right),
-                contentDescription = Constants.CONTENT_DESCRIPTION
-            )
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(
-                    onClick = {
-                        Ext.showToast(
-                            context = context,
-                            context.resources.getString(R.string.development)
-                        )
-                    }
-                )
-                .padding(bottom = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column() {
-                Text(
-                    text = stringResource(id = R.string.notifications_settings),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                )
-                Text(
-                    text = uiState.value.notification,
-                    fontSize = 16.sp,
-                )
-            }
-            Image(
-                painter = painterResource(id = R.drawable.ic_arrow_right),
-                contentDescription = Constants.CONTENT_DESCRIPTION
-            )
-        }
     }
 }
 
-@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
-fun AccountSettings(
-    uiState: State<SettingsUIState>,
-    viewModel: SettingsViewModel,
-    context: Context
+private fun SettingItem(
+    @StringRes title: Int,
+    value: String = "",
+    icon:  @Composable () -> Unit = { SettingIcon(id = R.drawable.ic_arrow_right) },
+    menu: @Composable () -> Unit = {},
+    onClick: () -> Unit
 ) {
-    Row(
+    Card(
         modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.LightGray)
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-    ) {
-        Text(
-            text = stringResource(id = R.string.account_label),
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-        )
-    }
-    Column(
-        modifier = Modifier
-            .padding(horizontal = 16.dp)
+            .fillMaxWidth(),
+        onClick = { onClick() },
+        colors = CardDefaults.cardColors(
+            containerColor = Color.Transparent
+        ),
+        shape = MaterialTheme.shapes.small.copy(CornerSize(0.dp))
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable(
-                    onClick = {
-                        Ext.showToast(
-                            context = context,
-                            context.resources.getString(R.string.development)
-                        )
-                    }
-                )
-                .padding(vertical = 8.dp),
+                .padding(vertical = 8.dp, horizontal = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column() {
-                Text(
-                    text = stringResource(id = R.string.privacy_settings),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                HeaderSetting(
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                    id = title
                 )
-                Text(
-                    text = uiState.value.privacy,
-                    fontSize = 16.sp,
-                )
+                if (value.isNotEmpty()) {
+                    Text(
+                        modifier = Modifier.padding(horizontal = 8.dp),
+                        text = value,
+                        fontSize = 16.sp,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                }
             }
-            Image(
-                painter = painterResource(id = R.drawable.ic_arrow_right),
-                contentDescription = Constants.CONTENT_DESCRIPTION
-            )
+            menu()
+            icon()
         }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(
-                    onClick = { }
-                )
-                .padding(vertical = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = stringResource(id = R.string.personal_data),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-            )
-            Image(
-                painter = painterResource(id = R.drawable.ic_arrow_right),
-                contentDescription = Constants.CONTENT_DESCRIPTION
-            )
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(
-                    onClick = {
-                        Ext.showToast(
-                            context = context,
-                            context.resources.getString(R.string.development)
-                        )
-                    }
-                )
-                .padding(vertical = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = stringResource(id = R.string.change_password_settings),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-            )
-            Image(
-                painter = painterResource(id = R.drawable.ic_arrow_right),
-                contentDescription = Constants.CONTENT_DESCRIPTION
-            )
-        }
+        Divider(
+            modifier = Modifier.fillMaxWidth(),
+            thickness = 1.dp,
+            color = MaterialTheme.colorScheme.outline
+        )
     }
 }
 
-@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
-fun SupportAndExit(
-    uiState: State<SettingsUIState>,
-    viewModel: SettingsViewModel,
-    context: Context
+private fun ShowMenuSetting(
+    expanded: MutableState<Boolean>,
+    type: SettingType,
+    onClick: (Pair<SettingType, Any>) -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(
-                    onClick = {
-                        val intent = Intent(Intent.ACTION_SENDTO)
-                        intent.data = Uri.parse("mailto:" + uiState.value.support)
-                        intent.putExtra(
-                            Intent.EXTRA_SUBJECT,
-                            context.resources.getString(R.string.bug_report_label)
-                        )
-                        context.startActivity(
-                            Intent.createChooser(
-                                intent,
-                                context.resources.getString(R.string.send_report_label)
-                            )
-                        )
-                    }
-                )
-                .padding(vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Column() {
-                Text(
-                    text = stringResource(id = R.string.tech_support_label),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                )
-                Text(
-                    text = uiState.value.support,
-                    fontSize = 16.sp,
-                )
-            }
-            Image(
-                painter = painterResource(id = R.drawable.ic_arrow_right),
-                contentDescription = Constants.CONTENT_DESCRIPTION
-            )
-
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(
-                    onClick = viewModel::userLogOut
-                )
-                .padding(vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Text(
-                text = stringResource(id = R.string.exit_label),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-            )
-            Image(
-                painter = painterResource(id = R.drawable.ic_logout),
-                contentDescription = Constants.CONTENT_DESCRIPTION
+    when (type) {
+        LANG -> {
+            ShowMenu(
+                expanded = expanded,
+                data = Constants.listTypeLang,
+                onCLick = {
+                    onClick(Pair(type, it))
+                }
             )
         }
+        THEME -> {
+            ShowMenu(
+                expanded = expanded,
+                data = Constants.listTypeTheme,
+                onCLick = {
+                    onClick(Pair(type, it))
+                }
+            )
+        }
+        NOTIFICATION -> {}
+        PERS_DATA -> {}
+        CONFIDENTIALITY -> {}
+        EDIT_PASSWORD -> {}
     }
 }

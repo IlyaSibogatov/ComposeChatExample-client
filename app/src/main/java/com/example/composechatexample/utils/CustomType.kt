@@ -7,6 +7,14 @@ data class Type<T>(
     @StringRes val str: Int
 )
 
+enum class SettingType {
+    LANG, THEME, NOTIFICATION, PERS_DATA, CONFIDENTIALITY, EDIT_PASSWORD
+}
+
+enum class TypeLang{
+    RU, ENG
+}
+
 enum class TypeTheme {
     DARK, LIGHT, SYSTEM
 }
