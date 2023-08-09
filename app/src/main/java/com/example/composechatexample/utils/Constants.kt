@@ -1,5 +1,6 @@
 package com.example.composechatexample.utils
 
+import com.example.composechatexample.R
 import com.example.composechatexample.data.model.LanguageEntity
 
 object Constants {
@@ -44,6 +45,15 @@ object Constants {
     val listLanguages = listOf(
         LanguageEntity("Русский", "ru"),
         LanguageEntity("English", "en"),
+    )
+    val listTypeTheme = listOf(
+        Type(nameType = TypeTheme.SYSTEM, str = R.string.theme_text_system),
+        Type(nameType = TypeTheme.DARK, str = R.string.theme_text_dark),
+        Type(nameType = TypeTheme.LIGHT, str = R.string.theme_text_light),
+    )
+    val listTypeLang = listOf(
+        Type(nameType = TypeLang.RU, str = R.string.languages_text_ru),
+        Type(nameType = TypeLang.ENG, str = R.string.languages_text_eng)
     )
 
     // Use 10.0.2.2:8080 if emulator is used
