@@ -12,7 +12,6 @@ import com.example.composechatexample.screens.onboarding.OnBoardingScreen
 import com.example.composechatexample.screens.profile.ProfileScreen
 import com.example.composechatexample.screens.profile.userlist.UsersListScreen
 import com.example.composechatexample.screens.settings.SettingsScreen
-import com.example.composechatexample.screens.settings.languages.LanguageScreen
 import com.example.composechatexample.utils.Constants
 
 @Composable
@@ -66,9 +65,6 @@ fun NavGraph(
                 navController,
                 backStackEntry.arguments?.getString(Constants.CHAT_ID)
             )
-        }
-        composable(route = Constants.LANGUAGE_ROUTE) {
-            LanguageScreen(navController)
         }
     }
 }
