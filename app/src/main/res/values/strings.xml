@@ -57,6 +57,8 @@
 
     <!--  Settings Screen  -->
     <string name="languages_settings">Language</string>
+    <string name="languages_text_eng" translatable="false">English</string>
+    <string name="languages_text_ru" translatable="false">Русский</string>
     <string name="theme_settings">Theme</string>
     <string name="theme_text_dark">Dark</string>
     <string name="theme_text_light">Light</string>
