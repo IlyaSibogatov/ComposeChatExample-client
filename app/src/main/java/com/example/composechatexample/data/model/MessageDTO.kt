@@ -9,11 +9,10 @@ data class MessageDTO(
     val id: String,
     val timestamp: Long,
     val message: String,
-    val username: String,
     val userId: String,
     val wasEdit: Boolean,
 ) {
-    fun toMessage(myName: String): Message {
+    fun toMessage(uid: String): Message {
         val date = Date(timestamp)
         val fd = android.text.format.DateFormat.format(
             "dd-MM-yyyy HH:MM:ss", date
@@ -22,10 +21,9 @@ data class MessageDTO(
             id = id,
             message = message,
             formattedTime = fd,
-            username = username,
             userId = userId,
             wasEdit = wasEdit,
-            myMessage = username == myName
+            myMessage = userId == uid
         )
     }
 }

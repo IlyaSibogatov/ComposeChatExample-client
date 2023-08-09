@@ -39,3 +39,9 @@ data class UserFromId(
     val followers: List<String>,
     val friendshipRequests: List<String>,
 )
+
+@Serializable
+data class UserChatInfo(
+    val uuid: String,
+    val username: String,
+)

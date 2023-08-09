@@ -2,6 +2,7 @@ package com.example.composechatexample.data.remote
 
 import com.example.composechatexample.data.model.ChatDTO
 import com.example.composechatexample.data.model.MessageDTO
+import com.example.composechatexample.data.model.UserChatInfo
 import com.example.composechatexample.data.response.DefaultResponse
 import com.example.composechatexample.domain.model.Chat
 import com.example.composechatexample.domain.model.Message
@@ -15,13 +16,24 @@ import io.ktor.http.contentType
 class MessageServiceImpl(
     private val client: HttpClient,
 ) : MessageService {
-    override suspend fun getAllMessages(chatId: String, myName: String): List<Message> {
+    override suspend fun getAllMessages(chatId: String, uid: String): List<Message> {
         return try {
             client.get<List<MessageDTO>>(MessageService.EndPoint.GetAllMessages.url) {
                 url.parameters.append("chatId", chatId)
             }
-                .map { it.toMessage(myName) }
+                .map { it.toMessage(uid) }
         } catch (e: Exception) {
+            e.printStackTrace()
+            emptyList()
+        }
+    }
+
+    override suspend fun getFollowers(chatId: String): List<UserChatInfo> {
+        return try {
+            client.get<List<UserChatInfo>>(MessageService.EndPoint.GetFollowers.url) {
+                url.parameters.append("chatId", chatId)
+            }
+        } catch (e: java.lang.Exception) {
             e.printStackTrace()
             emptyList()
         }
