@@ -42,17 +42,20 @@ class ChatViewModel @Inject constructor(
     fun connectToChat() {
         _uiState.value = uiState.value.copy(
             username = preferencesManager.userName,
-            isLoading = true,
         )
         viewModelScope.launch {
+            _uiState.value = uiState.value.copy(
+                isLoading = true,
+            )
             when (val result =
                 socketService.initSession(
                     preferencesManager.userName,
                     preferencesManager.uuid!!,
                     uiState.value.chatId
-                )) {
+                )
+            ) {
                 is Resources.Success -> {
-                    socketService.observeMessages(uiState.value.username)
+                    socketService.observeMessages(preferencesManager.uuid!!)
                         .onEach { message ->
                             val newList = uiState.value.messages.toMutableList()
                             when {
@@ -75,12 +78,19 @@ class ChatViewModel @Inject constructor(
                                             Message(
                                                 id = it.id,
                                                 message = msg,
-                                                username = it.username,
                                                 userId = it.userId,
                                                 myMessage = it.myMessage,
                                                 wasEdit = it.message != msg,
                                                 formattedTime = it.formattedTime,
                                             )
+                                        )
+                                    }
+                                }
+
+                                message.message.startsWith(ADD_FOLLOWERS) -> {
+                                    messageService.getFollowers(uiState.value.chatId).let {
+                                        _uiState.value = uiState.value.copy(
+                                            usersInfo = it
                                         )
                                     }
                                 }
@@ -102,7 +112,7 @@ class ChatViewModel @Inject constructor(
             _uiState.value = uiState.value.copy(
                 isLoading = false,
             )
-            getAllMessages()
+            getFollowers()
         }
     }
 
@@ -117,11 +127,27 @@ class ChatViewModel @Inject constructor(
             _uiState.value = uiState.value.copy(
                 isLoading = true,
             )
-            val result = messageService.getAllMessages(uiState.value.chatId, uiState.value.username)
+            val result =
+                messageService.getAllMessages(uiState.value.chatId, preferencesManager.uuid!!)
             _uiState.value = uiState.value.copy(
-                messages = result,
+                messages = result.toList(),
                 isLoading = false,
             )
+        }
+    }
+
+    private fun getFollowers() {
+        viewModelScope.launch {
+            _uiState.value = uiState.value.copy(
+                isLoading = true,
+            )
+            _uiState.value = uiState.value.copy(
+                usersInfo = messageService.getFollowers(uiState.value.chatId)
+            )
+            _uiState.value = uiState.value.copy(
+                isLoading = false,
+            )
+            getAllMessages()
         }
     }
 
@@ -206,6 +232,7 @@ class ChatViewModel @Inject constructor(
     companion object {
         const val EDIT_MESSAGE_ROUTE = "update_message_with_id="
         const val REMOVE_MESSAGE_ROUTE = "remove_message_with_id="
+        const val ADD_FOLLOWERS = "add_followers_with_id="
         const val SPLITTER = "/"
         const val EMPTY_CHAR = ""
     }

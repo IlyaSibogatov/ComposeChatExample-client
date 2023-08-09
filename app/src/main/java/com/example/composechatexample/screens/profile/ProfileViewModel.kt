@@ -59,6 +59,8 @@ class ProfileViewModel @Inject constructor(
                         selfInfo = response.selfInfo,
                     )
                 )
+                if (response.id == preferencesManager.uuid)
+                    preferencesManager.userName = response.username
             } else {
                 _uiState.value = uiState.value.copy(
                     gettingUserError = true,
