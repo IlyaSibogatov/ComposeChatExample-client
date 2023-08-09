@@ -6,7 +6,6 @@ import kotlinx.serialization.Serializable
 data class Message(
     val id: String,
     var message: String,
-    val username: String,
     val userId: String,
     var myMessage: Boolean = false,
     var wasEdit: Boolean = false,

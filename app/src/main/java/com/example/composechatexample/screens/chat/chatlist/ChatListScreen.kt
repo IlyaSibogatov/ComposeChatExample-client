@@ -308,7 +308,8 @@ fun PreviewCardChat() {
         password = "",
         owner = "Person",
         formattedTime = "24.07.2023 19 12",
-        id = "ibdifbaibfa"
+        id = "ibdifbaibfa",
+        ownerId = "",
     ),
         modifier = Modifier.padding(start = 16.dp, end = 16.dp),
         onChatClick = { /*TODO*/ },

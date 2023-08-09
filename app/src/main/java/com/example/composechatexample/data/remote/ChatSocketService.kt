@@ -14,7 +14,7 @@ interface ChatSocketService {
 
     suspend fun sendMessage(msg: String)
 
-    fun observeMessages(myName: String): Flow<Message>
+    fun observeMessages(uid: String): Flow<Message>
 
     suspend fun closeSessions()
 

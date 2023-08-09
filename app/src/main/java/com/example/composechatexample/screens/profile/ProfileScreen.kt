@@ -423,12 +423,6 @@ fun ProfileScreen(
                         }
                     )
                 }
-
-                is ProfileScreenEvent.ToastEvent -> {
-                    if (value.msg == "error")
-                        showToast(context, context.resources.getString(R.string.error_toast))
-                    else showToast(context, context.resources.getString(R.string.success_message))
-                }
             }
         }
     }
