@@ -13,17 +13,19 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -45,7 +47,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -54,6 +55,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavHostController
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.composechatexample.R
 import com.example.composechatexample.components.CircularLoader
 import com.example.composechatexample.components.CustomIconButton
@@ -160,11 +164,13 @@ fun ChatScreen(
                                     }
                                 )
                             },
-                            onAvatarCLick = { viewModel.navigateToProfile() }
+                            onAvatarCLick = { viewModel.navigateToProfile() },
+                            uuid = item.userId,
                         ) { expandedMenu.value = !expandedMenu.value }
                     } else {
                         GuestMessage(
-                            onAvatarCLick = { viewModel.navigateToProfile(item.userId) }
+                            onAvatarCLick = { viewModel.navigateToProfile(item.userId) },
+                            uuid = item.userId,
                         ) {
                             ContentMessage(
                                 data = item,
@@ -245,10 +251,12 @@ private fun PreviewSend() {
     SendingField("", {}) {}
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@SuppressLint("CheckResult")
+@OptIn(ExperimentalFoundationApi::class, ExperimentalGlideComposeApi::class)
 @Composable
 private fun MyMessage(
     content: @Composable () -> Unit,
+    uuid: String,
     menu: @Composable () -> Unit,
     onAvatarCLick: () -> Unit,
     onLongClick: () -> Unit,
@@ -266,7 +274,7 @@ private fun MyMessage(
             Spacer(modifier = Modifier.weight(1f))
             Card(
                 modifier = Modifier
-                    .padding(end = 32.dp)
+//                    .padding(end = 32.dp)
                     .wrapContentWidth()
                     .combinedClickable(
                         onClick = {},
@@ -285,19 +293,33 @@ private fun MyMessage(
             }
         }
         menu()
-        Icon(
-            modifier = Modifier
-                .padding(bottom = 8.dp)
-                .clickable { onAvatarCLick() },
-            painter = painterResource(id = R.drawable.ic_user),
-            contentDescription = Constants.CONTENT_DESCRIPTION
-        )
+//        Card(
+//            modifier = Modifier
+//                .size(36.dp),
+//            shape = CircleShape,
+//        ) {
+//            GlideImage(
+//                modifier = Modifier
+//                    .fillMaxSize()
+//                    .clickable { onAvatarCLick() },
+//                model = Constants.BASE_URL + "/images/" + uuid + ".jpeg",
+//                contentDescription = Constants.CONTENT_DESCRIPTION
+//            ) {
+//                it.placeholder(R.drawable.ic_user)
+//                it.skipMemoryCache(true)
+//                it.diskCacheStrategy(DiskCacheStrategy.NONE)
+//                it.centerCrop()
+//            }
+//        }
     }
 }
 
+@SuppressLint("CheckResult")
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 private fun GuestMessage(
     onAvatarCLick: () -> Unit,
+    uuid: String,
     content: @Composable () -> Unit,
 ) {
     Box(
@@ -309,13 +331,24 @@ private fun GuestMessage(
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.Start
         ) {
-            Icon(
+            Card(
                 modifier = Modifier
-                    .padding(bottom = 8.dp)
-                    .clickable { onAvatarCLick() },
-                painter = painterResource(id = R.drawable.ic_user),
-                contentDescription = ""
-            )
+                    .size(36.dp),
+                shape = CircleShape,
+            ) {
+                GlideImage(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clickable { onAvatarCLick() },
+                    model = Constants.BASE_URL + "/images/" + uuid + ".jpeg",
+                    contentDescription = ""
+                ) {
+                    it.placeholder(R.drawable.ic_user)
+                    it.skipMemoryCache(true)
+                    it.diskCacheStrategy(DiskCacheStrategy.NONE)
+                    it.centerCrop()
+                }
+            }
             Card(
                 modifier = Modifier
                     .padding(start = 8.dp)
@@ -371,7 +404,8 @@ private fun ContentMessage(
 @Composable
 private fun PreviewItemGuest() {
     GuestMessage(
-        onAvatarCLick = {}
+        onAvatarCLick = {},
+        uuid = "",
     ) {
         ContentMessage(
             data = FakeMessage,
@@ -397,7 +431,8 @@ private fun PreviewItemMy() {
             )
         },
         menu = {},
-        onAvatarCLick = {}
+        onAvatarCLick = {},
+        uuid = "",
     ) {}
 }
 

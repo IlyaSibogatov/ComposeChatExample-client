@@ -1,5 +1,6 @@
 package com.example.composechatexample.screens.profile.userlist
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -32,12 +34,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.composechatexample.R
 import com.example.composechatexample.screens.profile.userlist.model.UsersListEvent
 import com.example.composechatexample.utils.Constants
 import com.example.composechatexample.utils.Constants.FRIENDSHIPS_REQUESTS
 import kotlinx.coroutines.flow.collectLatest
 
+@SuppressLint("CheckResult")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable
 fun UsersListScreen(
@@ -73,15 +77,24 @@ fun UsersListScreen(
                     val (
                         profilePhoto, friendName, onlineStatus, chatWithFriend
                     ) = createRefs()
-                    GlideImage(
+                    Card(
                         modifier = Modifier
                             .padding(8.dp)
+                            .size(24.dp)
                             .constrainAs(profilePhoto) {
                                 start.linkTo(parent.start)
                             },
-                        model = R.drawable.ic_user,
-                        contentDescription = Constants.CONTENT_DESCRIPTION,
-                    )
+                        shape = CircleShape,
+                    ) {
+                        GlideImage(
+                            model = Constants.BASE_URL + "/images/" + item.id + ".jpeg",
+                            contentDescription = Constants.CONTENT_DESCRIPTION,
+                        ) {
+                            it.placeholder(R.drawable.ic_user)
+                            it.skipMemoryCache(true)
+                            it.diskCacheStrategy(DiskCacheStrategy.NONE)
+                        }
+                    }
                     Text(
                         modifier = Modifier
                             .padding(8.dp)

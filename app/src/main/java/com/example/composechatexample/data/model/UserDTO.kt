@@ -3,6 +3,7 @@ package com.example.composechatexample.data.model
 import com.example.composechatexample.domain.model.Friend
 import com.example.composechatexample.domain.model.User
 import kotlinx.serialization.Serializable
+import java.io.File
 
 @Serializable
 data class UserDTO(
@@ -32,6 +33,7 @@ data class UserDTO(
 data class UserFromId(
     val id: String,
     val username: String,
+    val avatar: String? = null,
     val selfInfo: String,
     var onlineStatus: Boolean,
     var lastActionTime: Long,
