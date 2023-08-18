@@ -1,5 +1,6 @@
 package com.example.composechatexample.screens.profile
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.composechatexample.data.model.UserFromId
@@ -12,6 +13,7 @@ import com.example.composechatexample.utils.Constants.ERROR
 import com.example.composechatexample.utils.Constants.FAILED
 import com.example.composechatexample.utils.Constants.SUCCESS
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,11 +34,9 @@ class ProfileViewModel @Inject constructor(
     val eventsFlow = eventChannel.receiveAsFlow()
 
     fun getProfile(uid: String?) {
-        uid?.let {
-            _uiState.value = uiState.value.copy(
-                uid = it,
-            )
-        }
+        _uiState.value = uiState.value.copy(
+            uid = uid ?: preferencesManager.uuid!!,
+        )
         viewModelScope.launch {
             _uiState.value = uiState.value.copy(
                 loadingStatus = true
@@ -146,6 +146,23 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
+    fun setAvatar(img: ByteArray) {
+        viewModelScope.launch {
+            userService.setAvatar(uiState.value.uid, img)?.let {
+                _uiState.value = uiState.value.copy(
+                    updateImage = it.status == HttpStatusCode.OK.value
+                )
+            }
+        }
+    }
+
+    fun updateImage(uri: Uri) {
+        _uiState.value = uiState.value.copy(
+            updateImage = false,
+            imageUri = uri
+        )
+    }
+
     fun isMyProfile(): Boolean {
         return uiState.value.uid == preferencesManager.uuid
     }
@@ -153,6 +170,8 @@ class ProfileViewModel @Inject constructor(
     fun isFriend(): Boolean {
         return uiState.value.friends.find {
             it.id == preferencesManager.uuid
+        } != null || uiState.value.friendshipRequests.find {
+            it == preferencesManager.uuid
         } != null || uiState.value.uid == preferencesManager.uuid
     }
 
