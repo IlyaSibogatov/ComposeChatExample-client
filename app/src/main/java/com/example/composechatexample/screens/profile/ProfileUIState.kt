@@ -1,10 +1,12 @@
 package com.example.composechatexample.screens.profile
 
+import android.net.Uri
 import com.example.composechatexample.domain.model.Friend
 import com.example.composechatexample.domain.model.NewUserInfo
 
 data class ProfileUIState(
     val uid: String = "",
+    val imageUri: Uri? = null,
     val username: String = "",
     val selfInfo: String = "",
     val showEditDialog: Boolean = false,
@@ -13,6 +15,7 @@ data class ProfileUIState(
     val onlineStatus: Boolean = false,
     val loadingStatus: Boolean = false,
     val gettingUserError: Boolean = false,
+    val updateImage: Boolean = false,
     val lastActionTime: Long? = null,
     val newInfo: NewUserInfo = NewUserInfo(),
     val friends: List<Friend> = listOf(),

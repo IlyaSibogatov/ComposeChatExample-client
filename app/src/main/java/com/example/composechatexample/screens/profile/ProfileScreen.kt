@@ -1,5 +1,9 @@
 package com.example.composechatexample.screens.profile
 
+import android.annotation.SuppressLint
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -26,6 +30,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -44,6 +50,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.composechatexample.R
 import com.example.composechatexample.screens.dialogs.EditInfoDialog
 import com.example.composechatexample.screens.profile.model.ProfileScreenEvent
@@ -57,6 +64,7 @@ import com.example.composechatexample.utils.Constants.SUCCESS
 import com.example.composechatexample.utils.Ext.showToast
 import kotlinx.coroutines.flow.collectLatest
 
+@SuppressLint("CheckResult")
 @OptIn(ExperimentalGlideComposeApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
@@ -67,6 +75,18 @@ fun ProfileScreen(
     val viewModel: ProfileViewModel = hiltViewModel()
     val uiState = viewModel.uiState.collectAsState()
 
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            val inputStream = context.contentResolver.openInputStream(it)
+            val imageByteArray = inputStream?.readBytes()
+            viewModel.updateImage(it)
+
+            viewModel.setAvatar(imageByteArray!!)
+            inputStream.close()
+        }
+    }
     viewModel.getProfile(uid?.removePrefix(Constants.USER_UID))
 
     ConstraintLayout(
@@ -91,11 +111,27 @@ fun ProfileScreen(
                 },
             shape = CircleShape,
         ) {
+            val avatar =
+                remember { mutableStateOf(Constants.BASE_URL + "/images/" + uiState.value.uid + ".jpeg") }
             GlideImage(
-                modifier = Modifier.fillMaxSize(),
-                model = R.drawable.ic_user,
-                contentDescription = Constants.CONTENT_DESCRIPTION
-            )
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clickable {
+                        if (viewModel.isMyProfile())
+                            launcher.launch("image/*")
+                    },
+                model =
+                if (uiState.value.updateImage)
+                    uiState.value.imageUri
+                else
+                    Constants.BASE_URL + "/images/" + uiState.value.uid + ".jpeg",
+                contentDescription = Constants.CONTENT_DESCRIPTION,
+            ) {
+                it.placeholder(R.drawable.ic_user)
+                it.skipMemoryCache(true)
+                it.diskCacheStrategy(DiskCacheStrategy.NONE)
+                it.centerCrop()
+            }
         }
         GlideImage(
             modifier = Modifier
@@ -296,9 +332,14 @@ fun ProfileScreen(
                                 .constrainAs(profilePhoto) {
                                     start.linkTo(parent.start)
                                 },
-                            model = R.drawable.ic_user,
+                            model =
+                            Constants.BASE_URL + "/images/" + item.id + ".jpeg",
                             contentDescription = Constants.CONTENT_DESCRIPTION,
-                        )
+                        ) {
+                            it.placeholder(R.drawable.ic_user)
+                            it.skipMemoryCache(true)
+                            it.diskCacheStrategy(DiskCacheStrategy.NONE)
+                        }
                         Text(
                             modifier = Modifier
                                 .padding(8.dp)
