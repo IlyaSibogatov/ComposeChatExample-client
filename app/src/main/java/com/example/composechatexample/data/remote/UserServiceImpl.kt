@@ -5,9 +5,13 @@ import com.example.composechatexample.data.response.DefaultResponse
 import com.example.composechatexample.domain.model.Friend
 import com.example.composechatexample.domain.model.NewUserInfo
 import io.ktor.client.HttpClient
+import io.ktor.client.request.forms.MultiPartFormDataContent
+import io.ktor.client.request.forms.formData
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.http.ContentType
+import io.ktor.http.Headers
+import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 
@@ -32,17 +36,9 @@ class UserServiceImpl(
                 url.parameters.append("userId", userId)
             }.let {
                 when (it.status) {
-                    HttpStatusCode.OK.value -> {
-                        true
-                    }
-
-                    HttpStatusCode.NoContent.value -> {
-                        false
-                    }
-
-                    else -> {
-                        false
-                    }
+                    HttpStatusCode.OK.value -> true
+                    HttpStatusCode.NoContent.value -> false
+                    else -> false
                 }
             }
         } catch (e: Exception) {
@@ -74,6 +70,27 @@ class UserServiceImpl(
         } catch (e: Exception) {
             e.printStackTrace()
             false
+        }
+    }
+
+    override suspend fun setAvatar(userId: String, img: ByteArray): DefaultResponse? {
+        return try {
+            client.post(UserService.EndPoint.UploadAvatar.url) {
+                url.parameters.append("userId", userId)
+                body = MultiPartFormDataContent(
+                    formData {
+                        append("description", "Ktor avatar")
+                        append("image", img, Headers.build {
+                            append(HttpHeaders.ContentType, "image/jpeg")
+                            append(HttpHeaders.ContentDisposition, "filename=image.png")
+                        }
+                        )
+                    }
+                )
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
         }
     }
 
