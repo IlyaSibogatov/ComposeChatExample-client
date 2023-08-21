@@ -45,6 +45,7 @@ The project used:
   # Settings screen
   Currently implemented:
 - Language change. Available in two languages - Russian - English
+- Themes change. System, Light, Dark
 - Communication with technical support (Send email)
 - User logout from the account
   
