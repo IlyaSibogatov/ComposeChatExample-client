@@ -300,7 +300,7 @@ private fun ItemChat(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(top = 8.dp, start = 16.dp, end = 16.dp)
             .combinedClickable(
                 onClick = { onChatClick() },
                 onLongClick = { onChatLongClick() },

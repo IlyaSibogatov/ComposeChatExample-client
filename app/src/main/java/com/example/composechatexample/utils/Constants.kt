@@ -25,18 +25,11 @@ object Constants {
     const val FRIENDS_LIST_ROUTE = "friends_list_route"
     const val FRIENDS_LIST_TITLE = "Friends list"
 
-    const val LANGUAGE_ROUTE = "languages_route"
-    const val LANGUAGE_TITLE = "Languages list"
-
     const val CONTENT_DESCRIPTION = "Content description"
     const val CHAT_ID = "chat_id"
 
     const val USER_UID = "user_uid"
     const val USERS_TYPE = "users_type"
-
-    const val SUCCESS = "success"
-    const val FAILED = "failed"
-    const val ERROR = "error"
 
     const val FOLLOWERS = "followers"
     const val FRIENDSHIPS_REQUESTS = "friendship_requests"

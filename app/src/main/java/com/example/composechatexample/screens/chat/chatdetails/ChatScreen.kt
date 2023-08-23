@@ -13,17 +13,19 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -43,6 +45,7 @@ import androidx.compose.ui.Alignment.Companion.BottomStart
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
@@ -54,6 +57,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
+import coil.request.CachePolicy
+import coil.request.ImageRequest
 import com.example.composechatexample.R
 import com.example.composechatexample.components.CircularLoader
 import com.example.composechatexample.components.CustomIconButton
@@ -160,11 +166,11 @@ fun ChatScreen(
                                     }
                                 )
                             },
-                            onAvatarCLick = { viewModel.navigateToProfile() }
                         ) { expandedMenu.value = !expandedMenu.value }
                     } else {
                         GuestMessage(
-                            onAvatarCLick = { viewModel.navigateToProfile(item.userId) }
+                            onAvatarCLick = { viewModel.navigateToProfile(item.userId) },
+                            uuid = item.userId,
                         ) {
                             ContentMessage(
                                 data = item,
@@ -245,12 +251,12 @@ private fun PreviewSend() {
     SendingField("", {}) {}
 }
 
+@SuppressLint("CheckResult")
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun MyMessage(
     content: @Composable () -> Unit,
     menu: @Composable () -> Unit,
-    onAvatarCLick: () -> Unit,
     onLongClick: () -> Unit,
 ) {
     Box(
@@ -266,7 +272,6 @@ private fun MyMessage(
             Spacer(modifier = Modifier.weight(1f))
             Card(
                 modifier = Modifier
-                    .padding(end = 32.dp)
                     .wrapContentWidth()
                     .combinedClickable(
                         onClick = {},
@@ -285,19 +290,14 @@ private fun MyMessage(
             }
         }
         menu()
-        Icon(
-            modifier = Modifier
-                .padding(bottom = 8.dp)
-                .clickable { onAvatarCLick() },
-            painter = painterResource(id = R.drawable.ic_user),
-            contentDescription = Constants.CONTENT_DESCRIPTION
-        )
     }
 }
 
+@SuppressLint("CheckResult")
 @Composable
 private fun GuestMessage(
     onAvatarCLick: () -> Unit,
+    uuid: String,
     content: @Composable () -> Unit,
 ) {
     Box(
@@ -309,13 +309,28 @@ private fun GuestMessage(
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.Start
         ) {
-            Icon(
+            Card(
                 modifier = Modifier
-                    .padding(bottom = 8.dp)
-                    .clickable { onAvatarCLick() },
-                painter = painterResource(id = R.drawable.ic_user),
-                contentDescription = ""
-            )
+                    .size(36.dp),
+                shape = CircleShape,
+            ) {
+                AsyncImage(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clickable { onAvatarCLick() },
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(Constants.BASE_URL + "/images/" + uuid + ".jpeg")
+                        .networkCachePolicy(CachePolicy.READ_ONLY)
+                        .diskCachePolicy(CachePolicy.READ_ONLY)
+                        .memoryCachePolicy(CachePolicy.DISABLED)
+                        .build(),
+                    alignment = Alignment.Center,
+                    contentScale = ContentScale.Crop,
+                    contentDescription = Constants.CONTENT_DESCRIPTION,
+                    placeholder = painterResource(id = R.drawable.ic_user),
+                    error = painterResource(id = R.drawable.ic_user),
+                )
+            }
             Card(
                 modifier = Modifier
                     .padding(start = 8.dp)
@@ -371,7 +386,8 @@ private fun ContentMessage(
 @Composable
 private fun PreviewItemGuest() {
     GuestMessage(
-        onAvatarCLick = {}
+        onAvatarCLick = {},
+        uuid = "",
     ) {
         ContentMessage(
             data = FakeMessage,
@@ -397,7 +413,6 @@ private fun PreviewItemMy() {
             )
         },
         menu = {},
-        onAvatarCLick = {}
     ) {}
 }
 

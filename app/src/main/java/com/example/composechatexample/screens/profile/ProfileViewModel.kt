@@ -1,5 +1,6 @@
 package com.example.composechatexample.screens.profile
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.composechatexample.data.model.UserFromId
@@ -8,10 +9,9 @@ import com.example.composechatexample.data.remote.UserService
 import com.example.composechatexample.domain.model.NewUserInfo
 import com.example.composechatexample.screens.profile.model.ProfileScreenEvent
 import com.example.composechatexample.utils.Constants
-import com.example.composechatexample.utils.Constants.ERROR
-import com.example.composechatexample.utils.Constants.FAILED
-import com.example.composechatexample.utils.Constants.SUCCESS
+import com.example.composechatexample.utils.Ext
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,11 +32,9 @@ class ProfileViewModel @Inject constructor(
     val eventsFlow = eventChannel.receiveAsFlow()
 
     fun getProfile(uid: String?) {
-        uid?.let {
-            _uiState.value = uiState.value.copy(
-                uid = it,
-            )
-        }
+        _uiState.value = uiState.value.copy(
+            uid = uid ?: preferencesManager.uuid!!,
+        )
         viewModelScope.launch {
             _uiState.value = uiState.value.copy(
                 loadingStatus = true
@@ -85,6 +83,12 @@ class ProfileViewModel @Inject constructor(
                 errors = ProfileErrors()
             )
         }
+    }
+
+    fun showMoreInfo() {
+        _uiState.value = uiState.value.copy(
+            showMoreInfo = !uiState.value.showMoreInfo
+        )
     }
 
     fun updateNameValue(username: String) {
@@ -136,14 +140,39 @@ class ProfileViewModel @Inject constructor(
                 userService.updateUserInfo(uiState.value.newInfo).let {
                     if (it) {
                         showEditDialog()
-                        sendEvent(ProfileScreenEvent.ToastEvent(msg = "success"))
+                        sendEvent(
+                            ProfileScreenEvent.ToastEvent(
+                                msg = Ext.ResponseStatus.INFO_UPDATED.value
+                            )
+                        )
                         getProfile(uiState.value.uid)
                     } else {
-                        sendEvent(ProfileScreenEvent.ToastEvent(msg = "error"))
+                        sendEvent(
+                            ProfileScreenEvent.ToastEvent(
+                                msg = Ext.ResponseStatus.INFO_NOT_UPDATED.value
+                            )
+                        )
                     }
                 }
             }
         }
+    }
+
+    fun setAvatar(img: ByteArray) {
+        viewModelScope.launch {
+            userService.setAvatar(uiState.value.uid, img)?.let {
+                _uiState.value = uiState.value.copy(
+                    updateImage = it.status == HttpStatusCode.OK.value
+                )
+            }
+        }
+    }
+
+    fun updateImage(uri: Uri) {
+        _uiState.value = uiState.value.copy(
+            updateImage = false,
+            imageUri = uri
+        )
     }
 
     fun isMyProfile(): Boolean {
@@ -153,7 +182,10 @@ class ProfileViewModel @Inject constructor(
     fun isFriend(): Boolean {
         return uiState.value.friends.find {
             it.id == preferencesManager.uuid
-        } != null || uiState.value.uid == preferencesManager.uuid
+        } != null || uiState.value.friendshipRequests.find {
+            it == preferencesManager.uuid
+        } != null || uiState.value.uid == preferencesManager.uuid ||
+                uiState.value.isFriend
     }
 
     fun friendshipRequest() {
@@ -165,9 +197,15 @@ class ProfileViewModel @Inject constructor(
                 sendEvent(
                     ProfileScreenEvent.ToastEvent(
                         when (it) {
-                            true -> SUCCESS
-                            false -> FAILED
-                            null -> ERROR
+                            true -> {
+                                _uiState.value = uiState.value.copy(
+                                    isFriend = true
+                                )
+                                Ext.ResponseStatus.FRIENDSHIP_REQUEST_SEND.value
+                            }
+
+                            false -> Ext.ResponseStatus.FRIENDSHIP_REQUEST_NOT_SEND.value
+                            null -> Ext.ResponseStatus.ERROR.value
                         }
                     )
                 )
