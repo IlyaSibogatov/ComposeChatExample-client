@@ -22,4 +22,15 @@ object Ext {
         val resources = context.resources
         return resources.configuration.locale.language
     }
+
+    enum class ResponseStatus(val value: String) {
+        SUCCESS("success"),
+        FAILED("failed"),
+        ERROR("error"),
+
+        INFO_UPDATED("info_was_update"),
+        INFO_NOT_UPDATED("info_not_update"),
+        FRIENDSHIP_REQUEST_SEND("request_was_send"),
+        FRIENDSHIP_REQUEST_NOT_SEND("request_not_send"),
+    }
 }

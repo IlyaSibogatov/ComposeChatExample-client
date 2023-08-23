@@ -26,10 +26,14 @@
     <string name="add_to_friend">Добавить в друзья</string>
     <string name="info_dont_filled">Информация не заполнена</string>
     <string name="show_more">Показать больше</string>
+    <string name="roll_up">Свернуть</string>
     <string name="view_friends">Все друзья</string>
     <string name="nickname">Никнейм</string>
     <string name="username_empty">Никнейм должен быть заполнен</string>
     <string name="info_dont_changes">Данные не изменились</string>
+
+    <string name="succes_data_update">Данные были изменены</string>
+    <string name="failed_data_update">Данные не были изменены</string>
 
     <string name="success_friend_request">Заявка в друзья отправлена</string>
     <string name="failed_friend_request">Не удалсь отправить заявку в друзья</string>
