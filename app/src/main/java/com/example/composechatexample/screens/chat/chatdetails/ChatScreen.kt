@@ -45,8 +45,10 @@ import androidx.compose.ui.Alignment.Companion.BottomStart
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -55,9 +57,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavHostController
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.GlideImage
-import com.bumptech.glide.load.engine.DiskCacheStrategy
+import coil.compose.AsyncImage
+import coil.request.CachePolicy
+import coil.request.ImageRequest
 import com.example.composechatexample.R
 import com.example.composechatexample.components.CircularLoader
 import com.example.composechatexample.components.CustomIconButton
@@ -164,8 +166,6 @@ fun ChatScreen(
                                     }
                                 )
                             },
-                            onAvatarCLick = { viewModel.navigateToProfile() },
-                            uuid = item.userId,
                         ) { expandedMenu.value = !expandedMenu.value }
                     } else {
                         GuestMessage(
@@ -252,13 +252,11 @@ private fun PreviewSend() {
 }
 
 @SuppressLint("CheckResult")
-@OptIn(ExperimentalFoundationApi::class, ExperimentalGlideComposeApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun MyMessage(
     content: @Composable () -> Unit,
-    uuid: String,
     menu: @Composable () -> Unit,
-    onAvatarCLick: () -> Unit,
     onLongClick: () -> Unit,
 ) {
     Box(
@@ -274,7 +272,6 @@ private fun MyMessage(
             Spacer(modifier = Modifier.weight(1f))
             Card(
                 modifier = Modifier
-//                    .padding(end = 32.dp)
                     .wrapContentWidth()
                     .combinedClickable(
                         onClick = {},
@@ -293,29 +290,10 @@ private fun MyMessage(
             }
         }
         menu()
-//        Card(
-//            modifier = Modifier
-//                .size(36.dp),
-//            shape = CircleShape,
-//        ) {
-//            GlideImage(
-//                modifier = Modifier
-//                    .fillMaxSize()
-//                    .clickable { onAvatarCLick() },
-//                model = Constants.BASE_URL + "/images/" + uuid + ".jpeg",
-//                contentDescription = Constants.CONTENT_DESCRIPTION
-//            ) {
-//                it.placeholder(R.drawable.ic_user)
-//                it.skipMemoryCache(true)
-//                it.diskCacheStrategy(DiskCacheStrategy.NONE)
-//                it.centerCrop()
-//            }
-//        }
     }
 }
 
 @SuppressLint("CheckResult")
-@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 private fun GuestMessage(
     onAvatarCLick: () -> Unit,
@@ -336,18 +314,22 @@ private fun GuestMessage(
                     .size(36.dp),
                 shape = CircleShape,
             ) {
-                GlideImage(
+                AsyncImage(
                     modifier = Modifier
                         .fillMaxSize()
                         .clickable { onAvatarCLick() },
-                    model = Constants.BASE_URL + "/images/" + uuid + ".jpeg",
-                    contentDescription = ""
-                ) {
-                    it.placeholder(R.drawable.ic_user)
-                    it.skipMemoryCache(true)
-                    it.diskCacheStrategy(DiskCacheStrategy.NONE)
-                    it.centerCrop()
-                }
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(Constants.BASE_URL + "/images/" + uuid + ".jpeg")
+                        .networkCachePolicy(CachePolicy.READ_ONLY)
+                        .diskCachePolicy(CachePolicy.READ_ONLY)
+                        .memoryCachePolicy(CachePolicy.DISABLED)
+                        .build(),
+                    alignment = Alignment.Center,
+                    contentScale = ContentScale.Crop,
+                    contentDescription = Constants.CONTENT_DESCRIPTION,
+                    placeholder = painterResource(id = R.drawable.ic_user),
+                    error = painterResource(id = R.drawable.ic_user),
+                )
             }
             Card(
                 modifier = Modifier
@@ -431,8 +413,6 @@ private fun PreviewItemMy() {
             )
         },
         menu = {},
-        onAvatarCLick = {},
-        uuid = "",
     ) {}
 }
 
