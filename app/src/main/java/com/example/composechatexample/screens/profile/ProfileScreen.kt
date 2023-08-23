@@ -30,12 +30,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -48,24 +48,22 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.GlideImage
-import com.bumptech.glide.load.engine.DiskCacheStrategy
+import coil.compose.AsyncImage
+import coil.request.CachePolicy
+import coil.request.ImageRequest
 import com.example.composechatexample.R
 import com.example.composechatexample.screens.dialogs.EditInfoDialog
 import com.example.composechatexample.screens.profile.model.ProfileScreenEvent
 import com.example.composechatexample.utils.Constants
-import com.example.composechatexample.utils.Constants.ERROR
-import com.example.composechatexample.utils.Constants.FAILED
 import com.example.composechatexample.utils.Constants.FOLLOWERS
 import com.example.composechatexample.utils.Constants.FRIENDS
 import com.example.composechatexample.utils.Constants.FRIENDSHIPS_REQUESTS
-import com.example.composechatexample.utils.Constants.SUCCESS
+import com.example.composechatexample.utils.Ext
 import com.example.composechatexample.utils.Ext.showToast
 import kotlinx.coroutines.flow.collectLatest
 
 @SuppressLint("CheckResult")
-@OptIn(ExperimentalGlideComposeApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     navController: NavHostController,
@@ -111,29 +109,31 @@ fun ProfileScreen(
                 },
             shape = CircleShape,
         ) {
-            val avatar =
-                remember { mutableStateOf(Constants.BASE_URL + "/images/" + uiState.value.uid + ".jpeg") }
-            GlideImage(
+            AsyncImage(
                 modifier = Modifier
                     .fillMaxSize()
                     .clickable {
                         if (viewModel.isMyProfile())
                             launcher.launch("image/*")
                     },
-                model =
-                if (uiState.value.updateImage)
-                    uiState.value.imageUri
-                else
-                    Constants.BASE_URL + "/images/" + uiState.value.uid + ".jpeg",
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(
+                        if (uiState.value.updateImage)
+                            uiState.value.imageUri
+                        else Constants.BASE_URL + "/images/" + uiState.value.uid + ".jpeg"
+                    )
+                    .networkCachePolicy(CachePolicy.READ_ONLY)
+                    .diskCachePolicy(CachePolicy.READ_ONLY)
+                    .memoryCachePolicy(CachePolicy.DISABLED)
+                    .build(),
+                alignment = Alignment.Center,
+                contentScale = ContentScale.Crop,
                 contentDescription = Constants.CONTENT_DESCRIPTION,
-            ) {
-                it.placeholder(R.drawable.ic_user)
-                it.skipMemoryCache(true)
-                it.diskCacheStrategy(DiskCacheStrategy.NONE)
-                it.centerCrop()
-            }
+                placeholder = painterResource(id = R.drawable.ic_user),
+                error = painterResource(id = R.drawable.ic_user),
+            )
         }
-        GlideImage(
+        AsyncImage(
             modifier = Modifier
                 .padding(top = 25.dp, end = 25.dp)
                 .size(16.dp)
@@ -146,22 +146,6 @@ fun ProfileScreen(
             else R.drawable.ic_user_offline,
             contentDescription = Constants.CONTENT_DESCRIPTION
         )
-        /** Offline timer */
-//            Card(
-//                modifier = Modifier
-//                    .constrainAs(userOfflineTime) {
-//                        top.linkTo(photo.top)
-//                        end.linkTo(photo.end)
-//                    }
-//                    .padding(top = 15.dp),
-//                shape = MaterialTheme.shapes.small,
-//            ) {
-//                Text(
-//                    modifier = Modifier
-//                        .padding(horizontal = 5.dp),
-//                    text = "25 min."
-//                )
-//            }
 
         Text(
             modifier = Modifier
@@ -202,28 +186,33 @@ fun ProfileScreen(
                 stringResource(id = R.string.info_dont_filled)
             },
             fontSize = 16.sp,
-            maxLines = 3,
-            overflow = TextOverflow.Ellipsis,
+            maxLines = if (!uiState.value.showMoreInfo) 3 else Int.MAX_VALUE,
+            overflow = if (!uiState.value.showMoreInfo) TextOverflow.Ellipsis else TextOverflow.Clip,
             onTextLayout = {
                 viewModel.selfInfoOverflowed(it.hasVisualOverflow)
             }
         )
-        if (uiState.value.infoOverflowed) {
+        if (uiState.value.infoOverflowed || uiState.value.showMoreInfo) {
             Text(
                 modifier = Modifier
                     .background(MaterialTheme.colorScheme.background)
+                    .padding(bottom = 8.dp, start = 4.dp, end = 4.dp)
                     .clickable {
-                        showToast(
-                            context = context,
-                            context.resources.getString(R.string.development)
-                        )
+                        viewModel.showMoreInfo()
                     }
                     .constrainAs(showMore) {
-                        bottom.linkTo(selfInfo.bottom)
+                        if (uiState.value.showMoreInfo)
+                            top.linkTo(selfInfo.bottom)
+                        else
+                            bottom.linkTo(selfInfo.bottom)
                         end.linkTo(selfInfo.end)
                     },
                 color = Color.Blue,
-                text = stringResource(id = R.string.show_more),
+                text = stringResource(
+                    id = if (uiState.value.showMoreInfo)
+                        R.string.roll_up
+                    else R.string.show_more
+                ),
             )
         }
         Row(
@@ -249,7 +238,10 @@ fun ProfileScreen(
                 .constrainAs(followerAndRequests) {
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
-                    top.linkTo(selfInfo.bottom)
+                    if (uiState.value.showMoreInfo)
+                        top.linkTo(showMore.bottom)
+                    else
+                        top.linkTo(selfInfo.bottom)
                 }
         ) {
             if (uiState.value.followers.isNotEmpty())
@@ -326,20 +318,27 @@ fun ProfileScreen(
                         val (
                             profilePhoto, friendName, onlineStatus, chatWithFriend
                         ) = createRefs()
-                        GlideImage(
+                        AsyncImage(
                             modifier = Modifier
                                 .padding(8.dp)
+                                .size(24.dp)
+                                .clip(CircleShape)
                                 .constrainAs(profilePhoto) {
                                     start.linkTo(parent.start)
                                 },
-                            model =
-                            Constants.BASE_URL + "/images/" + item.id + ".jpeg",
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(Constants.BASE_URL + "/images/" + item.id + ".jpeg")
+                                .networkCachePolicy(CachePolicy.READ_ONLY)
+                                .diskCachePolicy(CachePolicy.READ_ONLY)
+                                .memoryCachePolicy(CachePolicy.DISABLED)
+                                .build(),
+                            alignment = Alignment.Center,
+                            contentScale = ContentScale.Crop,
                             contentDescription = Constants.CONTENT_DESCRIPTION,
-                        ) {
-                            it.placeholder(R.drawable.ic_user)
-                            it.skipMemoryCache(true)
-                            it.diskCacheStrategy(DiskCacheStrategy.NONE)
-                        }
+                            placeholder = painterResource(id = R.drawable.ic_user),
+                            error = painterResource(id = R.drawable.ic_user),
+                        )
+
                         Text(
                             modifier = Modifier
                                 .padding(8.dp)
@@ -352,8 +351,9 @@ fun ProfileScreen(
                             fontSize = 16.sp,
                             maxLines = 1,
                         )
-                        GlideImage(
+                        AsyncImage(
                             modifier = Modifier
+                                .size(24.dp)
                                 .border(2.dp, Color.Gray, CircleShape)
                                 .constrainAs(onlineStatus) {
                                     top.linkTo(parent.top)
@@ -365,9 +365,11 @@ fun ProfileScreen(
                             else R.drawable.ic_user_offline,
                             contentDescription = Constants.CONTENT_DESCRIPTION
                         )
-                        GlideImage(
+                        AsyncImage(
                             modifier = Modifier
                                 .padding(start = 4.dp)
+                                .padding(horizontal = 8.dp)
+                                .size(24.dp)
                                 .clipToBounds()
                                 .clickable(onClick = {
                                     showToast(
@@ -375,7 +377,6 @@ fun ProfileScreen(
                                         context.resources.getString(R.string.development)
                                     )
                                 })
-                                .padding(horizontal = 8.dp)
                                 .constrainAs(chatWithFriend) {
                                     top.linkTo(parent.top)
                                     bottom.linkTo(parent.bottom)
@@ -457,9 +458,21 @@ fun ProfileScreen(
                     showToast(
                         context,
                         when (value.msg) {
-                            SUCCESS -> context.resources.getString(R.string.success_friend_request)
-                            ERROR -> context.resources.getString(R.string.failed_friend_request)
-                            FAILED -> context.resources.getString(R.string.exception_toast)
+                            Ext.ResponseStatus.INFO_UPDATED.value ->
+                                context.resources.getString(R.string.succes_data_update)
+
+                            Ext.ResponseStatus.INFO_NOT_UPDATED.value ->
+                                context.resources.getString(R.string.failed_data_update)
+
+                            Ext.ResponseStatus.FRIENDSHIP_REQUEST_SEND.value ->
+                                context.resources.getString(R.string.success_friend_request)
+
+                            Ext.ResponseStatus.FRIENDSHIP_REQUEST_NOT_SEND.value ->
+                                context.resources.getString(R.string.failed_friend_request)
+
+                            Ext.ResponseStatus.FAILED.value ->
+                                context.resources.getString(R.string.exception_toast)
+
                             else -> context.resources.getString(R.string.exception_toast)
                         }
                     )

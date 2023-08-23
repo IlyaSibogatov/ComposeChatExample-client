@@ -25,10 +25,14 @@
     <string name="add_to_friend">Add to friend</string>
     <string name="info_dont_filled">The information is not filled out</string>
     <string name="show_more">Show more</string>
+    <string name="roll_up">Roll up</string>
     <string name="view_friends">All friends</string>
     <string name="nickname">Username</string>
     <string name="username_empty">Username can`t be epmty</string>
     <string name="info_dont_changes">No change in data</string>
+
+    <string name="succes_data_update">The data has been changed</string>
+    <string name="failed_data_update">The data has not been changed</string>
 
     <string name="success_friend_request">Friend request sent</string>
     <string name="failed_friend_request">Failed to send friend request</string>
