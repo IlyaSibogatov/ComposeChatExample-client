@@ -1,9 +1,19 @@
 package com.example.composechatexample.screens.chat.chatlist
 
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.focusable
+import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.InteractionSource
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,6 +29,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -33,10 +44,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.focusTarget
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
@@ -55,6 +72,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavHostController
 import com.example.composechatexample.R
 import com.example.composechatexample.components.CircularLoader
+import com.example.composechatexample.components.CustomIconButton
 import com.example.composechatexample.components.ShowMenu
 import com.example.composechatexample.domain.model.Chat
 import com.example.composechatexample.screens.chat.chatlist.ChatListViewModel.Companion.ERROR
@@ -103,24 +121,32 @@ fun ChatListScreen(
                     },
                 horizontalArrangement = Arrangement.Center
             ) {
-                OutlinedTextField(
-                    modifier = Modifier
-                        .fillMaxWidth(),
+                val animState = remember {
+                    mutableStateOf(false)
+                }
+                val imSearchVisible = remember {
+                    mutableStateOf(true)
+                }
+                val focusRequester = remember { FocusRequester() }
+                if (imSearchVisible.value) {
+                    CustomIconButton(
+                        imageId = R.drawable.im_search,
+                        onClick = {
+                            animState.value = !animState.value
+                            imSearchVisible.value = !imSearchVisible.value
+                        }
+                    )
+                }
+                SearchField(
+                    modifier = Modifier.focusRequester(focusRequester),
+                    animateState = animState.value,
                     value = uiState.value.searchQuery,
-                    onValueChange = { newText ->
-                        viewModel.updateSearchQuery(newText)
-                    },
-                    placeholder = {
-                        Text(
-                            text = stringResource(id = R.string.find_chat),
-                            style = MaterialTheme.typography.labelLarge
-                        )
-                    },
-                    colors = TextFieldDefaults.outlinedTextFieldColors(
-                        containerColor = MaterialTheme.colorScheme.background
-                    ),
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
+                    keyboardController = keyboardController,
+                    onValueChange = viewModel::updateSearchQuery,
+                    imVisible = {
+                        imSearchVisible.value = it
+                        animState.value = !it
+                    }
                 )
             }
             LazyColumn(
@@ -217,6 +243,48 @@ fun ChatListScreen(
         onDispose {
             lifeCycleOwner.lifecycle.removeObserver(observer)
         }
+    }
+}
+
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
+@Composable
+fun SearchField(
+    modifier: Modifier = Modifier,
+    animateState: Boolean,
+    value: String,
+    keyboardController: SoftwareKeyboardController?,
+    imVisible: (Boolean) -> Unit,
+    onValueChange: (String) -> Unit,
+) {
+    AnimatedVisibility(
+        visible = animateState,
+        enter = expandHorizontally(
+            expandFrom = Alignment.End
+        ),
+        exit = shrinkHorizontally(
+            shrinkTowards = Alignment.Start
+        )
+    ) {
+        OutlinedTextField(
+            modifier = modifier
+                .fillMaxWidth(),
+            value = value,
+            onValueChange = { onValueChange(it) },
+            placeholder = {
+                Text(
+                    text = stringResource(id = R.string.find_chat),
+                    style = MaterialTheme.typography.labelLarge
+                )
+            },
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                containerColor = MaterialTheme.colorScheme.background
+            ),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(onDone = {
+                keyboardController?.hide()
+                imVisible(true)
+            }),
+        )
     }
 }
 

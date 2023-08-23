@@ -1,6 +1,7 @@
 package com.example.composechatexample.ui.theme
 
 import android.app.Activity
+import android.content.res.Configuration
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -61,6 +62,7 @@ private val LightColorScheme = lightColorScheme(
 )
 
 lateinit var themeState: MutableState<TypeTheme>
+lateinit var configurationState: MutableState<Configuration>
 
 @Composable
 fun ComposeChatExampleTheme(
