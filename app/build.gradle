@@ -57,7 +57,7 @@ dependencies {
     def ktor_version = "1.6.3"
 
     //Image loader
-    implementation "com.github.bumptech.glide:compose:1.0.0-alpha.1"
+    implementation "io.coil-kt:coil-compose:2.2.2"
 
     //Gson
     implementation 'com.google.code.gson:gson:2.9.0'

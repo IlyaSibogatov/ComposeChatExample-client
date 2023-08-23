@@ -59,6 +59,9 @@ class UsersListViewModel @Inject constructor(
                 _uiState.value = uiState.value.copy(
                     loadingStatus = false
                 )
+                if (uiState.value.usersList.isEmpty()) {
+                    sendEvent(UsersListEvent.NavigateTo("popBackStack"))
+                }
             }
         }
     }
