@@ -52,6 +52,7 @@ import androidx.navigation.NavHostController
 import com.example.composechatexample.R
 import com.example.composechatexample.components.ShowMenu
 import com.example.composechatexample.screens.settings.model.SettingsScreenEvent
+import com.example.composechatexample.ui.theme.configurationState
 import com.example.composechatexample.ui.theme.themeState
 import com.example.composechatexample.utils.Constants
 import com.example.composechatexample.utils.Ext
@@ -60,6 +61,7 @@ import com.example.composechatexample.utils.SettingType
 import com.example.composechatexample.utils.SettingType.*
 import com.example.composechatexample.utils.TypeTheme
 import kotlinx.coroutines.flow.collectLatest
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("StateFlowValueCalledInComposition")
@@ -100,8 +102,9 @@ fun SettingsScreen(
         }
     ) { padding ->
         LazyColumn(
-            modifier = Modifier.fillMaxHeight(),
-            contentPadding = padding
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxHeight()
         ) {
             item {
                 HeaderSetting(
@@ -176,7 +179,7 @@ fun SettingsScreen(
                     }
 
                     EDIT_PASSWORD -> {
-                        Pair(R.string.theme_settings, "")
+                        Pair(R.string.change_password_settings, "")
                     }
 
                     else -> Pair(0, "")
@@ -240,7 +243,7 @@ fun SettingsScreen(
 
 @Composable
 private fun SettingIcon(
-    @DrawableRes id: Int
+    @DrawableRes id : Int
 ) {
     Icon(
         painter = painterResource(id = id),
@@ -271,6 +274,7 @@ private fun HeaderSetting(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SettingItem(
     @StringRes title: Int,
@@ -338,7 +342,6 @@ private fun ShowMenuSetting(
                 }
             )
         }
-
         THEME -> {
             ShowMenu(
                 expanded = expanded,
@@ -348,7 +351,6 @@ private fun ShowMenuSetting(
                 }
             )
         }
-
         NOTIFICATION -> {}
         PERS_DATA -> {}
         CONFIDENTIALITY -> {}
