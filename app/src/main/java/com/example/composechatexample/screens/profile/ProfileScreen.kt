@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -58,8 +59,8 @@ import com.example.composechatexample.utils.Constants
 import com.example.composechatexample.utils.Constants.FOLLOWERS
 import com.example.composechatexample.utils.Constants.FRIENDS
 import com.example.composechatexample.utils.Constants.FRIENDSHIPS_REQUESTS
-import com.example.composechatexample.utils.Ext
 import com.example.composechatexample.utils.Ext.showToast
+import com.example.composechatexample.utils.ResponseStatus
 import kotlinx.coroutines.flow.collectLatest
 
 @SuppressLint("CheckResult")
@@ -123,8 +124,8 @@ fun ProfileScreen(
                         else Constants.BASE_URL + "/images/" + uiState.value.uid + ".jpeg"
                     )
                     .networkCachePolicy(CachePolicy.READ_ONLY)
-                    .diskCachePolicy(CachePolicy.READ_ONLY)
-                    .memoryCachePolicy(CachePolicy.DISABLED)
+                    .diskCachePolicy(CachePolicy.DISABLED)
+                    .memoryCachePolicy(CachePolicy.WRITE_ONLY)
                     .build(),
                 alignment = Alignment.Center,
                 contentScale = ContentScale.Crop,
@@ -133,7 +134,7 @@ fun ProfileScreen(
                 error = painterResource(id = R.drawable.ic_user),
             )
         }
-        AsyncImage(
+        Image(
             modifier = Modifier
                 .padding(top = 25.dp, end = 25.dp)
                 .size(16.dp)
@@ -142,11 +143,12 @@ fun ProfileScreen(
                     top.linkTo(photo.top)
                     end.linkTo(photo.end)
                 },
-            model = if (uiState.value.onlineStatus) R.drawable.ic_user_online
-            else R.drawable.ic_user_offline,
+            painter = painterResource(
+                id = if (uiState.value.onlineStatus) R.drawable.ic_user_online
+                else R.drawable.ic_user_offline
+            ),
             contentDescription = Constants.CONTENT_DESCRIPTION
         )
-
         Text(
             modifier = Modifier
                 .padding(8.dp)
@@ -329,8 +331,8 @@ fun ProfileScreen(
                             model = ImageRequest.Builder(LocalContext.current)
                                 .data(Constants.BASE_URL + "/images/" + item.id + ".jpeg")
                                 .networkCachePolicy(CachePolicy.READ_ONLY)
-                                .diskCachePolicy(CachePolicy.READ_ONLY)
-                                .memoryCachePolicy(CachePolicy.DISABLED)
+                                .diskCachePolicy(CachePolicy.DISABLED)
+                                .memoryCachePolicy(CachePolicy.WRITE_ONLY)
                                 .build(),
                             alignment = Alignment.Center,
                             contentScale = ContentScale.Crop,
@@ -351,7 +353,7 @@ fun ProfileScreen(
                             fontSize = 16.sp,
                             maxLines = 1,
                         )
-                        AsyncImage(
+                        Image(
                             modifier = Modifier
                                 .size(24.dp)
                                 .border(2.dp, Color.Gray, CircleShape)
@@ -361,31 +363,38 @@ fun ProfileScreen(
                                     start.linkTo(friendName.end)
                                     end.linkTo(chatWithFriend.start)
                                 },
-                            model = if (item.onlineStatus) R.drawable.ic_user_online
-                            else R.drawable.ic_user_offline,
+                            painter = painterResource(
+                                id = if (item.onlineStatus) R.drawable.ic_user_online
+                                else R.drawable.ic_user_offline
+                            ),
                             contentDescription = Constants.CONTENT_DESCRIPTION
                         )
-                        AsyncImage(
+                        IconButton(
                             modifier = Modifier
                                 .padding(start = 4.dp)
                                 .padding(horizontal = 8.dp)
                                 .size(24.dp)
                                 .clipToBounds()
-                                .clickable(onClick = {
-                                    showToast(
-                                        context = context,
-                                        context.resources.getString(R.string.development)
-                                    )
-                                })
                                 .constrainAs(chatWithFriend) {
                                     top.linkTo(parent.top)
                                     bottom.linkTo(parent.bottom)
                                     end.linkTo(parent.end)
                                     height = Dimension.fillToConstraints
                                 },
-                            model = R.drawable.ic_chat_with_friend,
-                            contentDescription = Constants.CONTENT_DESCRIPTION
-                        )
+                            onClick = {
+                                showToast(
+                                    context = context,
+                                    context.resources.getString(R.string.development)
+                                )
+                            }
+                        ) {
+                            Icon(
+                                painter = painterResource(
+                                    id = R.drawable.ic_chat_with_friend
+                                ),
+                                contentDescription = Constants.CONTENT_DESCRIPTION
+                            )
+                        }
                     }
                 }
             }
@@ -458,19 +467,19 @@ fun ProfileScreen(
                     showToast(
                         context,
                         when (value.msg) {
-                            Ext.ResponseStatus.INFO_UPDATED.value ->
+                            ResponseStatus.INFO_UPDATED.value ->
                                 context.resources.getString(R.string.succes_data_update)
 
-                            Ext.ResponseStatus.INFO_NOT_UPDATED.value ->
+                            ResponseStatus.INFO_NOT_UPDATED.value ->
                                 context.resources.getString(R.string.failed_data_update)
 
-                            Ext.ResponseStatus.FRIENDSHIP_REQUEST_SEND.value ->
+                            ResponseStatus.FRIENDSHIP_REQUEST_SEND.value ->
                                 context.resources.getString(R.string.success_friend_request)
 
-                            Ext.ResponseStatus.FRIENDSHIP_REQUEST_NOT_SEND.value ->
+                            ResponseStatus.FRIENDSHIP_REQUEST_NOT_SEND.value ->
                                 context.resources.getString(R.string.failed_friend_request)
 
-                            Ext.ResponseStatus.FAILED.value ->
+                            ResponseStatus.FAILED.value ->
                                 context.resources.getString(R.string.exception_toast)
 
                             else -> context.resources.getString(R.string.exception_toast)

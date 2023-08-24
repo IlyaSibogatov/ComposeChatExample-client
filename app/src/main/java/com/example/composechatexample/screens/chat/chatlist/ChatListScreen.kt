@@ -57,12 +57,12 @@ import com.example.composechatexample.R
 import com.example.composechatexample.components.CircularLoader
 import com.example.composechatexample.components.ShowMenu
 import com.example.composechatexample.domain.model.Chat
-import com.example.composechatexample.screens.chat.chatlist.ChatListViewModel.Companion.ERROR
 import com.example.composechatexample.screens.chat.chatlist.model.ChatListScreenEvent
 import com.example.composechatexample.screens.dialogs.CreateChatDialog
 import com.example.composechatexample.screens.dialogs.EntryDialog
 import com.example.composechatexample.utils.ChatEvent
 import com.example.composechatexample.utils.Constants
+import com.example.composechatexample.utils.ResponseStatus
 import com.example.composechatexample.utils.Type
 import kotlinx.coroutines.flow.collectLatest
 
@@ -199,7 +199,7 @@ fun ChatListScreen(
                     Toast.makeText(
                         context,
                         when (value.msg) {
-                            ERROR -> context.resources.getString(R.string.error_toast)
+                            ResponseStatus.ERROR.value -> context.resources.getString(R.string.error_toast)
                             else -> value.msg
                         },
                         Toast.LENGTH_SHORT

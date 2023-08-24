@@ -1,6 +1,7 @@
 package com.example.composechatexample.screens.profile.userlist
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +16,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -93,8 +96,8 @@ fun UsersListScreen(
                             model = ImageRequest.Builder(LocalContext.current)
                                 .data(Constants.BASE_URL + "/images/" + item.id + ".jpeg")
                                 .networkCachePolicy(CachePolicy.READ_ONLY)
-                                .diskCachePolicy(CachePolicy.READ_ONLY)
-                                .memoryCachePolicy(CachePolicy.DISABLED)
+                                .diskCachePolicy(CachePolicy.DISABLED)
+                                .memoryCachePolicy(CachePolicy.WRITE_ONLY)
                                 .build(),
                             alignment = Alignment.Center,
                             contentScale = ContentScale.Crop,
@@ -152,7 +155,7 @@ fun UsersListScreen(
                         }
 
                         else -> {
-                            AsyncImage(
+                            Image(
                                 modifier = Modifier
                                     .size(24.dp)
                                     .border(2.dp, Color.Gray, CircleShape)
@@ -162,28 +165,35 @@ fun UsersListScreen(
                                         start.linkTo(friendName.end)
                                         end.linkTo(chatWithFriend.start)
                                     },
-                                model = if (item.onlineStatus) R.drawable.ic_user_online
-                                else R.drawable.ic_user_offline,
+                                painter = painterResource(
+                                    id =
+                                    if (item.onlineStatus) R.drawable.ic_user_online
+                                    else R.drawable.ic_user_offline
+                                ),
                                 contentDescription = Constants.CONTENT_DESCRIPTION
                             )
-                            AsyncImage(
+                            /** Go to friend chat */
+                            IconButton(
                                 modifier = Modifier
                                     .padding(horizontal = 8.dp)
                                     .padding(start = 4.dp)
                                     .size(24.dp)
                                     .clipToBounds()
-                                    .clickable(onClick = {
-                                        /** Go to friend chat */
-                                    })
                                     .constrainAs(chatWithFriend) {
                                         top.linkTo(parent.top)
                                         bottom.linkTo(parent.bottom)
                                         end.linkTo(parent.end)
                                         height = Dimension.fillToConstraints
                                     },
-                                model = R.drawable.ic_chat_with_friend,
-                                contentDescription = Constants.CONTENT_DESCRIPTION
-                            )
+                                onClick = { }
+                            ) {
+                                Icon(
+                                    painter = painterResource(
+                                        id = R.drawable.ic_chat_with_friend
+                                    ),
+                                    contentDescription = Constants.CONTENT_DESCRIPTION
+                                )
+                            }
                         }
                     }
                 }

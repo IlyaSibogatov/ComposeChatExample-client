@@ -9,7 +9,7 @@ import com.example.composechatexample.data.remote.UserService
 import com.example.composechatexample.domain.model.NewUserInfo
 import com.example.composechatexample.screens.profile.model.ProfileScreenEvent
 import com.example.composechatexample.utils.Constants
-import com.example.composechatexample.utils.Ext
+import com.example.composechatexample.utils.ResponseStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.channels.Channel
@@ -142,14 +142,14 @@ class ProfileViewModel @Inject constructor(
                         showEditDialog()
                         sendEvent(
                             ProfileScreenEvent.ToastEvent(
-                                msg = Ext.ResponseStatus.INFO_UPDATED.value
+                                msg = ResponseStatus.INFO_UPDATED.value
                             )
                         )
                         getProfile(uiState.value.uid)
                     } else {
                         sendEvent(
                             ProfileScreenEvent.ToastEvent(
-                                msg = Ext.ResponseStatus.INFO_NOT_UPDATED.value
+                                msg = ResponseStatus.INFO_NOT_UPDATED.value
                             )
                         )
                     }
@@ -201,11 +201,11 @@ class ProfileViewModel @Inject constructor(
                                 _uiState.value = uiState.value.copy(
                                     isFriend = true
                                 )
-                                Ext.ResponseStatus.FRIENDSHIP_REQUEST_SEND.value
+                                ResponseStatus.FRIENDSHIP_REQUEST_SEND.value
                             }
 
-                            false -> Ext.ResponseStatus.FRIENDSHIP_REQUEST_NOT_SEND.value
-                            null -> Ext.ResponseStatus.ERROR.value
+                            false -> ResponseStatus.FRIENDSHIP_REQUEST_NOT_SEND.value
+                            null -> ResponseStatus.ERROR.value
                         }
                     )
                 )

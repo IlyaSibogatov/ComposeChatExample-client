@@ -321,8 +321,8 @@ private fun GuestMessage(
                     model = ImageRequest.Builder(LocalContext.current)
                         .data(Constants.BASE_URL + "/images/" + uuid + ".jpeg")
                         .networkCachePolicy(CachePolicy.READ_ONLY)
-                        .diskCachePolicy(CachePolicy.READ_ONLY)
-                        .memoryCachePolicy(CachePolicy.DISABLED)
+                        .diskCachePolicy(CachePolicy.DISABLED)
+                        .memoryCachePolicy(CachePolicy.WRITE_ONLY)
                         .build(),
                     alignment = Alignment.Center,
                     contentScale = ContentScale.Crop,
