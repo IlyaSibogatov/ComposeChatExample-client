@@ -13,6 +13,7 @@ import com.example.composechatexample.screens.chat.chatlist.model.ChatListUIStat
 import com.example.composechatexample.screens.chat.chatlist.model.CreatedChat
 import com.example.composechatexample.screens.chat.chatlist.model.DisplayDialog
 import com.example.composechatexample.utils.Constants
+import com.example.composechatexample.utils.ResponseStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.channels.Channel
@@ -83,7 +84,7 @@ class ChatListViewModel @Inject constructor(
                         }
 
                         false -> {
-                            sendEvent(ChatListScreenEvent.ToastEvent(ERROR))
+                            sendEvent(ChatListScreenEvent.ToastEvent(ResponseStatus.ERROR.value))
                         }
                     }
                 }
@@ -252,7 +253,7 @@ class ChatListViewModel @Inject constructor(
                         )
                     )?.let {
                         createOrEditSuccess(it)
-                    } ?: sendEvent(ChatListScreenEvent.ToastEvent("Exception"))
+                    } ?: sendEvent(ChatListScreenEvent.ToastEvent(ResponseStatus.ERROR.value))
                 } else {
                     messageService.createChat(
                         NewChat(
@@ -266,7 +267,7 @@ class ChatListViewModel @Inject constructor(
                         )
                     )?.let {
                         createOrEditSuccess(it)
-                    } ?: sendEvent(ChatListScreenEvent.ToastEvent("Exception"))
+                    } ?: sendEvent(ChatListScreenEvent.ToastEvent(ResponseStatus.ERROR.value))
                 }
             }
         }
@@ -295,9 +296,5 @@ class ChatListViewModel @Inject constructor(
         viewModelScope.launch {
             eventChannel.send(event)
         }
-    }
-
-    companion object {
-        const val ERROR = "error"
     }
 }

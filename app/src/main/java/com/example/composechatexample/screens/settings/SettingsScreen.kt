@@ -56,12 +56,14 @@ import com.example.composechatexample.ui.theme.configurationState
 import com.example.composechatexample.ui.theme.themeState
 import com.example.composechatexample.utils.Constants
 import com.example.composechatexample.utils.Ext
+import com.example.composechatexample.utils.ResponseStatus
 import com.example.composechatexample.utils.SettingType
 import com.example.composechatexample.utils.SettingType.*
 import com.example.composechatexample.utils.TypeTheme
 import kotlinx.coroutines.flow.collectLatest
 import java.util.Locale
 
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun SettingsScreen(
@@ -118,35 +120,45 @@ fun SettingsScreen(
                 }
                 val result = when (it) {
                     LANG -> {
-                        Pair(R.string.languages_settings, uiState.value.language)
+                        Pair(
+                            R.string.languages_settings,
+                            uiState.value.language ?: viewModel.getLanguage()
+                        )
                     }
+
                     THEME -> {
                         Pair(
-                            R.string.theme_settings, when (uiState.value.theme) {
+                            R.string.theme_settings, when (
+                                uiState.value.theme ?: viewModel.getTheme()
+                            ) {
                                 TypeTheme.SYSTEM.name -> stringResource(id = R.string.theme_text_system)
                                 TypeTheme.LIGHT.name -> stringResource(id = R.string.theme_text_light)
-                                else -> stringResource(id = R.string.theme_text_dark)
+                                TypeTheme.DARK.name -> stringResource(id = R.string.theme_text_dark)
+                                else -> null
                             }
                         )
                     }
+
                     NOTIFICATION -> {
                         Pair(R.string.notifications_settings, uiState.value.notification)
                     }
 
                     else -> Pair(0, "")
                 }
-                SettingItem(
-                    title = result.first,
-                    value = result.second,
-                    onClick = { expandedMenu.value = true },
-                    menu = {
-                        ShowMenuSetting(
-                            expanded = expandedMenu,
-                            type = it,
-                            onClick = viewModel::onClickItem
-                        )
-                    }
-                )
+                result.second?.let { second ->
+                    SettingItem(
+                        title = result.first,
+                        value = second,
+                        onClick = { expandedMenu.value = true },
+                        menu = {
+                            ShowMenuSetting(
+                                expanded = expandedMenu,
+                                type = it,
+                                onClick = viewModel::onClickItem
+                            )
+                        }
+                    )
+                }
             }
             item {
                 HeaderSetting(
@@ -199,7 +211,11 @@ fun SettingsScreen(
                 }
 
                 is SettingsScreenEvent.ToastEvent -> {
-                    Toast.makeText(context, value.msg, Toast.LENGTH_SHORT).show()
+                    if (value.msg == ResponseStatus.FAILED.value) {
+                        Toast.makeText(context, R.string.error_toast, Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(context, value.msg, Toast.LENGTH_SHORT).show()
+                    }
                 }
 
                 is SettingsScreenEvent.ThemeEvent -> {
@@ -208,9 +224,7 @@ fun SettingsScreen(
 
                 is SettingsScreenEvent.SetLanguage -> {
                     Ext.setLanguage(context = context, language = value.language.languageCode)
-                    val config = configurationState.value
-                    config.locale = Locale(value.language.languageValue)
-                    configurationState.value = config
+                    (context as Activity).recreate()
                 }
             }
         }
@@ -241,7 +255,7 @@ private fun SettingIcon(
 @Composable
 private fun HeaderSetting(
     modifier: Modifier = Modifier,
-    @StringRes id : Int,
+    @StringRes id: Int,
     colorContainer: Color = Color.Transparent,
     colorText: Color = MaterialTheme.colorScheme.onBackground,
 ) {
@@ -265,7 +279,7 @@ private fun HeaderSetting(
 private fun SettingItem(
     @StringRes title: Int,
     value: String = "",
-    icon:  @Composable () -> Unit = { SettingIcon(id = R.drawable.ic_arrow_right) },
+    icon: @Composable () -> Unit = { SettingIcon(id = R.drawable.ic_arrow_right) },
     menu: @Composable () -> Unit = {},
     onClick: () -> Unit
 ) {
@@ -281,7 +295,7 @@ private fun SettingItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 10.dp, horizontal = 8.dp),
+                .padding(vertical = 8.dp, horizontal = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {

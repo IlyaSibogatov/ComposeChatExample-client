@@ -9,8 +9,6 @@ import com.example.composechatexample.screens.onboarding.model.OnBoardingErrors
 import com.example.composechatexample.screens.onboarding.model.OnBoardingUIState
 import com.example.composechatexample.screens.onboarding.model.OnboardScreenEvent
 import com.example.composechatexample.utils.Constants
-import com.example.composechatexample.utils.eventprovider.EventProvider
-import com.example.composechatexample.utils.eventprovider.EventProviderImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.channels.Channel
@@ -24,7 +22,7 @@ import javax.inject.Inject
 class OnBoardingViewModel @Inject constructor(
     private val onboardingService: OnboardingService,
     private val preferencesManager: PreferencesManager
-) : ViewModel(), EventProvider<OnboardScreenEvent> by EventProviderImpl() {
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(OnBoardingUIState())
     val uiState: StateFlow<OnBoardingUIState> = _uiState

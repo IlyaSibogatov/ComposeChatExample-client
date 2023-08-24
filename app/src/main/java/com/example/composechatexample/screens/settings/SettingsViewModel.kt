@@ -2,13 +2,13 @@ package com.example.composechatexample.screens.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.composechatexample.data.model.LanguageEntity
 import com.example.composechatexample.data.preferences.PreferencesManager
 import com.example.composechatexample.data.remote.OnboardingService
 import com.example.composechatexample.screens.settings.model.SettingsScreenEvent
 import com.example.composechatexample.screens.settings.model.SettingsUIState
 import com.example.composechatexample.utils.Constants
 import com.example.composechatexample.utils.Constants.listLanguages
+import com.example.composechatexample.utils.ResponseStatus
 import com.example.composechatexample.utils.SettingType
 import com.example.composechatexample.utils.SettingType.CONFIDENTIALITY
 import com.example.composechatexample.utils.SettingType.EDIT_PASSWORD
@@ -38,16 +38,19 @@ class SettingsViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(SettingsUIState())
     val uiState: StateFlow<SettingsUIState> = _uiState
-    val listAppSetting = listOf(LANG, THEME, NOTIFICATION)
-    val listAccSetting = listOf(CONFIDENTIALITY, PERS_DATA, EDIT_PASSWORD)
 
     private val eventChannel = Channel<SettingsScreenEvent>(Channel.BUFFERED)
     val eventsFlow = eventChannel.receiveAsFlow()
 
+    val listAppSetting = listOf(LANG,THEME,NOTIFICATION)
+    val listAccSetting = listOf(CONFIDENTIALITY,PERS_DATA,EDIT_PASSWORD)
+
     fun init() {
         with(preferencesManager) {
             if (this.language == null) {
-                listLanguages.find { it.languageCode == Locale.getDefault().language }?.let {
+                listLanguages.find {
+                    it.languageCode == Locale.getDefault().language
+                }?.let {
                     this.language = it
                 } ?: let {
                     this.language = listLanguages.find { it.languageCode == "en" }
@@ -63,18 +66,24 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun onClickItem(type : Pair<SettingType, Any>) {
+    fun getLanguage(): String = preferencesManager.language?.languageValue!!
+
+    fun getTheme(): String = preferencesManager.theme
+
+    fun onClickItem(type: Pair<SettingType, Any>) {
         when (type.first) {
             LANG -> {
                 if (type.second is TypeLang) {
                     onLanguageClick(type.second as TypeLang)
                 }
             }
+
             THEME -> {
                 if (type.second is TypeTheme) {
                     saveTheme(type.second as TypeTheme)
                 }
             }
+
             NOTIFICATION -> {}
             PERS_DATA -> {}
             CONFIDENTIALITY -> {}
@@ -84,8 +93,8 @@ class SettingsViewModel @Inject constructor(
 
     private fun onLanguageClick(language: TypeLang) {
         val langEntity = when (language) {
-            RU -> LanguageEntity("Русский", "ru")
-            ENG -> LanguageEntity("English", "en")
+            RU -> listLanguages.first { it.languageCode == "ru" }
+            ENG -> listLanguages.first { it.languageCode == "en" }
         }
         preferencesManager.language = langEntity
         _uiState.value = uiState.value.copy(
@@ -94,24 +103,32 @@ class SettingsViewModel @Inject constructor(
         sendEvent(SettingsScreenEvent.SetLanguage(langEntity))
     }
 
-//    private fun onLanguageClick() {
-//        sendEvent(SettingsScreenEvent.NavigateTo(Constants.LANGUAGE_ROUTE))
-//    }
-
     fun userLogOut() {
         viewModelScope.launch {
             onboardingService.logout(preferencesManager.uuid!!)?.let {
                 when (it.status) {
                     HttpStatusCode.OK.value -> {
                         preferencesManager.clearData()
-                        sendEvent(SettingsScreenEvent.NavigateTo(Constants.ONBOARD_ROUTE))
+                        sendEvent(
+                            SettingsScreenEvent.NavigateTo(
+                                Constants.ONBOARD_ROUTE
+                            )
+                        )
                     }
 
                     HttpStatusCode.NoContent.value -> {
-                        /** Show error */
+                        sendEvent(
+                            SettingsScreenEvent.ToastEvent(
+                                ResponseStatus.FAILED.value
+                            )
+                        )
                     }
                 }
-            }
+            } ?: sendEvent(
+                SettingsScreenEvent.ToastEvent(
+                    ResponseStatus.FAILED.value
+                )
+            )
         }
     }
 
