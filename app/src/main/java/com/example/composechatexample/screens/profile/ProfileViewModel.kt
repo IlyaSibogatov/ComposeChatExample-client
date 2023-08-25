@@ -10,6 +10,7 @@ import com.example.composechatexample.domain.model.NewUserInfo
 import com.example.composechatexample.screens.profile.model.ProfileScreenEvent
 import com.example.composechatexample.utils.Constants
 import com.example.composechatexample.utils.ResponseStatus
+import com.example.composechatexample.utils.Validator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.channels.Channel
@@ -22,7 +23,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val userService: UserService,
-    private val preferencesManager: PreferencesManager
+    private val preferencesManager: PreferencesManager,
+    private val validator: Validator
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProfileUIState())
@@ -111,24 +113,54 @@ class ProfileViewModel @Inject constructor(
         )
     }
 
+    private fun checkNewInfo(newInfo: NewUserInfo, oldInfo: String, oldUsername: String) {
+        if (newInfo.selfInfo == oldInfo && newInfo.username == oldUsername) {
+            _uiState.value = uiState.value.copy(
+                errors = ProfileErrors(
+                    userNameNotMatched = uiState.value.errors.userNameNotMatched,
+                    emptyUsername = uiState.value.errors.emptyUsername,
+                    newInfoNotChanged = true
+                )
+            )
+        } else {
+            validator.isValidUserName(newInfo.username).let {
+                when (it) {
+                    "pattern_not_matched" -> {
+                        _uiState.value = uiState.value.copy(
+                            errors = ProfileErrors(
+                                userNameNotMatched = true,
+                                emptyUsername = uiState.value.errors.emptyUsername,
+                                newInfoNotChanged = uiState.value.errors.newInfoNotChanged
+                            )
+                        )
+                    }
+
+                    "empty_field" -> {
+                        _uiState.value = uiState.value.copy(
+                            errors = ProfileErrors(
+                                userNameNotMatched = uiState.value.errors.userNameNotMatched,
+                                emptyUsername = true,
+                                newInfoNotChanged = uiState.value.errors.newInfoNotChanged
+                            )
+                        )
+                    }
+
+                    "username_is_ok" -> {
+                        _uiState.value = uiState.value.copy(
+                            errors = ProfileErrors()
+                        )
+                    }
+                }
+            }
+        }
+    }
+
     fun updateInfo() {
-        viewModelScope.launch {
-            if (uiState.value.newInfo.username.isEmpty()) {
-                _uiState.value = uiState.value.copy(
-                    errors = ProfileErrors(
-                        emptyUsername = true
-                    )
-                )
-            } else if (
-                uiState.value.newInfo.username == uiState.value.username &&
-                uiState.value.newInfo.selfInfo == uiState.value.selfInfo
-            ) {
-                _uiState.value = uiState.value.copy(
-                    errors = ProfileErrors(
-                        newInfoNotChanged = true
-                    )
-                )
-            } else {
+        checkNewInfo(uiState.value.newInfo, uiState.value.selfInfo, uiState.value.username)
+        if (!uiState.value.errors.newInfoNotChanged && !uiState.value.errors.emptyUsername &&
+            !uiState.value.errors.userNameNotMatched
+        ) {
+            viewModelScope.launch {
                 val newInfo = uiState.value.newInfo
                 _uiState.value = uiState.value.copy(
                     newInfo = NewUserInfo(

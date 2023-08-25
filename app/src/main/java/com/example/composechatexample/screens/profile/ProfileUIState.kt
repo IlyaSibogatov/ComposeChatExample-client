@@ -33,6 +33,7 @@ data class FriendListUIState(
 )
 
 data class ProfileErrors(
+    val userNameNotMatched: Boolean = false,
     val emptyUsername: Boolean = false,
     val newInfoNotChanged: Boolean = false
 )

@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -52,20 +53,20 @@ fun OnBoardingScreen(
         SignUpField(
             value = uiState.value.username,
             text = stringResource(id = R.string.username_hint),
-            isError = uiState.value.errors.usernameError,
+            isError = uiState.value.errors.usernameError || uiState.value.errors.usernameEmptyError,
             checkError = { CheckUserName(uiState = uiState) },
             onValueChange = viewModel::updateUsername
         )
         SignUpField(
             value = uiState.value.password,
             text = stringResource(id = R.string.password_hint),
-            isError = uiState.value.errors.passwordError,
+            isError = uiState.value.errors.passwordError || uiState.value.errors.passwordEmptyError,
             checkError = { CheckPassword(uiState = uiState) },
             onValueChange = viewModel::updatePassword
         )
         ActionButton(
             text = stringResource(id = if (!uiState.value.showSignUp) R.string.login_label else R.string.signup_label),
-            onClick = {  if (!uiState.value.showSignUp) viewModel.login() else viewModel.signup() }
+            onClick = { if (!uiState.value.showSignUp) viewModel.login() else viewModel.signup() }
         )
         if (!uiState.value.showSignUp) {
             Text(
@@ -104,12 +105,15 @@ fun SignUpField(
     checkError: @Composable () -> Unit,
     onValueChange: (String) -> Unit
 ) {
+    val pattern = remember { Regex("[0-9a-zA-Z]*") }
     OutlinedTextField(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp),
         value = value,
-        onValueChange = onValueChange,
+        onValueChange = {
+            if (it.matches(pattern)) onValueChange(it)
+        },
         label = { Text(text = text) },
         shape = MaterialTheme.shapes.small,
         isError = isError,
@@ -117,7 +121,7 @@ fun SignUpField(
         singleLine = true,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
         colors = TextFieldDefaults.outlinedTextFieldColors(
-            focusedBorderColor = MaterialTheme.colorScheme.onPrimaryContainer ,
+            focusedBorderColor = MaterialTheme.colorScheme.onPrimaryContainer,
             focusedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
         )
     )
@@ -125,10 +129,10 @@ fun SignUpField(
 
 @Composable
 fun CheckUserName(uiState: State<OnBoardingUIState>) {
-    if (uiState.value.errors.usernameError) {
-        ErrorText(text = stringResource(id = R.string.check_username))
-    } else if (uiState.value.errors.usernameEmptyError) {
-        ErrorText(text = stringResource(id = R.string.username_cant_be_empty))
+    when {
+        uiState.value.errors.userNameExistError -> ErrorText(text = stringResource(id = R.string.username_exist))
+        uiState.value.errors.usernameError -> ErrorText(text = stringResource(id = R.string.check_username))
+        uiState.value.errors.usernameEmptyError -> ErrorText(text = stringResource(id = R.string.username_cant_be_empty))
     }
 }
 

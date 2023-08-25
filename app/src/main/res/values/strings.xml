@@ -6,6 +6,7 @@
     <!--  Onboard Screen  -->
     <string name="username_hint">Username</string>
     <string name="check_username">Check your username</string>
+    <string name="username_exist">The username is already in use</string>
     <string name="username_cant_be_empty">Username can`t be empty</string>
     <string name="password_hint">Password</string>
     <string name="check_password">Check your password</string>

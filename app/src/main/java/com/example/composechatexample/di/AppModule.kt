@@ -10,6 +10,7 @@ import com.example.composechatexample.data.remote.OnboardingService
 import com.example.composechatexample.data.remote.OnboardingServiceImpl
 import com.example.composechatexample.data.remote.UserService
 import com.example.composechatexample.data.remote.UserServiceImpl
+import com.example.composechatexample.utils.Validator
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -30,6 +31,12 @@ object AppModule {
     @Provides
     fun provideSharedPreference(@ApplicationContext context: Context): SharedPreferences {
         return context.getSharedPreferences("preferences_name", Context.MODE_PRIVATE)
+    }
+
+    @Singleton
+    @Provides
+    fun provideValidator(): Validator {
+        return Validator()
     }
 
     @Singleton
