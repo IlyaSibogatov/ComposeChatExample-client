@@ -196,12 +196,20 @@ class ProfileViewModel @Inject constructor(
                 _uiState.value = uiState.value.copy(
                     updateImage = it.status == HttpStatusCode.OK.value
                 )
+            } ?: {
+                _uiState.value = uiState.value.copy(
+                    updateImage = false
+                )
             }
+            _uiState.value = uiState.value.copy(
+                imageUploading = false
+            )
         }
     }
 
     fun updateImage(uri: Uri) {
         _uiState.value = uiState.value.copy(
+            imageUploading = true,
             updateImage = false,
             imageUri = uri
         )

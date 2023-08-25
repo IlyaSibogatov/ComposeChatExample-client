@@ -1,7 +1,9 @@
 package com.example.composechatexample.screens.profile
 
 import android.annotation.SuppressLint
+import android.graphics.Bitmap
 import android.net.Uri
+import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
@@ -14,6 +16,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -26,6 +29,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -62,6 +66,7 @@ import com.example.composechatexample.utils.Constants.FRIENDSHIPS_REQUESTS
 import com.example.composechatexample.utils.Ext.showToast
 import com.example.composechatexample.utils.ResponseStatus
 import kotlinx.coroutines.flow.collectLatest
+import java.io.ByteArrayOutputStream
 
 @SuppressLint("CheckResult")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -78,12 +83,12 @@ fun ProfileScreen(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let {
-            val inputStream = context.contentResolver.openInputStream(it)
-            val imageByteArray = inputStream?.readBytes()
+            val bitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, it)
+            val baos = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 25, baos)
+            val fileInBytes = baos.toByteArray()
             viewModel.updateImage(it)
-
-            viewModel.setAvatar(imageByteArray!!)
-            inputStream.close()
+            viewModel.setAvatar(fileInBytes)
         }
     }
     viewModel.getProfile(uid?.removePrefix(Constants.USER_UID))
@@ -93,9 +98,6 @@ fun ProfileScreen(
             .fillMaxSize()
             .padding(16.dp),
     ) {
-        if (uiState.value.showEditDialog) {
-            EditInfoDialog()
-        }
         val (
             photo, username, friendListEt, friendListLc, selfInfoPreview,
             editBtn, showMore, selfInfo, addToFriend, userStatus, followerAndRequests
@@ -455,6 +457,16 @@ fun ProfileScreen(
                 )
             }
         }
+    }
+    if (uiState.value.showEditDialog) {
+        EditInfoDialog()
+    }
+    if (uiState.value.imageUploading) {
+        LinearProgressIndicator(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(4.dp)
+        )
     }
     LaunchedEffect(key1 = Unit) {
         viewModel.eventsFlow.collectLatest { value ->
