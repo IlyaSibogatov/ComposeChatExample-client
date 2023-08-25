@@ -98,6 +98,16 @@ fun ProfileScreen(
             .fillMaxSize()
             .padding(16.dp),
     ) {
+        if (uiState.value.showEditDialog) {
+            EditInfoDialog()
+        }
+        if (uiState.value.imageUploading) {
+            LinearProgressIndicator(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(4.dp)
+            )
+        }
         val (
             photo, username, friendListEt, friendListLc, selfInfoPreview,
             editBtn, showMore, selfInfo, addToFriend, userStatus, followerAndRequests
@@ -265,7 +275,10 @@ fun ProfileScreen(
                     Text(
                         modifier = Modifier
                             .padding(8.dp),
-                        text = "${uiState.value.followers.size} followers",
+                        text = stringResource(
+                            id = R.string.count_followers,
+                            uiState.value.followers.size
+                        ),
                         textAlign = TextAlign.Center,
                     )
                 }
@@ -287,7 +300,9 @@ fun ProfileScreen(
                     Text(
                         modifier = Modifier
                             .padding(8.dp),
-                        text = "${uiState.value.friendshipRequests.size} requests",
+                        text = stringResource(
+                            id = R.string.count_requests, uiState.value.friendshipRequests.size
+                        ),
                         textAlign = TextAlign.Center,
                     )
                 }
@@ -457,16 +472,6 @@ fun ProfileScreen(
                 )
             }
         }
-    }
-    if (uiState.value.showEditDialog) {
-        EditInfoDialog()
-    }
-    if (uiState.value.imageUploading) {
-        LinearProgressIndicator(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(4.dp)
-        )
     }
     LaunchedEffect(key1 = Unit) {
         viewModel.eventsFlow.collectLatest { value ->

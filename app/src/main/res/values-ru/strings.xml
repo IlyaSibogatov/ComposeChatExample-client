@@ -39,6 +39,9 @@
     <string name="success_friend_request">Заявка в друзья отправлена</string>
     <string name="failed_friend_request">Не удалсь отправить заявку в друзья</string>
 
+    <string name="count_requests">%1$s запросов</string>
+    <string name="count_followers">%1$s подписчиков</string>
+
     <!--  Chat List Screen  -->
     <string name="find_chat">Найти чат</string>
     <string name="owner_label">Владелец: %1$s</string>
