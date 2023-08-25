@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -43,9 +44,12 @@ fun EditInfoDialog() {
         onDismissRequest = { viewModel.showEditDialog() },
         text = {
             Column() {
+                val pattern = remember { Regex("[0-9a-zA-Z]*") }
                 OutlinedTextField(
                     value = uiState.value.newInfo.username,
-                    onValueChange = viewModel::updateNameValue,
+                    onValueChange = {
+                        if (it.matches(pattern)) viewModel.updateNameValue(it)
+                    },
                     placeholder = {
                         Text(
                             text = stringResource(id = R.string.nickname),
@@ -69,8 +73,15 @@ fun EditInfoDialog() {
                         containerColor = MaterialTheme.colorScheme.background
                     ),
                     shape = MaterialTheme.shapes.small,
-                    isError = uiState.value.errors.emptyUsername || uiState.value.errors.newInfoNotChanged,
+                    isError =
+                    uiState.value.errors.emptyUsername ||
+                            uiState.value.errors.newInfoNotChanged ||
+                            uiState.value.errors.userNameNotMatched,
                     supportingText = {
+                        if (uiState.value.errors.userNameNotMatched)
+                            Text(
+                                text = stringResource(id = R.string.check_username)
+                            )
                         if (uiState.value.errors.emptyUsername)
                             Text(
                                 text = stringResource(id = R.string.username_empty)

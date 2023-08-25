@@ -9,8 +9,11 @@ data class OnBoardingUIState(
     val password: String = "",
 )
 data class OnBoardingErrors(
+    val userNameExistError: Boolean = false,
+
     val usernameError: Boolean = false,
     val passwordError: Boolean = false,
-    val usernameEmptyError:Boolean = false,
+
+    val usernameEmptyError: Boolean = false,
     val passwordEmptyError: Boolean = false,
 )
