@@ -17,6 +17,7 @@ data class ProfileUIState(
     val loadingStatus: Boolean = false,
     val gettingUserError: Boolean = false,
     val updateImage: Boolean = false,
+    val imageUploading: Boolean = false,
     val lastActionTime: Long? = null,
     val isFriend: Boolean = false,
     val newInfo: NewUserInfo = NewUserInfo(),
