@@ -7,6 +7,7 @@
     <!--  Onboard Screen  -->
     <string name="username_hint">Имя пользователя</string>
     <string name="check_username">Проверьте имя пользователя</string>
+    <string name="username_exist">Имя пользователя уже используется</string>
     <string name="username_cant_be_empty">Имя пользователя не может быть пустым</string>
     <string name="password_hint">Пароль</string>
     <string name="check_password">Проверьте пароль</string>
