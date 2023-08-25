@@ -38,6 +38,9 @@
     <string name="success_friend_request">Friend request sent</string>
     <string name="failed_friend_request">Failed to send friend request</string>
 
+    <string name="count_requests">%1$s requests</string>
+    <string name="count_followers">%1$s followers</string>
+
     <!--  Chat List Screen  -->
     <string name="find_chat">Find chat</string>
     <string name="owner_label">Owner: %1$s</string>
