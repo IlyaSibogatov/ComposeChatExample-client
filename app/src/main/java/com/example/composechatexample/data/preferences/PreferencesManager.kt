@@ -45,7 +45,9 @@ class PreferencesManager @Inject constructor(
         set(value) = sharedPreferences.edit().putString(LANGUAGE_ARG, Gson().toJson(value)).apply()
 
     fun clearData() {
+        val language = this.language
         sharedPreferences.edit().clear().apply()
+        this.language = language
     }
 
     companion object {
