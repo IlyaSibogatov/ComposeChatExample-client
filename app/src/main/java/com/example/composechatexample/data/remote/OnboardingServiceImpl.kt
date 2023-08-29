@@ -34,7 +34,21 @@ class OnboardingServiceImpl(
 
     override suspend fun logout(uid: String): DefaultResponse? {
         return try {
-            client.post<DefaultResponse>("${OnboardingService.EndPoint.Logout.url}?uid=$uid")
+            client.post<DefaultResponse>(OnboardingService.EndPoint.Logout.url) {
+                url.parameters.append("uid", uid)
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    override suspend fun changePass(current: String, new: String, uuid: String): String? {
+        return try {
+            client.post<String>(OnboardingService.EndPoint.ChangePass.url) {
+                url.parameters.append("uuid", uuid)
+                url.parameters.append("current", current)
+                url.parameters.append("new", new)
+            }
         } catch (e: Exception) {
             null
         }
