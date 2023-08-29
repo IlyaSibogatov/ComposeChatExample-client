@@ -37,3 +37,13 @@ enum class ResponseStatus(val value: String) {
     FRIENDSHIP_REQUEST_SEND("request_was_send"),
     FRIENDSHIP_REQUEST_NOT_SEND("request_not_send"),
 }
+
+enum class PassUpdateState(val value: String) {
+    EMPTY_FIELD("empty_field"),
+    NOT_MATCH_PATTERN("not_match_pattern"),
+    NEW_CURRENT_SAME("new_current_same"),
+    NEWEST_NOT_SAME("newest_pass_not_same"),
+    NEW_EQ_OLD("new_equals_old"),
+    CURRENT_NOT_EQ_OLD("current_not_eq_old"),
+    FIELD_CORRECTLY("field_correctly"),
+}
