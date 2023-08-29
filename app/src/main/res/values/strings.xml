@@ -83,6 +83,20 @@
     <string name="account_label">Account</string>
     <string name="personal_data">Personal data</string>
 
+    <!--  Change password dialog  -->
+    <string name="empty_field_error">Fill the field</string>
+    <string name="current_not_eq_old">The entered password does not match the current </string>
+    <string name="password_dont_match">Password does not match the pattern</string>
+    <string name="new_pass_eq_old">New password is equal to the old</string>
+    <string name="new_pass_eq_current">New password is equal to the current</string>
+    <string name="new_password_net_match">New passwords do not match</string>
+    <string name="pass_been_updat">Password has been updated</string>
+
+    <string name="change_password">Change password</string>
+    <string name="current_pass">Current Password</string>
+    <string name="new_pass">New password</string>
+    <string name="repeat_new_pass">Repeat new password</string>
+
     <!--  BottomBar  -->
     <string name="chat_list_title">Chats</string>
     <string name="profile_title">Profile</string>

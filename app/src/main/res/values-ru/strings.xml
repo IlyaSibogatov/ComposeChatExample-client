@@ -82,6 +82,15 @@
     <string name="account_label">Аккаунт</string>
     <string name="personal_data">Личные данные</string>
 
+    <!--  Change password dialog  -->
+    <string name="empty_field_error">Заполните поле</string>
+    <string name="current_not_eq_old">Введенный пароль не соответствует текущему</string>
+    <string name="password_dont_match">Пароль не соответствует шаблону</string>
+    <string name="new_pass_eq_old">Новый пароль должен отличаться от предыдущего</string>
+    <string name="new_pass_eq_current">Новый пароль должен отличаться от текущего</string>
+    <string name="new_password_net_match">Новые пароли не совпадают</string>
+    <string name="pass_been_updat">Пароль обновлен</string>
+
     <!--  BottomBar  -->
     <string name="chat_list_title">Чаты</string>
     <string name="profile_title">Профиль</string>

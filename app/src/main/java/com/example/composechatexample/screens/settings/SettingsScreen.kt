@@ -51,8 +51,8 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavHostController
 import com.example.composechatexample.R
 import com.example.composechatexample.components.ShowMenu
+import com.example.composechatexample.screens.dialogs.ChangePasswordDialog
 import com.example.composechatexample.screens.settings.model.SettingsScreenEvent
-import com.example.composechatexample.ui.theme.configurationState
 import com.example.composechatexample.ui.theme.themeState
 import com.example.composechatexample.utils.Constants
 import com.example.composechatexample.utils.Ext
@@ -61,7 +61,6 @@ import com.example.composechatexample.utils.SettingType
 import com.example.composechatexample.utils.SettingType.*
 import com.example.composechatexample.utils.TypeTheme
 import kotlinx.coroutines.flow.collectLatest
-import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("StateFlowValueCalledInComposition")
@@ -101,6 +100,7 @@ fun SettingsScreen(
             }
         }
     ) { padding ->
+        if (uiState.value.showPassDialog) ChangePasswordDialog()
         LazyColumn(
             modifier = Modifier
                 .padding(padding)
@@ -186,10 +186,12 @@ fun SettingsScreen(
                 }
                 SettingItem(
                     title = result.first,
-                    value = result.second
-                ) {
-
-                }
+                    value = result.second,
+                    onClick = {
+                        if (result.first == R.string.change_password_settings)
+                            viewModel.showChangePassDialog()
+                    }
+                )
             }
             item {
 
@@ -211,10 +213,27 @@ fun SettingsScreen(
                 }
 
                 is SettingsScreenEvent.ToastEvent -> {
-                    if (value.msg == ResponseStatus.FAILED.value) {
-                        Toast.makeText(context, R.string.error_toast, Toast.LENGTH_SHORT).show()
-                    } else {
-                        Toast.makeText(context, value.msg, Toast.LENGTH_SHORT).show()
+                    when (value.msg) {
+                        ResponseStatus.FAILED.value -> {
+                            Toast.makeText(
+                                context,
+                                R.string.error_toast, Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
+                        ResponseStatus.SUCCESS.value -> {
+                            Toast.makeText(
+                                context,
+                                R.string.pass_been_updat, Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
+                        else -> {
+                            Toast.makeText(
+                                context,
+                                value.msg, Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
                 }
 
@@ -243,7 +262,7 @@ fun SettingsScreen(
 
 @Composable
 private fun SettingIcon(
-    @DrawableRes id : Int
+    @DrawableRes id: Int
 ) {
     Icon(
         painter = painterResource(id = id),
@@ -342,6 +361,7 @@ private fun ShowMenuSetting(
                 }
             )
         }
+
         THEME -> {
             ShowMenu(
                 expanded = expanded,
@@ -351,6 +371,7 @@ private fun ShowMenuSetting(
                 }
             )
         }
+
         NOTIFICATION -> {}
         PERS_DATA -> {}
         CONFIDENTIALITY -> {}
