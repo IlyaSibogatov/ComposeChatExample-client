@@ -23,6 +23,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.composechatexample.R
 import com.example.composechatexample.screens.settings.SettingsViewModel
 import com.example.composechatexample.utils.Constants
+import com.example.composechatexample.utils.PassUpdateState
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
@@ -61,20 +62,15 @@ fun ChangePasswordDialog() {
                             }
                         )
                     },
-                    isError = with(uiState.value.errors) {
-                        this.currentIsEmpty ||
-                                this.currentNotEqOld ||
-                                this.currentNotMatch ||
-                                this.currentNewSame
-                    },
+                    isError = uiState.value.errors.currentField != PassUpdateState.FIELD_CORRECTLY,
                     supportingText = {
-                        if (uiState.value.errors.currentIsEmpty)
+                        if (uiState.value.errors.currentField == PassUpdateState.EMPTY_FIELD)
                             Text(text = stringResource(id = R.string.empty_field_error))
-                        if (uiState.value.errors.currentNotEqOld)
+                        if (uiState.value.errors.currentField == PassUpdateState.CURRENT_NOT_EQ_OLD)
                             Text(text = stringResource(id = R.string.current_not_eq_old))
-                        if (uiState.value.errors.currentNotMatch)
+                        if (uiState.value.errors.currentField == PassUpdateState.NOT_MATCH_PATTERN)
                             Text(text = stringResource(id = R.string.password_dont_match))
-                        if (uiState.value.errors.currentNewSame)
+                        if (uiState.value.errors.currentField == PassUpdateState.NEW_CURRENT_SAME)
                             Text(text = stringResource(id = R.string.new_pass_eq_current))
                     },
                 )
@@ -96,23 +92,17 @@ fun ChangePasswordDialog() {
                             }
                         )
                     },
-                    isError = with(uiState.value.errors) {
-                        this.newIsEmpty ||
-                                this.newEqOld ||
-                                this.newestNotSame ||
-                                this.newNotMatch ||
-                                this.currentNewSame
-                    },
+                    isError = uiState.value.errors.newField != PassUpdateState.FIELD_CORRECTLY,
                     supportingText = {
-                        if (uiState.value.errors.newIsEmpty)
+                        if (uiState.value.errors.newField == PassUpdateState.EMPTY_FIELD)
                             Text(text = stringResource(id = R.string.empty_field_error))
-                        if (uiState.value.errors.newEqOld)
+                        if (uiState.value.errors.newField == PassUpdateState.NEW_EQ_OLD)
                             Text(text = stringResource(id = R.string.new_pass_eq_old))
-                        if (uiState.value.errors.newestNotSame)
+                        if (uiState.value.errors.newField == PassUpdateState.NEWEST_NOT_SAME)
                             Text(text = stringResource(id = R.string.new_password_net_match))
-                        if (uiState.value.errors.newNotMatch)
+                        if (uiState.value.errors.newField == PassUpdateState.NOT_MATCH_PATTERN)
                             Text(text = stringResource(id = R.string.password_dont_match))
-                        if (uiState.value.errors.currentNewSame)
+                        if (uiState.value.errors.newField == PassUpdateState.NEW_CURRENT_SAME)
                             Text(text = stringResource(id = R.string.new_pass_eq_current))
                     },
                 )
@@ -134,17 +124,13 @@ fun ChangePasswordDialog() {
                             }
                         )
                     },
-                    isError = with(uiState.value.errors) {
-                        this.repeatIsEmpty ||
-                                this.newestNotSame ||
-                                this.repeatNotMatch
-                    },
+                    isError = uiState.value.errors.repeatedField != PassUpdateState.FIELD_CORRECTLY,
                     supportingText = {
-                        if (uiState.value.errors.repeatIsEmpty)
+                        if (uiState.value.errors.repeatedField == PassUpdateState.EMPTY_FIELD)
                             Text(text = stringResource(id = R.string.empty_field_error))
-                        if (uiState.value.errors.repeatNotMatch)
+                        if (uiState.value.errors.repeatedField == PassUpdateState.NOT_MATCH_PATTERN)
                             Text(text = stringResource(id = R.string.password_dont_match))
-                        if (uiState.value.errors.newestNotSame)
+                        if (uiState.value.errors.repeatedField == PassUpdateState.NEWEST_NOT_SAME)
                             Text(text = stringResource(id = R.string.new_password_net_match))
                     },
                 )

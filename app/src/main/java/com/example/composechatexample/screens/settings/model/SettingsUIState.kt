@@ -1,5 +1,7 @@
 package com.example.composechatexample.screens.settings.model
 
+import com.example.composechatexample.utils.PassUpdateState
+
 data class SettingsUIState(
     val language: String? = null,
     val theme: String? = null,
@@ -21,17 +23,7 @@ data class PassState (
 )
 
 data class PassErrors(
-    var currentNewSame: Boolean = false,
-    var newestNotSame: Boolean = false,
-
-    var currentNotMatch: Boolean = false,
-    var newNotMatch: Boolean = false,
-    var repeatNotMatch: Boolean = false,
-
-    var currentIsEmpty: Boolean = false,
-    var newIsEmpty: Boolean = false,
-    var repeatIsEmpty: Boolean = false,
-
-    var newEqOld: Boolean = false,
-    var currentNotEqOld: Boolean = false,
+    var currentField: PassUpdateState = PassUpdateState.FIELD_CORRECTLY,
+    var newField: PassUpdateState = PassUpdateState.FIELD_CORRECTLY,
+    var repeatedField: PassUpdateState = PassUpdateState.FIELD_CORRECTLY,
 )
