@@ -10,6 +10,7 @@ import com.example.composechatexample.screens.settings.model.SettingsScreenEvent
 import com.example.composechatexample.screens.settings.model.SettingsUIState
 import com.example.composechatexample.utils.Constants
 import com.example.composechatexample.utils.Constants.listLanguages
+import com.example.composechatexample.utils.PassUpdateState
 import com.example.composechatexample.utils.ResponseStatus
 import com.example.composechatexample.utils.SettingType
 import com.example.composechatexample.utils.SettingType.CONFIDENTIALITY
@@ -187,14 +188,9 @@ class SettingsViewModel @Inject constructor(
                 repeatedPass = uiState.value.pass.repeatedPass,
             ),
             errors = PassErrors(
-                currentNewSame = false,
-                newestNotSame = uiState.value.errors.newestNotSame,
-                currentNotMatch = false,
-                newNotMatch = uiState.value.errors.newNotMatch,
-                repeatNotMatch = uiState.value.errors.repeatNotMatch,
-                currentIsEmpty = false,
-                newIsEmpty = uiState.value.errors.newIsEmpty,
-                repeatIsEmpty = uiState.value.errors.repeatIsEmpty,
+                currentField = PassUpdateState.FIELD_CORRECTLY,
+                newField = uiState.value.errors.newField,
+                repeatedField = uiState.value.errors.repeatedField,
             )
         )
     }
@@ -207,14 +203,9 @@ class SettingsViewModel @Inject constructor(
                 repeatedPass = uiState.value.pass.repeatedPass,
             ),
             errors = PassErrors(
-                currentNewSame = false,
-                newestNotSame = false,
-                currentNotMatch = uiState.value.errors.currentNotMatch,
-                newNotMatch = false,
-                repeatNotMatch = uiState.value.errors.repeatNotMatch,
-                currentIsEmpty = uiState.value.errors.currentIsEmpty,
-                newIsEmpty = false,
-                repeatIsEmpty = uiState.value.errors.repeatIsEmpty,
+                currentField = uiState.value.errors.currentField,
+                newField = PassUpdateState.FIELD_CORRECTLY,
+                repeatedField = uiState.value.errors.repeatedField,
             )
         )
     }
@@ -227,14 +218,9 @@ class SettingsViewModel @Inject constructor(
                 repeatedPass = value,
             ),
             errors = PassErrors(
-                currentNewSame = uiState.value.errors.currentNewSame,
-                newestNotSame = false,
-                currentNotMatch = uiState.value.errors.currentNotMatch,
-                newNotMatch = uiState.value.errors.newNotMatch,
-                repeatNotMatch = false,
-                currentIsEmpty = uiState.value.errors.currentIsEmpty,
-                newIsEmpty = uiState.value.errors.newIsEmpty,
-                repeatIsEmpty = false,
+                currentField = uiState.value.errors.currentField,
+                newField = uiState.value.errors.newField,
+                repeatedField = PassUpdateState.FIELD_CORRECTLY,
             )
         )
     }
@@ -243,72 +229,50 @@ class SettingsViewModel @Inject constructor(
         val errors = PassErrors()
         viewModelScope.launch {
             validator.isValidPassword(uiState.value.pass.currentPass).let {
-                when (it) {
-                    "pattern_not_matched" -> {
-                        errors.currentNotMatch = true
-                    }
-
-                    "empty_field" -> {
-                        errors.currentIsEmpty = true
-                    }
-
-                    "password_is_ok" -> {
-                        errors.apply {
-                            currentNotMatch = false
-                            currentIsEmpty = false
-                        }
-                    }
+                errors.currentField = when (it) {
+                    "pattern_not_matched" -> PassUpdateState.NOT_MATCH_PATTERN
+                    "empty_field" -> PassUpdateState.EMPTY_FIELD
+                    "password_is_ok" -> PassUpdateState.FIELD_CORRECTLY
+                    else -> PassUpdateState.FIELD_CORRECTLY
                 }
             }
         }
         viewModelScope.launch {
             validator.isValidPassword(uiState.value.pass.newPass).let {
-                when (it) {
-                    "pattern_not_matched" -> {
-                        errors.newNotMatch = true
-                    }
-
-                    "empty_field" -> {
-                        errors.newIsEmpty = true
-                    }
-
-                    "password_is_ok" -> {
-                        errors.apply {
-                            repeatNotMatch = false
-                            repeatIsEmpty = false
-                        }
-                    }
+                errors.newField = when (it) {
+                    "pattern_not_matched" -> PassUpdateState.NOT_MATCH_PATTERN
+                    "empty_field" -> PassUpdateState.EMPTY_FIELD
+                    "password_is_ok" -> PassUpdateState.FIELD_CORRECTLY
+                    else -> PassUpdateState.FIELD_CORRECTLY
                 }
             }
         }
         viewModelScope.launch {
             validator.isValidPassword(uiState.value.pass.repeatedPass).let {
-                when (it) {
-                    "pattern_not_matched" -> {
-                        errors.repeatNotMatch = true
-                    }
-
-                    "empty_field" -> {
-                        errors.repeatIsEmpty = true
-                    }
-
-                    "password_is_ok" -> {
-                        errors.apply {
-                            repeatNotMatch = false
-                            repeatIsEmpty = false
-                        }
-                    }
+                errors.repeatedField = when (it) {
+                    "pattern_not_matched" -> PassUpdateState.NOT_MATCH_PATTERN
+                    "empty_field" -> PassUpdateState.EMPTY_FIELD
+                    "password_is_ok" -> PassUpdateState.FIELD_CORRECTLY
+                    else -> PassUpdateState.FIELD_CORRECTLY
                 }
             }
         }
-        errors.currentNewSame =
-            uiState.value.pass.newPass == uiState.value.pass.currentPass
-                    && uiState.value.pass.currentPass.isNotEmpty()
-                    && (!uiState.value.errors.currentNotMatch ||
-                    !uiState.value.errors.newNotMatch)
-        errors.newestNotSame = (!errors.newNotMatch && !errors.repeatNotMatch) &&
-                (uiState.value.pass.newPass != uiState.value.pass.repeatedPass) &&
-                (!errors.newIsEmpty && !errors.repeatIsEmpty)
+
+        if (uiState.value.pass.currentPass.isNotEmpty() &&
+            uiState.value.pass.currentPass == uiState.value.pass.newPass &&
+            (uiState.value.errors.currentField != PassUpdateState.NOT_MATCH_PATTERN ||
+                    uiState.value.errors.newField != PassUpdateState.NOT_MATCH_PATTERN)
+        ) errors.currentField = PassUpdateState.NEW_CURRENT_SAME
+
+        if (errors.newField != PassUpdateState.NOT_MATCH_PATTERN &&
+            errors.repeatedField != PassUpdateState.NOT_MATCH_PATTERN &&
+            (uiState.value.pass.newPass != uiState.value.pass.repeatedPass) &&
+            (errors.newField != PassUpdateState.EMPTY_FIELD &&
+                    errors.repeatedField != PassUpdateState.EMPTY_FIELD)
+        ) {
+            errors.newField = PassUpdateState.NEWEST_NOT_SAME
+            errors.repeatedField = PassUpdateState.NEWEST_NOT_SAME
+        }
         _uiState.value = uiState.value.copy(
             errors = errors
         )
@@ -317,10 +281,10 @@ class SettingsViewModel @Inject constructor(
     fun updatePass() {
         checkFields()
         with(uiState.value.errors) {
-            if (!this.currentNewSame && !this.newestNotSame &&
-                !this.currentNotMatch && !this.newNotMatch &&
-                !this.repeatNotMatch && !this.currentIsEmpty &&
-                !this.newIsEmpty && !this.repeatIsEmpty
+            if (
+                this.currentField == PassUpdateState.FIELD_CORRECTLY &&
+                this.newField == PassUpdateState.FIELD_CORRECTLY &&
+                this.repeatedField == PassUpdateState.FIELD_CORRECTLY
             ) {
                 viewModelScope.launch {
                     onboardingService.changePass(
@@ -331,7 +295,7 @@ class SettingsViewModel @Inject constructor(
                             "current with old not same" -> {
                                 _uiState.value = uiState.value.copy(
                                     errors = PassErrors(
-                                        currentNotEqOld = true
+                                        currentField = PassUpdateState.CURRENT_NOT_EQ_OLD
                                     )
                                 )
                             }
@@ -339,7 +303,7 @@ class SettingsViewModel @Inject constructor(
                             "new with old same" -> {
                                 _uiState.value = uiState.value.copy(
                                     errors = PassErrors(
-                                        newEqOld = true
+                                        newField = PassUpdateState.NEW_EQ_OLD
                                     )
                                 )
                             }
