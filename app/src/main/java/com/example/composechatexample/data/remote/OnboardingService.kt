@@ -11,10 +11,12 @@ interface OnboardingService {
 
     suspend fun logout(uid: String): DefaultResponse?
 
+    suspend fun changePass(current: String, new: String, uuid: String): String?
+
     sealed class EndPoint(val url: String) {
         object Login : EndPoint("${Constants.BASE_URL}/login")
         object SignUp : EndPoint("${Constants.BASE_URL}/signup")
-
         object Logout : EndPoint("${Constants.BASE_URL}/logout")
+        object ChangePass : EndPoint("${Constants.BASE_URL}/change_pass")
     }
 }
