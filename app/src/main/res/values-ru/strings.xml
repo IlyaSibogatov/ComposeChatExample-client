@@ -82,6 +82,11 @@
     <string name="account_label">Аккаунт</string>
     <string name="personal_data">Личные данные</string>
 
+    <string name="change_password">Изменение пароля</string>
+    <string name="current_pass">Текущий пароль</string>
+    <string name="new_pass">Новый пароль</string>
+    <string name="repeat_new_pass">Повторите новый пароль</string>
+
     <!--  Change password dialog  -->
     <string name="empty_field_error">Заполните поле</string>
     <string name="current_not_eq_old">Введенный пароль не соответствует текущему</string>
