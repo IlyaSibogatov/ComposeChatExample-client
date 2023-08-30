@@ -38,6 +38,12 @@
     <string name="success_friend_request">Friend request sent</string>
     <string name="failed_friend_request">Failed to send friend request</string>
 
+    <string name="add_user_to_friend">Send a friend request %1$s?</string>
+    <string name="remove_friend_check_quest">Are you sure you want to unfriend %1$s?</string>
+    <string name="remove_friend">Remove friend</string>
+
+    <string name="friend_was_removed">Friend was removed</string>
+
     <string name="count_requests">%1$s requests</string>
     <string name="count_followers">%1$s followers</string>
 

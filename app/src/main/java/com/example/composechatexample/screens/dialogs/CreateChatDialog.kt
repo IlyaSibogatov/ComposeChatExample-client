@@ -52,7 +52,7 @@ fun CreateChatDialog() {
         },
         text = {
             ConstraintLayout() {
-                val (chatName, chatPass, passCheckBox, passRow) = createRefs()
+                val (chatName, chatPass, passCheckBox) = createRefs()
                 OutlinedTextField(
                     modifier = Modifier
                         .constrainAs(chatName) {
