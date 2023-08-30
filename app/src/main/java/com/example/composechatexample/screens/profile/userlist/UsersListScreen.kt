@@ -45,6 +45,8 @@ import com.example.composechatexample.R
 import com.example.composechatexample.screens.profile.userlist.model.UsersListEvent
 import com.example.composechatexample.utils.Constants
 import com.example.composechatexample.utils.Constants.FRIENDSHIPS_REQUESTS
+import com.example.composechatexample.utils.Ext.showToast
+import com.example.composechatexample.utils.ResponseStatus
 import kotlinx.coroutines.flow.collectLatest
 
 @SuppressLint("CheckResult")
@@ -55,6 +57,7 @@ fun UsersListScreen(
     uid: String? = null,
     type: String? = null
 ) {
+    val context = LocalContext.current
     val viewModel: UsersListViewModel = hiltViewModel()
     val uiState = viewModel.uiState.collectAsState()
 
@@ -209,6 +212,18 @@ fun UsersListScreen(
                         navController.popBackStack()
                     else
                         navController.navigate(value.route)
+                }
+
+                is UsersListEvent.ToastEvent -> {
+                    showToast(
+                        context,
+                        when (value.msg) {
+                            ResponseStatus.FAILED.value ->
+                                context.resources.getString(R.string.exception_toast)
+
+                            else -> context.resources.getString(R.string.exception_toast)
+                        }
+                    )
                 }
             }
         }

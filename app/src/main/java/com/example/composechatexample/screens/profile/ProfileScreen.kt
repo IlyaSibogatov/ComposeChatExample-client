@@ -58,6 +58,7 @@ import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.example.composechatexample.R
 import com.example.composechatexample.screens.dialogs.EditInfoDialog
+import com.example.composechatexample.screens.dialogs.FriendAddRemoveDialog
 import com.example.composechatexample.screens.profile.model.ProfileScreenEvent
 import com.example.composechatexample.utils.Constants
 import com.example.composechatexample.utils.Constants.FOLLOWERS
@@ -65,6 +66,7 @@ import com.example.composechatexample.utils.Constants.FRIENDS
 import com.example.composechatexample.utils.Constants.FRIENDSHIPS_REQUESTS
 import com.example.composechatexample.utils.Ext.showToast
 import com.example.composechatexample.utils.ResponseStatus
+import com.example.composechatexample.utils.ViewForDisplay
 import kotlinx.coroutines.flow.collectLatest
 import java.io.ByteArrayOutputStream
 
@@ -98,15 +100,28 @@ fun ProfileScreen(
             .fillMaxSize()
             .padding(16.dp),
     ) {
-        if (uiState.value.showEditDialog) {
-            EditInfoDialog()
-        }
-        if (uiState.value.imageUploading) {
-            LinearProgressIndicator(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(4.dp)
-            )
+        when (uiState.value.displayingView) {
+            ViewForDisplay.ADD_FRIEND -> {
+                FriendAddRemoveDialog(true)
+            }
+
+            ViewForDisplay.REMOVE_FRIEND -> {
+                FriendAddRemoveDialog()
+            }
+
+            ViewForDisplay.PROGRESS_LINEAR -> {
+                LinearProgressIndicator(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(4.dp)
+                )
+            }
+
+            ViewForDisplay.EDIT_INFO -> {
+                EditInfoDialog()
+            }
+
+            else -> {}
         }
         val (
             photo, username, friendListEt, friendListLc, selfInfoPreview,
@@ -457,17 +472,20 @@ fun ProfileScreen(
                 )
             }
         }
-        if (!viewModel.isFriend()) {
+        if (viewModel.isFriend() || viewModel.isNotInFriendRequest() && !viewModel.isMyProfile()) {
             IconButton(
                 modifier = Modifier
                     .constrainAs(addToFriend) {
                         top.linkTo(parent.top)
                         start.linkTo(parent.start)
                     },
-                onClick = { viewModel.friendshipRequest() }
+                onClick = { viewModel.showAddRemoveDialog(viewModel.isFriend()) }
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_person_add),
+                    painter = painterResource(
+                        id = if (viewModel.isFriend()) R.drawable.ic_remove_friend
+                        else R.drawable.ic_person_add
+                    ),
                     contentDescription = Constants.CONTENT_DESCRIPTION
                 )
             }
@@ -495,6 +513,9 @@ fun ProfileScreen(
 
                             ResponseStatus.FRIENDSHIP_REQUEST_NOT_SEND.value ->
                                 context.resources.getString(R.string.failed_friend_request)
+
+                            ResponseStatus.FRIEND_REMOVED.value ->
+                                context.resources.getString(R.string.friend_was_removed)
 
                             ResponseStatus.FAILED.value ->
                                 context.resources.getString(R.string.exception_toast)

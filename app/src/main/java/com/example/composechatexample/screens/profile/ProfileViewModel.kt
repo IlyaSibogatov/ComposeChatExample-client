@@ -11,6 +11,7 @@ import com.example.composechatexample.screens.profile.model.ProfileScreenEvent
 import com.example.composechatexample.utils.Constants
 import com.example.composechatexample.utils.ResponseStatus
 import com.example.composechatexample.utils.Validator
+import com.example.composechatexample.utils.ViewForDisplay
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.channels.Channel
@@ -39,7 +40,7 @@ class ProfileViewModel @Inject constructor(
         )
         viewModelScope.launch {
             _uiState.value = uiState.value.copy(
-                loadingStatus = true
+                displayingView = ViewForDisplay.PROGRESS_LINEAR
             )
             val response: UserFromId? =
                 userService.getUserById(uid ?: preferencesManager.uuid!!)
@@ -67,16 +68,18 @@ class ProfileViewModel @Inject constructor(
                 )
             }
             _uiState.value = uiState.value.copy(
-                loadingStatus = false
+                displayingView = null
             )
         }
     }
 
     fun showEditDialog() {
         _uiState.value = uiState.value.copy(
-            showEditDialog = !uiState.value.showEditDialog
+            displayingView =
+            if (uiState.value.displayingView != ViewForDisplay.EDIT_INFO) ViewForDisplay.EDIT_INFO
+            else null
         )
-        if (!uiState.value.showEditDialog) {
+        if (uiState.value.displayingView != ViewForDisplay.EDIT_INFO) {
             _uiState.value = uiState.value.copy(
                 newInfo = NewUserInfo(
                     username = uiState.value.username,
@@ -202,14 +205,14 @@ class ProfileViewModel @Inject constructor(
                 )
             }
             _uiState.value = uiState.value.copy(
-                imageUploading = false
+                displayingView = null
             )
         }
     }
 
     fun updateImage(uri: Uri) {
         _uiState.value = uiState.value.copy(
-            imageUploading = true,
+            displayingView = ViewForDisplay.PROGRESS_LINEAR,
             updateImage = false,
             imageUri = uri
         )
@@ -219,39 +222,40 @@ class ProfileViewModel @Inject constructor(
         return uiState.value.uid == preferencesManager.uuid
     }
 
-    fun isFriend(): Boolean {
-        return uiState.value.friends.find {
-            it.id == preferencesManager.uuid
-        } != null || uiState.value.friendshipRequests.find {
-            it == preferencesManager.uuid
-        } != null || uiState.value.uid == preferencesManager.uuid ||
-                uiState.value.isFriend
+    fun isFriend(): Boolean =
+        uiState.value.friends.find { it.id == preferencesManager.uuid } != null
+
+    fun isNotInFriendRequest(): Boolean {
+        return uiState.value.friendshipRequests.find { it == preferencesManager.uuid } == null
     }
 
     fun friendshipRequest() {
         viewModelScope.launch {
             _uiState.value = uiState.value.copy(
-                loadingStatus = true
+                displayingView = ViewForDisplay.PROGRESS_LINEAR,
             )
-            userService.friendshipRequest(preferencesManager.uuid!!, uiState.value.uid).let {
+            userService.friendshipRequest(preferencesManager.uuid!!, uiState.value.uid)?.let {
                 sendEvent(
                     ProfileScreenEvent.ToastEvent(
-                        when (it) {
-                            true -> {
+                        when (it.msg) {
+                            "Add success" -> {
                                 _uiState.value = uiState.value.copy(
-                                    isFriend = true
+                                    followers = uiState.value.followers + preferencesManager.uuid!!,
+                                    friendshipRequests = uiState.value.friendshipRequests + preferencesManager.uuid!!,
                                 )
                                 ResponseStatus.FRIENDSHIP_REQUEST_SEND.value
                             }
 
-                            false -> ResponseStatus.FRIENDSHIP_REQUEST_NOT_SEND.value
-                            null -> ResponseStatus.ERROR.value
+                            "Add failed" -> ResponseStatus.FRIENDSHIP_REQUEST_NOT_SEND.value
+                            else -> ResponseStatus.ERROR.value
                         }
                     )
                 )
+            } ?: {
+                ProfileScreenEvent.ToastEvent(ResponseStatus.ERROR.value)
             }
             _uiState.value = uiState.value.copy(
-                loadingStatus = false
+                displayingView = null
             )
         }
     }
@@ -281,6 +285,47 @@ class ProfileViewModel @Inject constructor(
         _uiState.value = uiState.value.copy(
             infoOverflowed = overflowed
         )
+    }
+
+    fun showAddRemoveDialog(isFriend: Boolean? = null) {
+        _uiState.value = uiState.value.copy(
+            displayingView = when (isFriend) {
+                true -> ViewForDisplay.REMOVE_FRIEND
+                false -> ViewForDisplay.ADD_FRIEND
+                else -> null
+            }
+        )
+    }
+
+    fun removeFriend() {
+        viewModelScope.launch {
+            _uiState.value = uiState.value.copy(
+                displayingView = ViewForDisplay.PROGRESS_LINEAR,
+            )
+            userService.removeFriend(preferencesManager.uuid!!, uiState.value.uid, false)?.let {
+                sendEvent(
+                    ProfileScreenEvent.ToastEvent(
+                        when (it.msg) {
+                            "friend removed" -> {
+                                val friends = uiState.value.friends.toMutableList()
+                                friends.remove(friends.find { it.id == preferencesManager.uuid })
+                                _uiState.value = uiState.value.copy(
+                                    friends = friends,
+                                )
+                                ResponseStatus.FRIEND_REMOVED.value
+                            }
+
+                            else -> ResponseStatus.ERROR.value
+                        }
+                    )
+                )
+            } ?: {
+                ProfileScreenEvent.ToastEvent(ResponseStatus.ERROR.value)
+            }
+            _uiState.value = uiState.value.copy(
+                displayingView = null
+            )
+        }
     }
 
     private fun sendEvent(event: ProfileScreenEvent) {

@@ -37,7 +37,13 @@
     <string name="failed_data_update">Данные не были изменены</string>
 
     <string name="success_friend_request">Заявка в друзья отправлена</string>
-    <string name="failed_friend_request">Не удалсь отправить заявку в друзья</string>
+    <string name="failed_friend_request">Не удалось отправить заявку в друзья</string>
+
+    <string name="friend_was_removed">Друг был удалён</string>
+
+    <string name="add_user_to_friend">Отправить запрос дружбы %1$s?</string>
+    <string name="remove_friend_check_quest">Вы уверены что хотите удалить из друзей %1$s?</string>
+    <string name="remove_friend">Удалить из друзей</string>
 
     <string name="count_requests">%1$s запросов</string>
     <string name="count_followers">%1$s подписчиков</string>

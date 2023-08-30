@@ -27,6 +27,13 @@ enum class ChatEvent {
     EDIT, REMOVE
 }
 
+enum class ViewForDisplay {
+    ADD_FRIEND,
+    REMOVE_FRIEND,
+    PROGRESS_LINEAR,
+    EDIT_INFO,
+}
+
 enum class ResponseStatus(val value: String) {
     SUCCESS("success"),
     FAILED("failed"),
@@ -36,6 +43,8 @@ enum class ResponseStatus(val value: String) {
     INFO_NOT_UPDATED("info_not_update"),
     FRIENDSHIP_REQUEST_SEND("request_was_send"),
     FRIENDSHIP_REQUEST_NOT_SEND("request_not_send"),
+
+    FRIEND_REMOVED("friend removed")
 }
 
 enum class PassUpdateState(val value: String) {

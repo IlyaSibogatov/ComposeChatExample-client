@@ -258,11 +258,13 @@ class SettingsViewModel @Inject constructor(
             }
         }
 
-        if (uiState.value.pass.currentPass.isNotEmpty() &&
+        if (
             uiState.value.pass.currentPass == uiState.value.pass.newPass &&
-            (uiState.value.errors.currentField != PassUpdateState.NOT_MATCH_PATTERN ||
-                    uiState.value.errors.newField != PassUpdateState.NOT_MATCH_PATTERN)
-        ) errors.currentField = PassUpdateState.NEW_CURRENT_SAME
+            errors.currentField == PassUpdateState.FIELD_CORRECTLY
+        ) {
+            errors.currentField = PassUpdateState.NEW_CURRENT_SAME
+            errors.newField = PassUpdateState.NEW_CURRENT_SAME
+        }
 
         if (errors.newField != PassUpdateState.NOT_MATCH_PATTERN &&
             errors.repeatedField != PassUpdateState.NOT_MATCH_PATTERN &&
