@@ -8,6 +8,7 @@ import com.example.composechatexample.screens.profile.FriendListUIState
 import com.example.composechatexample.screens.profile.userlist.model.UsersListEvent
 import com.example.composechatexample.utils.Constants
 import com.example.composechatexample.utils.Constants.FRIENDS
+import com.example.composechatexample.utils.ResponseStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,8 +49,8 @@ class UsersListViewModel @Inject constructor(
             _uiState.value = uiState.value.copy(
                 loadingStatus = true
             )
-            userService.friendshipAccept(preferencesManager.uuid!!, userId, accept).let {
-                if (it) {
+            userService.friendshipAccept(preferencesManager.uuid!!, userId, accept)?.let {
+                if (it.msg == "Action success") {
                     val list = uiState.value.usersList.toMutableList()
                     list.remove(list.find { user -> user.id == userId })
                     _uiState.value = uiState.value.copy(
@@ -62,7 +63,7 @@ class UsersListViewModel @Inject constructor(
                 if (uiState.value.usersList.isEmpty()) {
                     sendEvent(UsersListEvent.NavigateTo("popBackStack"))
                 }
-            }
+            } ?: sendEvent(UsersListEvent.ToastEvent(ResponseStatus.ERROR.value))
         }
     }
 
