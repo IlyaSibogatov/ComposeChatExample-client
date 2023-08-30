@@ -29,17 +29,11 @@ class UserServiceImpl(
         }
     }
 
-    override suspend fun friendshipRequest(selfId: String, userId: String): Boolean? {
+    override suspend fun friendshipRequest(selfId: String, userId: String): DefaultResponse? {
         return try {
             client.post<DefaultResponse>(UserService.EndPoint.AddFriends.url) {
                 url.parameters.append("selfId", selfId)
                 url.parameters.append("userId", userId)
-            }.let {
-                when (it.status) {
-                    HttpStatusCode.OK.value -> true
-                    HttpStatusCode.NoContent.value -> false
-                    else -> false
-                }
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -98,17 +92,33 @@ class UserServiceImpl(
         selfId: String,
         userId: String,
         action: Boolean
-    ): Boolean {
+    ): DefaultResponse? {
         return try {
             client.post<DefaultResponse>(UserService.EndPoint.FriendshipAction.url) {
                 url.parameters.append("selfId", selfId)
                 url.parameters.append("userId", userId)
                 url.parameters.append("accept", action.toString())
             }
-            true
         } catch (e: Exception) {
             e.printStackTrace()
-            false
+            null
+        }
+    }
+
+    override suspend fun removeFriend(
+        selfId: String,
+        userId: String,
+        selfRemoving: Boolean
+    ): DefaultResponse? {
+        return try {
+            client.post<DefaultResponse>(UserService.EndPoint.RemoveFriend.url) {
+                url.parameters.append("selfId", selfId)
+                url.parameters.append("userId", userId)
+                url.parameters.append("selfRemoving", selfRemoving.toString())
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
         }
     }
 }

@@ -10,11 +10,17 @@ interface UserService {
 
     suspend fun getUserById(uid: String): UserFromId?
 
-    suspend fun friendshipRequest(selfId: String, userId: String): Boolean?
+    suspend fun friendshipRequest(selfId: String, userId: String): DefaultResponse?
 
     suspend fun getFollowerFriends(uid: String, type: String): List<Friend>?
 
-    suspend fun friendshipAccept(selfId: String, userId: String, action: Boolean): Boolean
+    suspend fun friendshipAccept(selfId: String, userId: String, action: Boolean): DefaultResponse?
+
+    suspend fun removeFriend(
+        selfId: String,
+        userId: String,
+        selfRemoving: Boolean
+    ): DefaultResponse?
 
     suspend fun updateUserInfo(newInfo: NewUserInfo): Boolean
 
@@ -26,6 +32,8 @@ interface UserService {
         object AddFriends : EndPoint("${Constants.BASE_URL}/add_friend")
         object GetFollowerFriends : EndPoint("${Constants.BASE_URL}/get_follower_friends")
         object FriendshipAction : EndPoint("${Constants.BASE_URL}/friendship")
+
+        object RemoveFriend : EndPoint("${Constants.BASE_URL}/remove_friend")
         object UploadAvatar : EndPoint("${Constants.BASE_URL}/upload_avatar")
     }
 }
