@@ -27,11 +27,22 @@ enum class ChatEvent {
     EDIT, REMOVE
 }
 
-enum class ViewForDisplay {
+enum class ProfileDialogs {
     ADD_FRIEND,
     REMOVE_FRIEND,
     PROGRESS_LINEAR,
     EDIT_INFO,
+}
+
+enum class SettingsDialogs {
+    PASS,
+    LOG_OUT
+}
+
+enum class ScreenState {
+    INIT,
+    ERROR,
+    SUCCESS,
 }
 
 enum class ResponseStatus(val value: String) {

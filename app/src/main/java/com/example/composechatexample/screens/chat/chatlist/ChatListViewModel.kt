@@ -14,6 +14,7 @@ import com.example.composechatexample.screens.chat.chatlist.model.CreatedChat
 import com.example.composechatexample.screens.chat.chatlist.model.DisplayDialog
 import com.example.composechatexample.utils.Constants
 import com.example.composechatexample.utils.ResponseStatus
+import com.example.composechatexample.utils.ScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.channels.Channel
@@ -44,17 +45,23 @@ class ChatListViewModel @Inject constructor(
 
     fun loadChatList() {
         _uiState.value = uiState.value.copy(
-            isLoading = true
+            screenState = ScreenState.INIT
         )
         viewModelScope.launch {
-            val result = messageService.getAllChats().toMutableList()
-            _uiState.value = uiState.value.copy(
-                chats = result,
-                newChats = result
-            )
-            _uiState.value = uiState.value.copy(
-                isLoading = false
-            )
+            val result = messageService.getAllChats()?.toMutableList()
+            if (result != null) {
+                _uiState.value = uiState.value.copy(
+                    chats = result,
+                    newChats = result,
+                    screenState = ScreenState.SUCCESS
+                )
+            } else {
+                _uiState.value = uiState.value.copy(
+                    chats = mutableListOf(),
+                    newChats = mutableListOf(),
+                    screenState = ScreenState.ERROR
+                )
+            }
         }
     }
 

@@ -19,6 +19,7 @@ import com.example.composechatexample.utils.SettingType.LANG
 import com.example.composechatexample.utils.SettingType.NOTIFICATION
 import com.example.composechatexample.utils.SettingType.PERS_DATA
 import com.example.composechatexample.utils.SettingType.THEME
+import com.example.composechatexample.utils.SettingsDialogs
 import com.example.composechatexample.utils.TypeLang
 import com.example.composechatexample.utils.TypeLang.ENG
 import com.example.composechatexample.utils.TypeLang.RU
@@ -136,6 +137,9 @@ class SettingsViewModel @Inject constructor(
                     ResponseStatus.FAILED.value
                 )
             )
+            _uiState.value = uiState.value.copy(
+                dialogs = null
+            )
         }
     }
 
@@ -148,14 +152,17 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun showChangePassDialog() {
-        _uiState.value = uiState.value.copy(
-            showPassDialog = !uiState.value.showPassDialog
-        )
-        if (!uiState.value.showPassDialog)
+        if (uiState.value.dialogs == null) {
             _uiState.value = uiState.value.copy(
+                dialogs = SettingsDialogs.PASS
+            )
+        } else {
+            _uiState.value = uiState.value.copy(
+                dialogs = null,
                 pass = PassState(),
                 errors = PassErrors()
             )
+        }
     }
 
     fun clearPassField(field: String) {
@@ -223,6 +230,18 @@ class SettingsViewModel @Inject constructor(
                 repeatedField = PassUpdateState.FIELD_CORRECTLY,
             )
         )
+    }
+
+    fun showExitDialog() {
+        if (uiState.value.dialogs == null) {
+            _uiState.value = uiState.value.copy(
+                dialogs = SettingsDialogs.LOG_OUT
+            )
+        } else {
+            _uiState.value = uiState.value.copy(
+                dialogs = null
+            )
+        }
     }
 
     private fun checkFields() {

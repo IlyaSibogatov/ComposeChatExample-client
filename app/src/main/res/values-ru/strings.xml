@@ -93,6 +93,8 @@
     <string name="new_pass">Новый пароль</string>
     <string name="repeat_new_pass">Повторите новый пароль</string>
 
+    <string name="check_exit">Вы действительно хотите выйти?</string>
+
     <!--  Change password dialog  -->
     <string name="empty_field_error">Заполните поле</string>
     <string name="current_not_eq_old">Введенный пароль не соответствует текущему</string>
@@ -113,6 +115,7 @@
     <!--  Exception message  -->
     <string name="error_toast">Не удалось обработать запрос</string>
     <string name="exception_toast">Непредвиденная ошибка</string>
+    <string name="try_again_later">Что-то пошло не так. Попробуйте позже</string>
 
     <!--  Actions  -->
     <string name="decline">Отклонить</string>

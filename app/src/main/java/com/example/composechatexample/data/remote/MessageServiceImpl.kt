@@ -39,13 +39,13 @@ class MessageServiceImpl(
         }
     }
 
-    override suspend fun getAllChats(): List<Chat> {
+    override suspend fun getAllChats(): List<Chat>? {
         return try {
             client.get<List<ChatDTO>>(MessageService.EndPoint.GetAllChats.url)
                 .map { it.toChat() }
         } catch (e: Exception) {
             e.printStackTrace()
-            emptyList()
+            null
         }
     }
 
