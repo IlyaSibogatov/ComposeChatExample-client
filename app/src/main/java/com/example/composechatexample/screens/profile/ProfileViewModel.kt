@@ -8,10 +8,13 @@ import com.example.composechatexample.data.preferences.PreferencesManager
 import com.example.composechatexample.data.remote.UserService
 import com.example.composechatexample.domain.model.NewUserInfo
 import com.example.composechatexample.screens.profile.model.ProfileScreenEvent
+import com.example.composechatexample.screens.profile.userlist.model.ProfileErrors
+import com.example.composechatexample.screens.profile.userlist.model.ProfileUIState
 import com.example.composechatexample.utils.Constants
+import com.example.composechatexample.utils.ProfileDialogs
 import com.example.composechatexample.utils.ResponseStatus
+import com.example.composechatexample.utils.ScreenState
 import com.example.composechatexample.utils.Validator
-import com.example.composechatexample.utils.ViewForDisplay
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.channels.Channel
@@ -40,7 +43,7 @@ class ProfileViewModel @Inject constructor(
         )
         viewModelScope.launch {
             _uiState.value = uiState.value.copy(
-                displayingView = ViewForDisplay.PROGRESS_LINEAR
+                screenState = ScreenState.INIT
             )
             val response: UserFromId? =
                 userService.getUserById(uid ?: preferencesManager.uuid!!)
@@ -54,7 +57,6 @@ class ProfileViewModel @Inject constructor(
                     friends = response.friends.sortedByDescending { it.onlineStatus },
                     followers = response.followers,
                     friendshipRequests = response.friendshipRequests,
-                    gettingUserError = false,
                     newInfo = NewUserInfo(
                         username = response.username,
                         selfInfo = response.selfInfo,
@@ -62,24 +64,24 @@ class ProfileViewModel @Inject constructor(
                 )
                 if (response.id == preferencesManager.uuid)
                     preferencesManager.userName = response.username
+                _uiState.value = uiState.value.copy(
+                    screenState = ScreenState.SUCCESS
+                )
             } else {
                 _uiState.value = uiState.value.copy(
-                    gettingUserError = true,
+                    screenState = ScreenState.ERROR,
                 )
             }
-            _uiState.value = uiState.value.copy(
-                displayingView = null
-            )
         }
     }
 
     fun showEditDialog() {
         _uiState.value = uiState.value.copy(
             displayingView =
-            if (uiState.value.displayingView != ViewForDisplay.EDIT_INFO) ViewForDisplay.EDIT_INFO
+            if (uiState.value.displayingView != ProfileDialogs.EDIT_INFO) ProfileDialogs.EDIT_INFO
             else null
         )
-        if (uiState.value.displayingView != ViewForDisplay.EDIT_INFO) {
+        if (uiState.value.displayingView != ProfileDialogs.EDIT_INFO) {
             _uiState.value = uiState.value.copy(
                 newInfo = NewUserInfo(
                     username = uiState.value.username,
@@ -212,7 +214,7 @@ class ProfileViewModel @Inject constructor(
 
     fun updateImage(uri: Uri) {
         _uiState.value = uiState.value.copy(
-            displayingView = ViewForDisplay.PROGRESS_LINEAR,
+            displayingView = ProfileDialogs.PROGRESS_LINEAR,
             updateImage = false,
             imageUri = uri
         )
@@ -232,7 +234,7 @@ class ProfileViewModel @Inject constructor(
     fun friendshipRequest() {
         viewModelScope.launch {
             _uiState.value = uiState.value.copy(
-                displayingView = ViewForDisplay.PROGRESS_LINEAR,
+                displayingView = ProfileDialogs.PROGRESS_LINEAR,
             )
             userService.friendshipRequest(preferencesManager.uuid!!, uiState.value.uid)?.let {
                 sendEvent(
@@ -290,8 +292,8 @@ class ProfileViewModel @Inject constructor(
     fun showAddRemoveDialog(isFriend: Boolean? = null) {
         _uiState.value = uiState.value.copy(
             displayingView = when (isFriend) {
-                true -> ViewForDisplay.REMOVE_FRIEND
-                false -> ViewForDisplay.ADD_FRIEND
+                true -> ProfileDialogs.REMOVE_FRIEND
+                false -> ProfileDialogs.ADD_FRIEND
                 else -> null
             }
         )
@@ -300,7 +302,7 @@ class ProfileViewModel @Inject constructor(
     fun removeFriend() {
         viewModelScope.launch {
             _uiState.value = uiState.value.copy(
-                displayingView = ViewForDisplay.PROGRESS_LINEAR,
+                displayingView = ProfileDialogs.PROGRESS_LINEAR,
             )
             userService.removeFriend(preferencesManager.uuid!!, uiState.value.uid, false)?.let {
                 sendEvent(

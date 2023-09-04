@@ -3,7 +3,6 @@ package com.example.composechatexample.screens.dialogs
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -23,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.composechatexample.R
+import com.example.composechatexample.components.ActionButton
 import com.example.composechatexample.screens.profile.ProfileViewModel
 import com.example.composechatexample.utils.Constants
 
@@ -131,16 +131,20 @@ fun EditInfoDialog() {
             }
         },
         confirmButton = {
-            Button(
+            ActionButton(
+                text = stringResource(id = R.string.accept_label),
                 onClick = {
                     viewModel.updateInfo()
                 }
-            ) { Text(stringResource(id = R.string.accept_label)) }
+            )
         },
         dismissButton = {
-            Button(
-                onClick = { viewModel.showEditDialog() }
-            ) { Text(stringResource(id = R.string.cancel_label)) }
+            ActionButton(
+                text = stringResource(id = R.string.cancel_label),
+                onClick = {
+                    viewModel.showEditDialog()
+                }
+            )
         },
     )
 }

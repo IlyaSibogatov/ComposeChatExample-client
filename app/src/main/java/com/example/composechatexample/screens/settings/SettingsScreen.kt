@@ -52,6 +52,7 @@ import androidx.navigation.NavHostController
 import com.example.composechatexample.R
 import com.example.composechatexample.components.ShowMenu
 import com.example.composechatexample.screens.dialogs.ChangePasswordDialog
+import com.example.composechatexample.screens.dialogs.ExitDialog
 import com.example.composechatexample.screens.settings.model.SettingsScreenEvent
 import com.example.composechatexample.ui.theme.themeState
 import com.example.composechatexample.utils.Constants
@@ -59,6 +60,7 @@ import com.example.composechatexample.utils.Ext
 import com.example.composechatexample.utils.ResponseStatus
 import com.example.composechatexample.utils.SettingType
 import com.example.composechatexample.utils.SettingType.*
+import com.example.composechatexample.utils.SettingsDialogs
 import com.example.composechatexample.utils.TypeTheme
 import kotlinx.coroutines.flow.collectLatest
 
@@ -95,12 +97,22 @@ fun SettingsScreen(
                 SettingItem(
                     title = R.string.exit_label,
                     icon = { SettingIcon(id = R.drawable.ic_logout) },
-                    onClick = viewModel::userLogOut
+                    onClick = { viewModel.showExitDialog() }
                 )
             }
         }
     ) { padding ->
-        if (uiState.value.showPassDialog) ChangePasswordDialog()
+        when {
+            uiState.value.dialogs == SettingsDialogs.LOG_OUT -> {
+                ExitDialog()
+            }
+
+            uiState.value.dialogs == SettingsDialogs.PASS -> {
+                ChangePasswordDialog()
+            }
+
+            else -> {}
+        }
         LazyColumn(
             modifier = Modifier
                 .padding(padding)

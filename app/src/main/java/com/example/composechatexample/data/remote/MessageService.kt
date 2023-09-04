@@ -12,7 +12,7 @@ interface MessageService {
 
     suspend fun getFollowers(chatId: String): List<UserChatInfo>
 
-    suspend fun getAllChats(): List<Chat>
+    suspend fun getAllChats(): List<Chat>?
 
     suspend fun createChat(chat: NewChat): DefaultResponse?
 
