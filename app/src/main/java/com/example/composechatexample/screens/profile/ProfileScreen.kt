@@ -1,9 +1,7 @@
 package com.example.composechatexample.screens.profile
 
 import android.annotation.SuppressLint
-import android.graphics.Bitmap
 import android.net.Uri
-import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
@@ -12,6 +10,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -57,6 +56,7 @@ import coil.compose.AsyncImage
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.example.composechatexample.R
+import com.example.composechatexample.components.CircularLoader
 import com.example.composechatexample.screens.dialogs.EditInfoDialog
 import com.example.composechatexample.screens.dialogs.FriendAddRemoveDialog
 import com.example.composechatexample.screens.profile.model.ProfileScreenEvent
@@ -64,11 +64,12 @@ import com.example.composechatexample.utils.Constants
 import com.example.composechatexample.utils.Constants.FOLLOWERS
 import com.example.composechatexample.utils.Constants.FRIENDS
 import com.example.composechatexample.utils.Constants.FRIENDSHIPS_REQUESTS
+import com.example.composechatexample.utils.Ext.getCompressedFile
 import com.example.composechatexample.utils.Ext.showToast
+import com.example.composechatexample.utils.ProfileDialogs
 import com.example.composechatexample.utils.ResponseStatus
-import com.example.composechatexample.utils.ViewForDisplay
+import com.example.composechatexample.utils.ScreenState
 import kotlinx.coroutines.flow.collectLatest
-import java.io.ByteArrayOutputStream
 
 @SuppressLint("CheckResult")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -85,12 +86,8 @@ fun ProfileScreen(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let {
-            val bitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, it)
-            val baos = ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 25, baos)
-            val fileInBytes = baos.toByteArray()
             viewModel.updateImage(it)
-            viewModel.setAvatar(fileInBytes)
+            viewModel.setAvatar(getCompressedFile(it, context))
         }
     }
     viewModel.getProfile(uid?.removePrefix(Constants.USER_UID))
@@ -100,395 +97,431 @@ fun ProfileScreen(
             .fillMaxSize()
             .padding(16.dp),
     ) {
-        when (uiState.value.displayingView) {
-            ViewForDisplay.ADD_FRIEND -> {
-                FriendAddRemoveDialog(true)
-            }
 
-            ViewForDisplay.REMOVE_FRIEND -> {
-                FriendAddRemoveDialog()
-            }
-
-            ViewForDisplay.PROGRESS_LINEAR -> {
-                LinearProgressIndicator(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(4.dp)
-                )
-            }
-
-            ViewForDisplay.EDIT_INFO -> {
-                EditInfoDialog()
-            }
-
-            else -> {}
-        }
         val (
-            photo, username, friendListEt, friendListLc, selfInfoPreview,
+            photo, username, friendListEt, friendListLc, selfInfoPreview, errorView,
             editBtn, showMore, selfInfo, addToFriend, userStatus, followerAndRequests
         ) = createRefs()
-        Card(
-            modifier = Modifier
-                .size(150.dp)
-                .constrainAs(photo) {
-                    top.linkTo(parent.top)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                },
-            shape = CircleShape,
-        ) {
-            AsyncImage(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clickable {
-                        if (viewModel.isMyProfile())
-                            launcher.launch("image/*")
-                    },
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(
-                        if (uiState.value.updateImage)
-                            uiState.value.imageUri
-                        else Constants.BASE_URL + "/images/" + uiState.value.uid + ".jpeg"
-                    )
-                    .networkCachePolicy(CachePolicy.READ_ONLY)
-                    .diskCachePolicy(CachePolicy.DISABLED)
-                    .memoryCachePolicy(CachePolicy.WRITE_ONLY)
-                    .build(),
-                alignment = Alignment.Center,
-                contentScale = ContentScale.Crop,
-                contentDescription = Constants.CONTENT_DESCRIPTION,
-                placeholder = painterResource(id = R.drawable.ic_user),
-                error = painterResource(id = R.drawable.ic_user),
-            )
-        }
-        Image(
-            modifier = Modifier
-                .padding(top = 25.dp, end = 25.dp)
-                .size(16.dp)
-                .border(2.dp, Color.Gray, CircleShape)
-                .constrainAs(userStatus) {
-                    top.linkTo(photo.top)
-                    end.linkTo(photo.end)
-                },
-            painter = painterResource(
-                id = if (uiState.value.onlineStatus) R.drawable.ic_user_online
-                else R.drawable.ic_user_offline
-            ),
-            contentDescription = Constants.CONTENT_DESCRIPTION
-        )
-        Text(
-            modifier = Modifier
-                .padding(8.dp)
-                .constrainAs(username) {
-                    top.linkTo(photo.bottom)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                },
-            text = uiState.value.username,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
-        )
 
-        Text(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 8.dp)
-                .constrainAs(selfInfoPreview) {
-                    top.linkTo(username.bottom)
-                    start.linkTo(parent.start)
-                },
-            text = stringResource(id = R.string.user_info_label),
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-        )
-
-        Text(
-            modifier = Modifier
-                .padding(bottom = 8.dp)
-                .wrapContentWidth()
-                .constrainAs(selfInfo) {
-                    top.linkTo(selfInfoPreview.bottom)
-                    start.linkTo(parent.start)
-                },
-            text = uiState.value.selfInfo.ifEmpty {
-                stringResource(id = R.string.info_dont_filled)
-            },
-            fontSize = 16.sp,
-            maxLines = if (!uiState.value.showMoreInfo) 3 else Int.MAX_VALUE,
-            overflow = if (!uiState.value.showMoreInfo) TextOverflow.Ellipsis else TextOverflow.Clip,
-            onTextLayout = {
-                viewModel.selfInfoOverflowed(it.hasVisualOverflow)
-            }
-        )
-        if (uiState.value.infoOverflowed || uiState.value.showMoreInfo) {
-            Text(
-                modifier = Modifier
-                    .background(MaterialTheme.colorScheme.background)
-                    .padding(bottom = 8.dp, start = 4.dp, end = 4.dp)
-                    .clickable {
-                        viewModel.showMoreInfo()
+        when (uiState.value.screenState) {
+            ScreenState.INIT -> CircularLoader()
+            ScreenState.SUCCESS -> {
+                when (uiState.value.displayingView) {
+                    ProfileDialogs.ADD_FRIEND -> {
+                        FriendAddRemoveDialog(true)
                     }
-                    .constrainAs(showMore) {
-                        if (uiState.value.showMoreInfo)
-                            top.linkTo(selfInfo.bottom)
-                        else
-                            bottom.linkTo(selfInfo.bottom)
-                        end.linkTo(selfInfo.end)
-                    },
-                color = Color.Blue,
-                text = stringResource(
-                    id = if (uiState.value.showMoreInfo)
-                        R.string.roll_up
-                    else R.string.show_more
-                ),
-            )
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 8.dp)
-                .constrainAs(friendListEt) {
-                    start.linkTo(parent.start)
-                    top.linkTo(followerAndRequests.bottom)
-                },
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = stringResource(id = R.string.friend_list),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-            )
-        }
-        Row(
-            modifier = Modifier
-                .constrainAs(followerAndRequests) {
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    if (uiState.value.showMoreInfo)
-                        top.linkTo(showMore.bottom)
-                    else
-                        top.linkTo(selfInfo.bottom)
-                }
-        ) {
-            if (uiState.value.followers.isNotEmpty())
-                Card(
-                    modifier = Modifier
-                        .weight(1f),
-                    colors = CardDefaults.cardColors(
-                        containerColor =
-                        MaterialTheme.colorScheme.primaryContainer
-                    ),
-                    onClick = {
-                        if (uiState.value.followers.isNotEmpty()) viewModel.openUsersList(
-                            FOLLOWERS
-                        )
-                    },
-                ) {
-                    Text(
-                        modifier = Modifier
-                            .padding(8.dp),
-                        text = stringResource(
-                            id = R.string.count_followers,
-                            uiState.value.followers.size
-                        ),
-                        textAlign = TextAlign.Center,
-                    )
-                }
-            if (uiState.value.friendshipRequests.isNotEmpty() && viewModel.isMyProfile()) {
-                Spacer(modifier = Modifier.width(8.dp))
-                Card(
-                    modifier = Modifier
-                        .weight(1f),
-                    colors = CardDefaults.cardColors(
-                        containerColor =
-                        MaterialTheme.colorScheme.primaryContainer
-                    ),
-                    onClick = {
-                        if (uiState.value.friendshipRequests.isNotEmpty()) viewModel.openUsersList(
-                            FRIENDSHIPS_REQUESTS
-                        )
-                    },
-                ) {
-                    Text(
-                        modifier = Modifier
-                            .padding(8.dp),
-                        text = stringResource(
-                            id = R.string.count_requests, uiState.value.friendshipRequests.size
-                        ),
-                        textAlign = TextAlign.Center,
-                    )
-                }
-            }
-        }
-        LazyColumn(
-            modifier = Modifier
-                .padding(bottom = 8.dp)
-                .constrainAs(friendListLc) {
-                    top.linkTo(friendListEt.bottom)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    bottom.linkTo(parent.bottom)
-                    height = Dimension.fillToConstraints
-                }
-        ) {
-            items(uiState.value.friends.take(5)) { item ->
-                Card(
-                    modifier = Modifier
-                        .padding(bottom = 1.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor =
-                        MaterialTheme.colorScheme.primaryContainer
-                    ),
-                    onClick = {
-                        viewModel.openProfile(item.id)
-                    },
-                ) {
-                    ConstraintLayout(
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        val (
-                            profilePhoto, friendName, onlineStatus, chatWithFriend
-                        ) = createRefs()
-                        AsyncImage(
-                            modifier = Modifier
-                                .padding(8.dp)
-                                .size(24.dp)
-                                .clip(CircleShape)
-                                .constrainAs(profilePhoto) {
-                                    start.linkTo(parent.start)
-                                },
-                            model = ImageRequest.Builder(LocalContext.current)
-                                .data(Constants.BASE_URL + "/images/" + item.id + ".jpeg")
-                                .networkCachePolicy(CachePolicy.READ_ONLY)
-                                .diskCachePolicy(CachePolicy.DISABLED)
-                                .memoryCachePolicy(CachePolicy.WRITE_ONLY)
-                                .build(),
-                            alignment = Alignment.Center,
-                            contentScale = ContentScale.Crop,
-                            contentDescription = Constants.CONTENT_DESCRIPTION,
-                            placeholder = painterResource(id = R.drawable.ic_user),
-                            error = painterResource(id = R.drawable.ic_user),
-                        )
 
-                        Text(
+                    ProfileDialogs.REMOVE_FRIEND -> {
+                        FriendAddRemoveDialog()
+                    }
+
+                    ProfileDialogs.PROGRESS_LINEAR -> {
+                        LinearProgressIndicator(
                             modifier = Modifier
-                                .padding(8.dp)
-                                .constrainAs(friendName) {
-                                    start.linkTo(profilePhoto.end)
-                                    end.linkTo(onlineStatus.start)
-                                    width = Dimension.fillToConstraints
-                                },
-                            text = item.username,
-                            fontSize = 16.sp,
-                            maxLines = 1,
+                                .fillMaxWidth()
+                                .height(4.dp)
                         )
-                        Image(
-                            modifier = Modifier
-                                .size(24.dp)
-                                .border(2.dp, Color.Gray, CircleShape)
-                                .constrainAs(onlineStatus) {
-                                    top.linkTo(parent.top)
-                                    bottom.linkTo(parent.bottom)
-                                    start.linkTo(friendName.end)
-                                    end.linkTo(chatWithFriend.start)
-                                },
-                            painter = painterResource(
-                                id = if (item.onlineStatus) R.drawable.ic_user_online
-                                else R.drawable.ic_user_offline
-                            ),
-                            contentDescription = Constants.CONTENT_DESCRIPTION
-                        )
-                        IconButton(
-                            modifier = Modifier
-                                .padding(start = 4.dp)
-                                .padding(horizontal = 8.dp)
-                                .size(24.dp)
-                                .clipToBounds()
-                                .constrainAs(chatWithFriend) {
-                                    top.linkTo(parent.top)
-                                    bottom.linkTo(parent.bottom)
-                                    end.linkTo(parent.end)
-                                    height = Dimension.fillToConstraints
-                                },
-                            onClick = {
-                                showToast(
-                                    context = context,
-                                    context.resources.getString(R.string.development)
-                                )
+                    }
+
+                    ProfileDialogs.EDIT_INFO -> {
+                        EditInfoDialog()
+                    }
+
+                    else -> {}
+                }
+                Card(
+                    modifier = Modifier
+                        .size(150.dp)
+                        .constrainAs(photo) {
+                            top.linkTo(parent.top)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                        },
+                    shape = CircleShape,
+                ) {
+                    AsyncImage(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clickable {
+                                if (viewModel.isMyProfile())
+                                    launcher.launch("image/*")
+                            },
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(
+                                if (uiState.value.updateImage)
+                                    uiState.value.imageUri
+                                else Constants.BASE_URL + "/images/" + uiState.value.uid + ".jpeg"
+                            )
+                            .networkCachePolicy(CachePolicy.READ_ONLY)
+                            .diskCachePolicy(CachePolicy.DISABLED)
+                            .memoryCachePolicy(CachePolicy.WRITE_ONLY)
+                            .build(),
+                        alignment = Alignment.Center,
+                        contentScale = ContentScale.Crop,
+                        contentDescription = Constants.CONTENT_DESCRIPTION,
+                        placeholder = painterResource(id = R.drawable.ic_user),
+                        error = painterResource(id = R.drawable.ic_user),
+                    )
+                }
+                Image(
+                    modifier = Modifier
+                        .padding(top = 25.dp, end = 25.dp)
+                        .size(16.dp)
+                        .border(2.dp, Color.Gray, CircleShape)
+                        .constrainAs(userStatus) {
+                            top.linkTo(photo.top)
+                            end.linkTo(photo.end)
+                        },
+                    painter = painterResource(
+                        id = if (uiState.value.onlineStatus) R.drawable.ic_user_online
+                        else R.drawable.ic_user_offline
+                    ),
+                    contentDescription = Constants.CONTENT_DESCRIPTION
+                )
+                Text(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .constrainAs(username) {
+                            top.linkTo(photo.bottom)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                        },
+                    text = uiState.value.username,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                )
+
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp)
+                        .constrainAs(selfInfoPreview) {
+                            top.linkTo(username.bottom)
+                            start.linkTo(parent.start)
+                        },
+                    text = stringResource(id = R.string.user_info_label),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+
+                Text(
+                    modifier = Modifier
+                        .padding(bottom = 8.dp)
+                        .wrapContentWidth()
+                        .constrainAs(selfInfo) {
+                            top.linkTo(selfInfoPreview.bottom)
+                            start.linkTo(parent.start)
+                        },
+                    text = uiState.value.selfInfo.ifEmpty {
+                        stringResource(id = R.string.info_dont_filled)
+                    },
+                    fontSize = 16.sp,
+                    maxLines = if (!uiState.value.showMoreInfo) 3 else Int.MAX_VALUE,
+                    overflow = if (!uiState.value.showMoreInfo) TextOverflow.Ellipsis else TextOverflow.Clip,
+                    onTextLayout = {
+                        viewModel.selfInfoOverflowed(it.hasVisualOverflow)
+                    }
+                )
+                if (uiState.value.infoOverflowed || uiState.value.showMoreInfo) {
+                    Text(
+                        modifier = Modifier
+                            .background(MaterialTheme.colorScheme.background)
+                            .padding(bottom = 8.dp, start = 4.dp, end = 4.dp)
+                            .clickable {
+                                viewModel.showMoreInfo()
                             }
+                            .constrainAs(showMore) {
+                                if (uiState.value.showMoreInfo)
+                                    top.linkTo(selfInfo.bottom)
+                                else
+                                    bottom.linkTo(selfInfo.bottom)
+                                end.linkTo(selfInfo.end)
+                            },
+                        color = Color.Blue,
+                        text = stringResource(
+                            id = if (uiState.value.showMoreInfo)
+                                R.string.roll_up
+                            else R.string.show_more
+                        ),
+                    )
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp)
+                        .constrainAs(friendListEt) {
+                            start.linkTo(parent.start)
+                            top.linkTo(followerAndRequests.bottom)
+                        },
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.friend_list),
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                    )
+                }
+                Row(
+                    modifier = Modifier
+                        .constrainAs(followerAndRequests) {
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                            if (uiState.value.showMoreInfo)
+                                top.linkTo(showMore.bottom)
+                            else
+                                top.linkTo(selfInfo.bottom)
+                        }
+                ) {
+                    if (uiState.value.followers.isNotEmpty())
+                        Card(
+                            modifier = Modifier
+                                .weight(1f),
+                            colors = CardDefaults.cardColors(
+                                containerColor =
+                                MaterialTheme.colorScheme.primaryContainer
+                            ),
+                            onClick = {
+                                if (uiState.value.followers.isNotEmpty()) viewModel.openUsersList(
+                                    FOLLOWERS
+                                )
+                            },
                         ) {
-                            Icon(
-                                painter = painterResource(
-                                    id = R.drawable.ic_chat_with_friend
+                            Text(
+                                modifier = Modifier
+                                    .padding(8.dp),
+                                text = stringResource(
+                                    id = R.string.count_followers,
+                                    uiState.value.followers.size
                                 ),
-                                contentDescription = Constants.CONTENT_DESCRIPTION
+                                textAlign = TextAlign.Center,
+                            )
+                        }
+                    if (uiState.value.friendshipRequests.isNotEmpty() && viewModel.isMyProfile()) {
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Card(
+                            modifier = Modifier
+                                .weight(1f),
+                            colors = CardDefaults.cardColors(
+                                containerColor =
+                                MaterialTheme.colorScheme.primaryContainer
+                            ),
+                            onClick = {
+                                if (uiState.value.friendshipRequests.isNotEmpty()) viewModel.openUsersList(
+                                    FRIENDSHIPS_REQUESTS
+                                )
+                            },
+                        ) {
+                            Text(
+                                modifier = Modifier
+                                    .padding(8.dp),
+                                text = stringResource(
+                                    id = R.string.count_requests,
+                                    uiState.value.friendshipRequests.size
+                                ),
+                                textAlign = TextAlign.Center,
                             )
                         }
                     }
                 }
-            }
-            item {
-                Card(
+                LazyColumn(
                     modifier = Modifier
-                        .padding(bottom = 5.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer
-                    ),
-                    onClick = {
-                        if (uiState.value.friends.isNotEmpty()) viewModel.openUsersList(FRIENDS)
-                    },
-                    elevation = CardDefaults.cardElevation(3.dp),
-                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground)
+                        .padding(bottom = 8.dp)
+                        .constrainAs(friendListLc) {
+                            top.linkTo(friendListEt.bottom)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                            bottom.linkTo(parent.bottom)
+                            height = Dimension.fillToConstraints
+                        }
                 ) {
-                    Text(
+                    items(uiState.value.friends.take(5)) { item ->
+                        Card(
+                            modifier = Modifier
+                                .padding(bottom = 1.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor =
+                                MaterialTheme.colorScheme.primaryContainer
+                            ),
+                            onClick = {
+                                viewModel.openProfile(item.id)
+                            },
+                        ) {
+                            ConstraintLayout(
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                val (
+                                    profilePhoto, friendName, onlineStatus, chatWithFriend
+                                ) = createRefs()
+                                AsyncImage(
+                                    modifier = Modifier
+                                        .padding(8.dp)
+                                        .size(24.dp)
+                                        .clip(CircleShape)
+                                        .constrainAs(profilePhoto) {
+                                            start.linkTo(parent.start)
+                                        },
+                                    model = ImageRequest.Builder(LocalContext.current)
+                                        .data(Constants.BASE_URL + "/images/" + item.id + ".jpeg")
+                                        .networkCachePolicy(CachePolicy.READ_ONLY)
+                                        .diskCachePolicy(CachePolicy.DISABLED)
+                                        .memoryCachePolicy(CachePolicy.WRITE_ONLY)
+                                        .build(),
+                                    alignment = Alignment.Center,
+                                    contentScale = ContentScale.Crop,
+                                    contentDescription = Constants.CONTENT_DESCRIPTION,
+                                    placeholder = painterResource(id = R.drawable.ic_user),
+                                    error = painterResource(id = R.drawable.ic_user),
+                                )
+
+                                Text(
+                                    modifier = Modifier
+                                        .padding(8.dp)
+                                        .constrainAs(friendName) {
+                                            start.linkTo(profilePhoto.end)
+                                            end.linkTo(onlineStatus.start)
+                                            width = Dimension.fillToConstraints
+                                        },
+                                    text = item.username,
+                                    fontSize = 16.sp,
+                                    maxLines = 1,
+                                )
+                                Image(
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                        .border(2.dp, Color.Gray, CircleShape)
+                                        .constrainAs(onlineStatus) {
+                                            top.linkTo(parent.top)
+                                            bottom.linkTo(parent.bottom)
+                                            start.linkTo(friendName.end)
+                                            end.linkTo(chatWithFriend.start)
+                                        },
+                                    painter = painterResource(
+                                        id = if (item.onlineStatus) R.drawable.ic_user_online
+                                        else R.drawable.ic_user_offline
+                                    ),
+                                    contentDescription = Constants.CONTENT_DESCRIPTION
+                                )
+                                IconButton(
+                                    modifier = Modifier
+                                        .padding(start = 4.dp)
+                                        .padding(horizontal = 8.dp)
+                                        .size(24.dp)
+                                        .clipToBounds()
+                                        .constrainAs(chatWithFriend) {
+                                            top.linkTo(parent.top)
+                                            bottom.linkTo(parent.bottom)
+                                            end.linkTo(parent.end)
+                                            height = Dimension.fillToConstraints
+                                        },
+                                    onClick = {
+                                        showToast(
+                                            context = context,
+                                            context.resources.getString(R.string.development)
+                                        )
+                                    }
+                                ) {
+                                    Icon(
+                                        painter = painterResource(
+                                            id = R.drawable.ic_chat_with_friend
+                                        ),
+                                        contentDescription = Constants.CONTENT_DESCRIPTION
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    item {
+                        Card(
+                            modifier = Modifier
+                                .padding(bottom = 5.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.primaryContainer
+                            ),
+                            onClick = {
+                                if (uiState.value.friends.isNotEmpty()) viewModel.openUsersList(
+                                    FRIENDS
+                                )
+                            },
+                            elevation = CardDefaults.cardElevation(3.dp),
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground)
+                        ) {
+                            Text(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(8.dp),
+                                text = stringResource(id = R.string.view_friends),
+                                textAlign = TextAlign.Center,
+                                fontSize = 16.sp,
+                                maxLines = 1,
+                            )
+                        }
+                    }
+                }
+                if (viewModel.isMyProfile()) {
+                    IconButton(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
-                        text = stringResource(id = R.string.view_friends),
-                        textAlign = TextAlign.Center,
-                        fontSize = 16.sp,
-                        maxLines = 1,
+                            .constrainAs(editBtn) {
+                                top.linkTo(parent.top)
+                                end.linkTo(parent.end)
+                            },
+                        onClick = {
+                            viewModel.showEditDialog()
+                        }
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_edit_data),
+                            contentDescription = Constants.CONTENT_DESCRIPTION
+                        )
+                    }
+                }
+                if (viewModel.isFriend() || viewModel.isNotInFriendRequest() && !viewModel.isMyProfile()) {
+                    IconButton(
+                        modifier = Modifier
+                            .constrainAs(addToFriend) {
+                                top.linkTo(parent.top)
+                                start.linkTo(parent.start)
+                            },
+                        onClick = { viewModel.showAddRemoveDialog(viewModel.isFriend()) }
+                    ) {
+                        Icon(
+                            painter = painterResource(
+                                id = if (viewModel.isFriend()) R.drawable.ic_remove_friend
+                                else R.drawable.ic_person_add
+                            ),
+                            contentDescription = Constants.CONTENT_DESCRIPTION
+                        )
+                    }
+                }
+            }
+
+            ScreenState.ERROR -> {
+                Column(
+                    modifier = Modifier
+                        .constrainAs(errorView) {
+                            top.linkTo(parent.top)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                            bottom.linkTo(parent.bottom)
+                        }
+                ) {
+                    Icon(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        painter = painterResource(id = R.drawable.ic_alert),
+                        contentDescription = Constants.CONTENT_DESCRIPTION,
+                    )
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = stringResource(id = R.string.try_again_later),
+                        textAlign = TextAlign.Center
                     )
                 }
             }
-        }
-        if (viewModel.isMyProfile()) {
-            IconButton(
-                modifier = Modifier
-                    .constrainAs(editBtn) {
-                        top.linkTo(parent.top)
-                        end.linkTo(parent.end)
-                    },
-                onClick = {
-                    viewModel.showEditDialog()
-                }
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_edit_data),
-                    contentDescription = Constants.CONTENT_DESCRIPTION
-                )
-            }
-        }
-        if (viewModel.isFriend() || viewModel.isNotInFriendRequest() && !viewModel.isMyProfile()) {
-            IconButton(
-                modifier = Modifier
-                    .constrainAs(addToFriend) {
-                        top.linkTo(parent.top)
-                        start.linkTo(parent.start)
-                    },
-                onClick = { viewModel.showAddRemoveDialog(viewModel.isFriend()) }
-            ) {
-                Icon(
-                    painter = painterResource(
-                        id = if (viewModel.isFriend()) R.drawable.ic_remove_friend
-                        else R.drawable.ic_person_add
-                    ),
-                    contentDescription = Constants.CONTENT_DESCRIPTION
-                )
-            }
+
+            else -> {}
         }
     }
     LaunchedEffect(key1 = Unit) {

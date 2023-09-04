@@ -89,6 +89,8 @@
     <string name="account_label">Account</string>
     <string name="personal_data">Personal data</string>
 
+    <string name="check_exit">Do you really want to get out?</string>
+
     <!--  Change password dialog  -->
     <string name="empty_field_error">Fill the field</string>
     <string name="current_not_eq_old">The entered password does not match the current </string>
@@ -114,6 +116,7 @@
     <!--  Exception message  -->
     <string name="error_toast">Failed to process request</string>
     <string name="exception_toast">Unforeseen error</string>
+    <string name="try_again_later">Something went wrong. Try again later</string>
 
     <!--  Actions  -->
     <string name="decline">Decline</string>

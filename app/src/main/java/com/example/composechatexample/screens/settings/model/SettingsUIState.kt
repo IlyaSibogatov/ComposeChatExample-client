@@ -1,6 +1,7 @@
 package com.example.composechatexample.screens.settings.model
 
 import com.example.composechatexample.utils.PassUpdateState
+import com.example.composechatexample.utils.SettingsDialogs
 
 data class SettingsUIState(
     val language: String? = null,
@@ -10,9 +11,8 @@ data class SettingsUIState(
     val blackList: List<String> = listOf("user1", "user2", "user3", "user4"),
     val support: String = "",
 
-    val showPassDialog: Boolean = false,
+    val dialogs: SettingsDialogs? = null,
     val pass: PassState = PassState(),
-
     val errors: PassErrors = PassErrors()
 )
 
