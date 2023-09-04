@@ -1,9 +1,10 @@
-package com.example.composechatexample.screens.profile
+package com.example.composechatexample.screens.profile.userlist.model
 
 import android.net.Uri
 import com.example.composechatexample.domain.model.Friend
 import com.example.composechatexample.domain.model.NewUserInfo
-import com.example.composechatexample.utils.ViewForDisplay
+import com.example.composechatexample.utils.ProfileDialogs
+import com.example.composechatexample.utils.ScreenState
 
 data class ProfileUIState(
     val uid: String = "",
@@ -14,14 +15,14 @@ data class ProfileUIState(
     val errors: ProfileErrors = ProfileErrors(),
     val infoOverflowed: Boolean = false,
     val onlineStatus: Boolean = false,
-    val gettingUserError: Boolean = false,
     val updateImage: Boolean = false,
     val lastActionTime: Long? = null,
     val newInfo: NewUserInfo = NewUserInfo(),
     val friends: List<Friend> = listOf(),
     val followers: List<String> = listOf(),
     val friendshipRequests: List<String> = listOf(),
-    val displayingView: ViewForDisplay? = null
+    val displayingView: ProfileDialogs? = null,
+    val screenState: ScreenState? = null,
 )
 
 data class FriendListUIState(

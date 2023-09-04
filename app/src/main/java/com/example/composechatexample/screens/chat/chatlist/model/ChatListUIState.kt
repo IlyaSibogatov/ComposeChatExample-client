@@ -1,9 +1,9 @@
 package com.example.composechatexample.screens.chat.chatlist.model
 
 import com.example.composechatexample.domain.model.Chat
+import com.example.composechatexample.utils.ScreenState
 
 data class ChatListUIState(
-    val isLoading: Boolean = false,
     val userLogged: Boolean = false,
     val updateChat: Boolean = false,
     val roomPassword: String = "",
@@ -14,7 +14,8 @@ data class ChatListUIState(
     var chatInfo: Chat? = null,
     val dialogs: DisplayDialog = DisplayDialog(),
     var errors: ChatListErrors = ChatListErrors(),
-    val createdChat: CreatedChat = CreatedChat()
+    val createdChat: CreatedChat = CreatedChat(),
+    val screenState: ScreenState? = null
 )
 
 data class DisplayDialog(
