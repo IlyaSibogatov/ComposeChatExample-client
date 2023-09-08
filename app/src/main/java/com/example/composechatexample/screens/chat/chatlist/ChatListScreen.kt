@@ -260,7 +260,7 @@ fun ChatListScreen(
     val lifeCycleOwner = LocalLifecycleOwner.current
     DisposableEffect(key1 = lifeCycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) viewModel.loadChatList()
+            if (event == Lifecycle.Event.ON_START) viewModel.loadChatList()
         }
         lifeCycleOwner.lifecycle.addObserver(observer)
         onDispose {

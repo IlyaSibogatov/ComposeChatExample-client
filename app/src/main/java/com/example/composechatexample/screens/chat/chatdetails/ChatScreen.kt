@@ -86,7 +86,6 @@ fun ChatScreen(
     val viewModel: ChatViewModel = hiltViewModel()
     val uiState = viewModel.uiState.collectAsState()
 
-    viewModel.updateChatId(chatId!!)
     CompositionLocalProvider(
         LocalOverscrollConfiguration provides null,
     ) {
@@ -199,8 +198,12 @@ fun ChatScreen(
     val lifeCycleOwner = LocalLifecycleOwner.current
     DisposableEffect(key1 = lifeCycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_START) viewModel.connectToChat()
-            else if (event == Lifecycle.Event.ON_PAUSE) viewModel.socketDisconnect()
+            when (event) {
+                Lifecycle.Event.ON_START -> viewModel.updateChatId(chatId!!)
+                Lifecycle.Event.ON_RESUME -> viewModel.connectToChat()
+                Lifecycle.Event.ON_PAUSE -> viewModel.socketDisconnect()
+                else -> {}
+            }
         }
         lifeCycleOwner.lifecycle.addObserver(observer)
         onDispose {
