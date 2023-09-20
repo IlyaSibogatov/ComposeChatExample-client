@@ -52,7 +52,7 @@ import androidx.navigation.NavHostController
 import com.example.composechatexample.R
 import com.example.composechatexample.components.ShowMenu
 import com.example.composechatexample.screens.dialogs.ChangePasswordDialog
-import com.example.composechatexample.screens.dialogs.ExitDialog
+import com.example.composechatexample.screens.dialogs.VerificationDialog
 import com.example.composechatexample.screens.settings.model.SettingsScreenEvent
 import com.example.composechatexample.ui.theme.themeState
 import com.example.composechatexample.utils.Constants
@@ -79,7 +79,7 @@ fun SettingsScreen(
             Column {
                 SettingItem(
                     title = R.string.tech_support_label,
-                    value = uiState.value.support
+                    value = uiState.value.support ?: viewModel.getMail()
                 ) {
                     val intent = Intent(Intent.ACTION_SENDTO)
                     intent.data = Uri.parse("mailto:" + uiState.value.support)
@@ -97,14 +97,22 @@ fun SettingsScreen(
                 SettingItem(
                     title = R.string.exit_label,
                     icon = { SettingIcon(id = R.drawable.ic_logout) },
-                    onClick = { viewModel.showExitDialog() }
+                    onClick = { viewModel.showVerificationDialog() }
                 )
             }
         }
     ) { padding ->
         when {
             uiState.value.dialogs == SettingsDialogs.LOG_OUT -> {
-                ExitDialog()
+                VerificationDialog(
+                    text = stringResource(id = R.string.check_exit),
+                    acceptOnClick = (
+                            viewModel::userLogOut
+                            ),
+                    declinedOnClick = (
+                            viewModel::showVerificationDialog
+                            )
+                )
             }
 
             uiState.value.dialogs == SettingsDialogs.PASS -> {
@@ -152,7 +160,11 @@ fun SettingsScreen(
                     }
 
                     NOTIFICATION -> {
-                        Pair(R.string.notifications_settings, uiState.value.notification)
+                        val enabled = uiState.value.notification ?: viewModel.getNotification()
+                        Pair(
+                            R.string.notifications_settings,
+                            stringResource(id = if (enabled) R.string.enabled_label else R.string.disabled_label)
+                        )
                     }
 
                     else -> Pair(0, "")
@@ -183,7 +195,10 @@ fun SettingsScreen(
             items(viewModel.listAccSetting) {
                 val result = when (it) {
                     CONFIDENTIALITY -> {
-                        Pair(R.string.privacy_settings, uiState.value.privacy)
+                        Pair(
+                            R.string.privacy_settings,
+                            uiState.value.privacy ?: viewModel.getPrivacy()
+                        )
                     }
 
                     PERS_DATA -> {

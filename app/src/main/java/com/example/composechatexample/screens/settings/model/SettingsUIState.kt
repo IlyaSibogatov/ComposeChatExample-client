@@ -6,10 +6,10 @@ import com.example.composechatexample.utils.SettingsDialogs
 data class SettingsUIState(
     val language: String? = null,
     val theme: String? = null,
-    val privacy: String = "",
-    val notification: String = "",
+    val privacy: String? = null,
+    val notification: Boolean? = null,
+    val support: String? = null,
     val blackList: List<String> = listOf("user1", "user2", "user3", "user4"),
-    val support: String = "",
 
     val dialogs: SettingsDialogs? = null,
     val pass: PassState = PassState(),

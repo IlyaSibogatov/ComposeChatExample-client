@@ -21,6 +21,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
@@ -29,6 +30,7 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -37,6 +39,8 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.CachePolicy
@@ -61,10 +65,6 @@ fun UsersListScreen(
     val viewModel: UsersListViewModel = hiltViewModel()
     val uiState = viewModel.uiState.collectAsState()
 
-    viewModel.getFollowerFriends(
-        uid?.removePrefix(Constants.USER_UID),
-        type?.removePrefix(Constants.USERS_TYPE)
-    )
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -226,6 +226,21 @@ fun UsersListScreen(
                     )
                 }
             }
+        }
+    }
+    val lifeCycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(key1 = lifeCycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_START) {
+                viewModel.getFollowerFriends(
+                    uid?.removePrefix(Constants.USER_UID),
+                    type?.removePrefix(Constants.USERS_TYPE)
+                )
+            }
+        }
+        lifeCycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifeCycleOwner.lifecycle.removeObserver(observer)
         }
     }
 }
