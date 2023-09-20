@@ -17,7 +17,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -26,16 +25,20 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.composechatexample.R
 import com.example.composechatexample.components.CustomIconButton
+import com.example.composechatexample.data.preferences.PreferencesManager
 import com.example.composechatexample.utils.Constants
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainEntryPoint() {
+fun MainEntryPoint(
+    preferencesManager: PreferencesManager
+) {
     val navController = rememberNavController()
 
     val screensToShowBottomBar = listOf(
         BottomNavBar.ChatList,
         BottomNavBar.Profile,
+        BottomNavBar.Notifications,
         BottomNavBar.Settings,
     )
 
@@ -44,7 +47,8 @@ fun MainEntryPoint() {
         Screen(Constants.CHAT_ROUTE + "/{${Constants.CHAT_ID}}", Constants.CHAT_TITLE),
         Screen(Constants.PROFILE_ROUTE, Constants.PROFILE_TITLE),
         Screen(Constants.CREATE_CHAT_ROUTE, Constants.CREATE_CHAT_TITLE),
-        Screen(Constants.FRIENDS_LIST_ROUTE, Constants.FRIENDS_LIST_TITLE)
+        Screen(Constants.FRIENDS_LIST_ROUTE, Constants.FRIENDS_LIST_TITLE),
+        Screen(Constants.NOTIFICATIONS_ROUTE, Constants.NOTIFICATION_TITLE)
     )
 
     val newBackStackEntry by navController.currentBackStackEntryAsState()
@@ -96,18 +100,18 @@ fun MainEntryPoint() {
                 ) {
                     screensToShowBottomBar.forEach { screen ->
                         NavigationBarItem(
-                            label = {
-                                Text(
-                                    text = stringResource(id = screen.title),
-                                    color = if (isCurrentDestination(
-                                            currentDestination,
-                                            screen.route
-                                        )
-                                    )
-                                        MaterialTheme.colorScheme.onPrimary
-                                    else MaterialTheme.colorScheme.surface
-                                )
-                            },
+//                            label = {
+//                                Text(
+//                                    text = stringResource(id = screen.title),
+//                                    color = if (isCurrentDestination(
+//                                            currentDestination,
+//                                            screen.route
+//                                        )
+//                                    )
+//                                        MaterialTheme.colorScheme.onPrimary
+//                                    else MaterialTheme.colorScheme.surface
+//                                )
+//                            },
                             icon = {
                                 Icon(
                                     painterResource(id = screen.icon),
@@ -142,6 +146,7 @@ fun MainEntryPoint() {
                 .padding(contentPadding)
         ) {
             NavGraph(
+                preferencesManager = preferencesManager,
                 navController = navController
             )
         }

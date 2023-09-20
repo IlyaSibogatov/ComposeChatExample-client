@@ -1,6 +1,7 @@
 package com.example.composechatexample.data.remote
 
 import com.example.composechatexample.data.model.UserFromId
+import com.example.composechatexample.data.model.UserNotification
 import com.example.composechatexample.data.response.DefaultResponse
 import com.example.composechatexample.domain.model.Friend
 import com.example.composechatexample.domain.model.NewUserInfo
@@ -118,6 +119,35 @@ class UserServiceImpl(
             }
         } catch (e: Exception) {
             e.printStackTrace()
+            null
+        }
+    }
+
+    override suspend fun updateToken(
+        uuid: String,
+        token: String,
+        deviceId: String,
+        deviceType: String
+    ): DefaultResponse? {
+        return try {
+            client.post<DefaultResponse>(UserService.EndPoint.UpdateToken.url) {
+                url.parameters.append("uuid", uuid)
+                url.parameters.append("token", token)
+                url.parameters.append("deviceId", deviceId)
+                url.parameters.append("deviceType", deviceType)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    override suspend fun getNotifications(uuid: String): List<UserNotification>? {
+        return try {
+            client.get<List<UserNotification>>(UserService.EndPoint.GetNotifications.url) {
+                url.parameters.append("uuid", uuid)
+            }
+        } catch (e: Exception) {
             null
         }
     }

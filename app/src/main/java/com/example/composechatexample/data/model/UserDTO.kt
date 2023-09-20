@@ -3,7 +3,6 @@ package com.example.composechatexample.data.model
 import com.example.composechatexample.domain.model.Friend
 import com.example.composechatexample.domain.model.User
 import kotlinx.serialization.Serializable
-import java.io.File
 
 @Serializable
 data class UserDTO(
@@ -39,11 +38,17 @@ data class UserFromId(
     var lastActionTime: Long,
     val friends: List<Friend>,
     val followers: List<String>,
-    val friendshipRequests: List<String>,
+    val friendshipRequests: List<FriendShipRequest>,
 )
 
 @Serializable
 data class UserChatInfo(
     val uuid: String,
     val username: String,
+)
+
+@Serializable
+data class FriendShipRequest(
+    val uuid: String,
+    val id: String,
 )

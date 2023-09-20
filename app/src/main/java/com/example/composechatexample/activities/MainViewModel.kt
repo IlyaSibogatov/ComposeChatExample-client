@@ -32,6 +32,10 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    fun setNotificationEnabled(enabled: Boolean) {
+        preferencesManager.notification = enabled
+    }
+
     companion object {
         private const val ENGLISH_LANGUAGE_CODE = "en"
     }
