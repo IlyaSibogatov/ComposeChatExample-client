@@ -358,12 +358,13 @@ private fun ContentMessage(
     user: UserChatInfo?,
     colorText: Color
 ) {
-    Text(
-        modifier = modifier.padding(top = 4.dp),
-        text = user?.username ?: "",
-        fontSize = 16.sp,
-        color = colorText
-    )
+    if (!data.myMessage)
+        Text(
+            modifier = modifier.padding(top = 4.dp),
+            text = user?.username ?: "",
+            fontSize = 16.sp,
+            color = colorText
+        )
     Text(
         modifier = modifier.padding(vertical = 4.dp),
         text = data.message,

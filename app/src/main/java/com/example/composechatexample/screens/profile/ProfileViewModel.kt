@@ -3,6 +3,7 @@ package com.example.composechatexample.screens.profile
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.composechatexample.data.model.FriendShipRequest
 import com.example.composechatexample.data.model.UserFromId
 import com.example.composechatexample.data.preferences.PreferencesManager
 import com.example.composechatexample.data.remote.UserService
@@ -56,7 +57,7 @@ class ProfileViewModel @Inject constructor(
                     lastActionTime = response.lastActionTime,
                     friends = response.friends.sortedByDescending { it.onlineStatus },
                     followers = response.followers,
-                    friendshipRequests = response.friendshipRequests,
+                    friendshipRequests = response.friendshipRequests.toMutableList(),
                     newInfo = NewUserInfo(
                         username = response.username,
                         selfInfo = response.selfInfo,
@@ -228,7 +229,7 @@ class ProfileViewModel @Inject constructor(
         uiState.value.friends.find { it.id == preferencesManager.uuid } != null
 
     fun isNotInFriendRequest(): Boolean {
-        return uiState.value.friendshipRequests.find { it == preferencesManager.uuid } == null
+        return uiState.value.friendshipRequests.find { it.uuid == preferencesManager.uuid } == null
     }
 
     fun friendshipRequest() {
@@ -241,9 +242,16 @@ class ProfileViewModel @Inject constructor(
                     ProfileScreenEvent.ToastEvent(
                         when (it.msg) {
                             "Add success" -> {
+                                val list = uiState.value.friendshipRequests
+                                list.add(
+                                    FriendShipRequest(
+                                        uuid = preferencesManager.uuid!!,
+                                        id = ""
+                                    )
+                                )
                                 _uiState.value = uiState.value.copy(
                                     followers = uiState.value.followers + preferencesManager.uuid!!,
-                                    friendshipRequests = uiState.value.friendshipRequests + preferencesManager.uuid!!,
+                                    friendshipRequests = list
                                 )
                                 ResponseStatus.FRIENDSHIP_REQUEST_SEND.value
                             }

@@ -18,7 +18,12 @@ import com.example.composechatexample.screens.settings.SettingsViewModel
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun ExitDialog() {
+fun VerificationDialog(
+    title: String? = null,
+    text: String? = null,
+    acceptOnClick: () -> Unit,
+    declinedOnClick: () -> Unit,
+) {
 
     val viewModel: SettingsViewModel = hiltViewModel()
 
@@ -26,26 +31,28 @@ fun ExitDialog() {
         modifier = Modifier
             .padding(horizontal = 15.dp),
         properties = DialogProperties(usePlatformDefaultWidth = false),
-        onDismissRequest = { viewModel.showExitDialog() },
+        onDismissRequest = { viewModel.showVerificationDialog() },
         text = {
             Column() {
-                Text(
-                    modifier = Modifier,
-                    text = stringResource(id = R.string.check_exit),
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
+                text?.let {
+                    Text(
+                        modifier = Modifier,
+                        text = it,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                }
             }
         },
         confirmButton = {
             ActionButton(
                 text = stringResource(id = R.string.accept_label),
-                onClick = viewModel::userLogOut
+                onClick = { acceptOnClick() }
             )
         },
         dismissButton = {
             ActionButton(
                 text = stringResource(id = R.string.cancel_label),
-                onClick = { viewModel.showExitDialog() }
+                onClick = { declinedOnClick() }
             )
         }
     )

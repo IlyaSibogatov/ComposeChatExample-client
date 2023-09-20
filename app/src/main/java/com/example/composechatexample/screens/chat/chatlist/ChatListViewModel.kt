@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.composechatexample.data.preferences.PreferencesManager
 import com.example.composechatexample.data.remote.MessageService
+import com.example.composechatexample.data.remote.UserService
 import com.example.composechatexample.data.response.DefaultResponse
 import com.example.composechatexample.domain.model.Chat
 import com.example.composechatexample.domain.model.NewChat
@@ -28,6 +29,7 @@ import javax.inject.Inject
 class ChatListViewModel @Inject constructor(
     private val preferencesManager: PreferencesManager,
     private val messageService: MessageService,
+    private val userService: UserService,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ChatListUIState())
@@ -41,6 +43,15 @@ class ChatListViewModel @Inject constructor(
             userLogged = preferencesManager.userLogged,
             username = preferencesManager.userName
         )
+        println("TOKEN LENGTH ---> ${preferencesManager.tokenFcm!!.length}")
+    }
+
+    fun updateToken() {
+        with(preferencesManager) {
+            viewModelScope.launch {
+                userService.updateToken(uuid!!, tokenFcm!!, deviceId!!, deviceType!!)
+            }
+        }
     }
 
     fun loadChatList() {

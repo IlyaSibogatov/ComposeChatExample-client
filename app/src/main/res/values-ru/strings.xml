@@ -48,6 +48,11 @@
     <string name="count_requests">%1$s запросов</string>
     <string name="count_followers">%1$s подписчиков</string>
 
+    <!--  Notifications Screen  -->
+    <string name="request_friendship">%1$s отправил Вам запрос в друзья</string>
+    <string name="accepted_friendship">Вы приняли запрос в друзья от %1$s</string>
+    <string name="declined_friendship">Вы отклонили запрос в друзья от %1$s</string>
+
     <!--  Chat List Screen  -->
     <string name="find_chat">Найти чат</string>
     <string name="owner_label">Владелец: %1$s</string>
@@ -107,6 +112,7 @@
     <!--  BottomBar  -->
     <string name="chat_list_title">Чаты</string>
     <string name="profile_title">Профиль</string>
+    <string name="notifications_title">Уведомления</string>
     <string name="settings_title">Настройки</string>
 
     <!--  Success messages  -->
@@ -121,5 +127,7 @@
     <string name="decline">Отклонить</string>
     <string name="accept_label">Подтвердить</string>
     <string name="cancel_label">Отменить</string>
+    <string name="enabled_label">Включено</string>
+    <string name="disabled_label">Выключено</string>
 
 </resources>

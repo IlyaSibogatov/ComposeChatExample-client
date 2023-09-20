@@ -47,6 +47,11 @@
     <string name="count_requests">%1$s requests</string>
     <string name="count_followers">%1$s followers</string>
 
+    <!--  Notifications Screen  -->
+    <string name="request_friendship">%1$s sent you a friend request</string>
+    <string name="accepted_friendship">You accepted a friend request from</string>
+    <string name="declined_friendship">You rejected a friend request from %1$s</string>
+
     <!--  Chat List Screen  -->
     <string name="find_chat">Find chat</string>
     <string name="owner_label">Owner: %1$s</string>
@@ -108,6 +113,7 @@
     <!--  BottomBar  -->
     <string name="chat_list_title">Chats</string>
     <string name="profile_title">Profile</string>
+    <string name="notifications_title">Notifications</string>
     <string name="settings_title">Settings</string>
 
     <!--  Success messages  -->
@@ -122,5 +128,7 @@
     <string name="decline">Decline</string>
     <string name="accept_label">Accept</string>
     <string name="cancel_label">Cancel</string>
+    <string name="enabled_label">Enabled</string>
+    <string name="disabled_label">Disabled</string>
 
 </resources>

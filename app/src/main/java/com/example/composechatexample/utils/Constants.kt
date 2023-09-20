@@ -10,6 +10,9 @@ object Constants {
     const val PROFILE_ROUTE = "profile_screen"
     const val PROFILE_TITLE = "Profile"
 
+    const val NOTIFICATIONS_ROUTE = "notifications_screen"
+    const val NOTIFICATION_TITLE = "Notification"
+
     const val CHAT_ROUTE = "chat_screen"
     const val CHAT_TITLE = "Chat"
 

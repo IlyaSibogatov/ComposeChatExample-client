@@ -20,6 +20,12 @@ sealed class BottomNavBar(
         icon = R.drawable.ic_profile,
     )
 
+    object Notifications : BottomNavBar(
+        route = Constants.NOTIFICATIONS_ROUTE,
+        title = R.string.notifications_title,
+        icon = R.drawable.ic_notifications,
+    )
+
     object Settings : BottomNavBar(
         route = Constants.SETTINGS_ROUTE,
         title = R.string.settings_title,
