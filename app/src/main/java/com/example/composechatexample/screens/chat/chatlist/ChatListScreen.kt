@@ -85,159 +85,154 @@ fun ChatListScreen(
     val uiState = viewModel.uiState.collectAsState()
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    if (!uiState.value.userLogged)
-        navController.navigate(Constants.ONBOARD_ROUTE)
-    else {
-        ConstraintLayout(
+    ConstraintLayout(
+        modifier = Modifier
+            .fillMaxSize()
+            .onGloballyPositioned { },
+    ) {
+        val (lcChats, searchRow, createChatBtn, errorView) = createRefs()
+        Row(
             modifier = Modifier
-                .fillMaxSize()
-                .onGloballyPositioned {
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.primary)
+                .padding(15.dp)
+                .constrainAs(searchRow) {
+                    top.linkTo(parent.top)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
                 },
+            horizontalArrangement = Arrangement.End
         ) {
-            val (lcChats, searchRow, createChatBtn, errorView) = createRefs()
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.primary)
-                    .padding(15.dp)
-                    .constrainAs(searchRow) {
-                        top.linkTo(parent.top)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                    },
-                horizontalArrangement = Arrangement.End
-            ) {
-                val animState = remember {
-                    mutableStateOf(false)
-                }
-                val imSearchVisible = remember {
-                    mutableStateOf(true)
-                }
-                val focusRequester = remember { FocusRequester() }
-                if (imSearchVisible.value) {
-                    CustomIconButton(
-                        imageId = R.drawable.im_search,
-                        onClick = {
-                            animState.value = !animState.value
-                            imSearchVisible.value = !imSearchVisible.value
-                        }
-                    )
-                }
-                SearchField(
-                    modifier = Modifier.focusRequester(focusRequester),
-                    animateState = animState.value,
-                    value = uiState.value.searchQuery,
-                    keyboardController = keyboardController,
-                    onValueChange = viewModel::updateSearchQuery,
-                    imVisible = {
-                        imSearchVisible.value = it
-                        animState.value = !it
+            val animState = remember {
+                mutableStateOf(false)
+            }
+            val imSearchVisible = remember {
+                mutableStateOf(true)
+            }
+            val focusRequester = remember { FocusRequester() }
+            if (imSearchVisible.value) {
+                CustomIconButton(
+                    imageId = R.drawable.im_search,
+                    onClick = {
+                        animState.value = !animState.value
+                        imSearchVisible.value = !imSearchVisible.value
                     }
                 )
             }
-            when (uiState.value.screenState) {
-                ScreenState.INIT -> CircularLoader()
-                ScreenState.SUCCESS -> {
-                    when {
-                        uiState.value.dialogs.passDialog -> EntryDialog()
-                        uiState.value.dialogs.createDialog -> CreateChatDialog()
-                    }
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .constrainAs(lcChats) {
-                                top.linkTo(searchRow.bottom)
-                                bottom.linkTo(parent.bottom)
-                                start.linkTo(parent.start)
-                                end.linkTo(parent.end)
-                                height = Dimension.fillToConstraints
+            SearchField(
+                modifier = Modifier.focusRequester(focusRequester),
+                animateState = animState.value,
+                value = uiState.value.searchQuery,
+                keyboardController = keyboardController,
+                onValueChange = viewModel::updateSearchQuery,
+                imVisible = {
+                    imSearchVisible.value = it
+                    animState.value = !it
+                }
+            )
+        }
+        when (uiState.value.screenState) {
+            ScreenState.INIT -> CircularLoader()
+            ScreenState.SUCCESS -> {
+                when {
+                    uiState.value.dialogs.passDialog -> EntryDialog()
+                    uiState.value.dialogs.createDialog -> CreateChatDialog()
+                }
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .constrainAs(lcChats) {
+                            top.linkTo(searchRow.bottom)
+                            bottom.linkTo(parent.bottom)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                            height = Dimension.fillToConstraints
+                        },
+                ) {
+                    items(uiState.value.newChats) { item ->
+                        val expandedMenu = remember { mutableStateOf(false) }
+                        ItemChat(
+                            data = item,
+                            modifier = Modifier.padding(start = 8.dp, end = 8.dp),
+                            onChatClick = {
+                                viewModel.checkChat(item)
                             },
-                    ) {
-                        items(uiState.value.newChats) { item ->
-                            val expandedMenu = remember { mutableStateOf(false) }
-                            ItemChat(
-                                data = item,
-                                modifier = Modifier.padding(start = 8.dp, end = 8.dp),
-                                onChatClick = {
-                                    viewModel.checkChat(item)
-                                },
-                                onChatLongClick = {
-                                    viewModel.chatLongClick(item)?.let {
-                                        expandedMenu.value = !expandedMenu.value
-                                    }
-                                },
-                                menu = {
-                                    ShowMenu(
-                                        expanded = expandedMenu,
-                                        data = listOf(
-                                            Type(nameType = ChatEvent.EDIT, str = R.string.edit),
-                                            Type(
-                                                nameType = ChatEvent.REMOVE,
-                                                str = R.string.remove
-                                            ),
+                            onChatLongClick = {
+                                viewModel.chatLongClick(item)?.let {
+                                    expandedMenu.value = !expandedMenu.value
+                                }
+                            },
+                            menu = {
+                                ShowMenu(
+                                    expanded = expandedMenu,
+                                    data = listOf(
+                                        Type(nameType = ChatEvent.EDIT, str = R.string.edit),
+                                        Type(
+                                            nameType = ChatEvent.REMOVE,
+                                            str = R.string.remove
                                         ),
-                                        onCLick = { type ->
-                                            when (type) {
-                                                ChatEvent.EDIT -> {
-                                                    viewModel.showCreateDialog(true)
-                                                    expandedMenu.value = false
-                                                }
+                                    ),
+                                    onCLick = { type ->
+                                        when (type) {
+                                            ChatEvent.EDIT -> {
+                                                viewModel.showCreateDialog(true)
+                                                expandedMenu.value = false
+                                            }
 
-                                                ChatEvent.REMOVE -> {
-                                                    viewModel.deleteChat()
-                                                    expandedMenu.value = !expandedMenu.value
-                                                }
+                                            ChatEvent.REMOVE -> {
+                                                viewModel.deleteChat()
+                                                expandedMenu.value = !expandedMenu.value
                                             }
                                         }
-                                    )
-                                }
-                            )
-                        }
-                    }
-                    OutlinedButton(
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .constrainAs(createChatBtn) {
-                                bottom.linkTo(parent.bottom)
-                                end.linkTo(parent.end)
-                            },
-                        shape = CircleShape,
-                        onClick = viewModel::showCreateDialog,
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_new_chat),
-                            contentDescription = Constants.CONTENT_DESCRIPTION,
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                    }
-                }
-
-                ScreenState.ERROR -> {
-                    Column(
-                        modifier = Modifier
-                            .constrainAs(errorView) {
-                                top.linkTo(searchRow.bottom)
-                                start.linkTo(parent.start)
-                                end.linkTo(parent.end)
-                                bottom.linkTo(parent.bottom)
+                                    }
+                                )
                             }
-                    ) {
-                        Icon(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            painter = painterResource(id = R.drawable.ic_alert),
-                            contentDescription = Constants.CONTENT_DESCRIPTION,
-                        )
-                        Text(
-                            modifier = Modifier.fillMaxWidth(),
-                            text = stringResource(id = R.string.try_again_later),
-                            textAlign = TextAlign.Center
                         )
                     }
                 }
-
-                else -> {}
+                OutlinedButton(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .constrainAs(createChatBtn) {
+                            bottom.linkTo(parent.bottom)
+                            end.linkTo(parent.end)
+                        },
+                    shape = CircleShape,
+                    onClick = viewModel::showCreateDialog,
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_new_chat),
+                        contentDescription = Constants.CONTENT_DESCRIPTION,
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                }
             }
+
+            ScreenState.ERROR -> {
+                Column(
+                    modifier = Modifier
+                        .constrainAs(errorView) {
+                            top.linkTo(searchRow.bottom)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                            bottom.linkTo(parent.bottom)
+                        }
+                ) {
+                    Icon(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        painter = painterResource(id = R.drawable.ic_alert),
+                        contentDescription = Constants.CONTENT_DESCRIPTION,
+                    )
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = stringResource(id = R.string.try_again_later),
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+
+            else -> {}
         }
     }
     LaunchedEffect(key1 = Unit) {
@@ -260,7 +255,10 @@ fun ChatListScreen(
     val lifeCycleOwner = LocalLifecycleOwner.current
     DisposableEffect(key1 = lifeCycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_START) viewModel.loadChatList()
+            if (event == Lifecycle.Event.ON_START) {
+                viewModel.loadChatList()
+                viewModel.updateToken()
+            }
         }
         lifeCycleOwner.lifecycle.addObserver(observer)
         onDispose {

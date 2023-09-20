@@ -1,6 +1,7 @@
 package com.example.composechatexample.data.remote
 
 import com.example.composechatexample.data.model.UserFromId
+import com.example.composechatexample.data.model.UserNotification
 import com.example.composechatexample.data.response.DefaultResponse
 import com.example.composechatexample.domain.model.Friend
 import com.example.composechatexample.domain.model.NewUserInfo
@@ -15,6 +16,15 @@ interface UserService {
     suspend fun getFollowerFriends(uid: String, type: String): List<Friend>?
 
     suspend fun friendshipAccept(selfId: String, userId: String, action: Boolean): DefaultResponse?
+
+    suspend fun updateToken(
+        uuid: String,
+        token: String,
+        deviceId: String,
+        type: String
+    ): DefaultResponse?
+
+    suspend fun getNotifications(uuid: String): List<UserNotification>?
 
     suspend fun removeFriend(
         selfId: String,
@@ -35,5 +45,9 @@ interface UserService {
 
         object RemoveFriend : EndPoint("${Constants.BASE_URL}/remove_friend")
         object UploadAvatar : EndPoint("${Constants.BASE_URL}/upload_avatar")
+
+        object UpdateToken : EndPoint("${Constants.BASE_URL}/update_token")
+
+        object GetNotifications : EndPoint("${Constants.BASE_URL}/notifications")
     }
 }

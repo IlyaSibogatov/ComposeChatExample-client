@@ -25,9 +25,9 @@ class PreferencesManager @Inject constructor(
         get() = sharedPreferences.getString(PRIVACY, "Public").toString()
         set(value) = sharedPreferences.edit().putString(PRIVACY, value).apply()
 
-    var notification: String
-        get() = sharedPreferences.getString(NOTIFICATION, "Enabled").toString()
-        set(value) = sharedPreferences.edit().putString(NOTIFICATION, value).apply()
+    var notification: Boolean
+        get() = sharedPreferences.getBoolean(NOTIFICATION, true)
+        set(value) = sharedPreferences.edit().putBoolean(NOTIFICATION, value).apply()
 
     var support: String
         get() = sharedPreferences.getString(SUPPORT, "___@gmail.com").toString()
@@ -44,10 +44,28 @@ class PreferencesManager @Inject constructor(
         )
         set(value) = sharedPreferences.edit().putString(LANGUAGE_ARG, Gson().toJson(value)).apply()
 
+    var tokenFcm: String?
+        get() = sharedPreferences.getString(TOKEN_FCM, null).toString()
+        set(value) = sharedPreferences.edit().putString(TOKEN_FCM, value).apply()
+
+    var deviceId: String?
+        get() = sharedPreferences.getString(DEVICE_ID, null).toString()
+        set(value) = sharedPreferences.edit().putString(DEVICE_ID, value).apply()
+
+    var deviceType: String?
+        get() = sharedPreferences.getString(DEVICE_TYPE, null).toString()
+        set(value) = sharedPreferences.edit().putString(DEVICE_TYPE, value).apply()
+
     fun clearData() {
-        val language = this.language
+        val _language = language
+        val _tokenFcm = tokenFcm
+        val _deviceId = deviceId
+        val _deviceType = deviceType
         sharedPreferences.edit().clear().apply()
-        this.language = language
+        language = _language
+        tokenFcm = _tokenFcm
+        deviceId = _deviceId
+        deviceType = _deviceType
     }
 
     companion object {
@@ -59,5 +77,8 @@ class PreferencesManager @Inject constructor(
         private const val SUPPORT = "support"
         private const val UUID = "uuid"
         private const val LANGUAGE_ARG = "user_language_arg"
+        private const val TOKEN_FCM = "tokenFcm"
+        private const val DEVICE_ID = "device_id"
+        private const val DEVICE_TYPE = "device_type"
     }
 }

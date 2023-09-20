@@ -76,6 +76,12 @@ class SettingsViewModel @Inject constructor(
 
     fun getTheme(): String = preferencesManager.theme
 
+    fun getNotification(): Boolean = preferencesManager.notification
+
+    fun getPrivacy(): String = preferencesManager.privacy
+
+    fun getMail(): String = preferencesManager.support
+
     fun onClickItem(type: Pair<SettingType, Any>) {
         when (type.first) {
             LANG -> {
@@ -232,7 +238,7 @@ class SettingsViewModel @Inject constructor(
         )
     }
 
-    fun showExitDialog() {
+    fun showVerificationDialog() {
         if (uiState.value.dialogs == null) {
             _uiState.value = uiState.value.copy(
                 dialogs = SettingsDialogs.LOG_OUT

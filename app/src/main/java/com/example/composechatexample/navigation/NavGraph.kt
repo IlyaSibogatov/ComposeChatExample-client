@@ -6,8 +6,10 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.composechatexample.data.preferences.PreferencesManager
 import com.example.composechatexample.screens.chat.chatdetails.ChatScreen
 import com.example.composechatexample.screens.chat.chatlist.ChatListScreen
+import com.example.composechatexample.screens.notifications.NotificationsScreen
 import com.example.composechatexample.screens.onboarding.OnBoardingScreen
 import com.example.composechatexample.screens.profile.ProfileScreen
 import com.example.composechatexample.screens.profile.userlist.UsersListScreen
@@ -16,17 +18,24 @@ import com.example.composechatexample.utils.Constants
 
 @Composable
 fun NavGraph(
+    preferencesManager: PreferencesManager,
     navController: NavHostController,
 ) {
     NavHost(
         navController = navController,
-        startDestination = Constants.CHAT_LIST_ROUTE
+        startDestination =
+        if (preferencesManager.userLogged && preferencesManager.uuid != null)
+            Constants.CHAT_LIST_ROUTE
+        else Constants.ONBOARD_ROUTE
     ) {
         composable(route = BottomNavBar.ChatList.route) {
             ChatListScreen(navController)
         }
         composable(route = BottomNavBar.Profile.route) {
             ProfileScreen(navController)
+        }
+        composable(route = BottomNavBar.Notifications.route) {
+            NotificationsScreen(navController)
         }
         composable(
             route = "${Constants.PROFILE_ROUTE}/{${Constants.USER_UID}}",
