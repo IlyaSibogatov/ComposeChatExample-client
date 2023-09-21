@@ -32,10 +32,13 @@ import coil.compose.AsyncImage
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.example.composechatexample.R
+import com.example.composechatexample.components.CircularLoader
 import com.example.composechatexample.components.CustomIconButton
+import com.example.composechatexample.components.EmptyOrErrorView
 import com.example.composechatexample.data.model.NotificationType
 import com.example.composechatexample.data.model.UserNotification
 import com.example.composechatexample.utils.Constants
+import com.example.composechatexample.utils.ScreenState
 
 @Composable
 fun NotificationsScreen(
@@ -45,26 +48,48 @@ fun NotificationsScreen(
     val viewModel: NotificationsViewModel = hiltViewModel()
     val uiState = viewModel.uiState.collectAsState()
 
+    when (uiState.value.screenState) {
+        ScreenState.INIT -> {
+            CircularLoader()
+        }
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp)
-    ) {
-        items(uiState.value.notifications) { item ->
-            NotificationItem(
-                item,
-                acceptClick = { viewModel.friendshipAction(item, true) },
-                declinedClick = { viewModel.friendshipAction(item) }
+        ScreenState.SUCCESS -> {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp)
+            ) {
+                items(uiState.value.notifications) { item ->
+                    NotificationItem(
+                        item,
+                        acceptClick = { viewModel.friendshipAction(item, true) },
+                        declinedClick = { viewModel.friendshipAction(item) }
+                    )
+                }
+            }
+        }
+
+        ScreenState.ERROR -> {
+            EmptyOrErrorView(
+                modifier = Modifier.fillMaxSize(),
+                isError = true
             )
         }
+
+        ScreenState.EMPTY_DATA -> {
+            EmptyOrErrorView(
+                modifier = Modifier.fillMaxSize(),
+            )
+        }
+
+        else -> {}
     }
     val lifeCycleOwner = LocalLifecycleOwner.current
     DisposableEffect(key1 = lifeCycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_START) {
-                viewModel.getNotifications()
-            }
+            if (event == Lifecycle.Event.ON_START) viewModel.getNotifications()
+            if (event == Lifecycle.Event.ON_RESUME) viewModel.notificationScreenOpen(true)
+            if (event == Lifecycle.Event.ON_PAUSE) viewModel.notificationScreenOpen(false)
         }
         lifeCycleOwner.lifecycle.addObserver(observer)
         onDispose {
@@ -132,11 +157,11 @@ fun NotificationItem(
                     }
 
                     NotificationType.USER_ACCEPT_FRIENDSHIP -> {
-                        "${item.senderName} accept ur request"
+                        stringResource(id = R.string.user_accepted_friendship, item.senderName)
                     }
 
                     NotificationType.USER_DECLINED_FRIENDSHIP -> {
-                        "${item.senderName} declined ur request"
+                        stringResource(id = R.string.user_declined_friendship, item.senderName)
                     }
                 }
             )

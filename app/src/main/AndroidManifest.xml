@@ -30,7 +30,7 @@
             </intent-filter>
         </activity>
         <service
-            android:name="com.example.composechatexample.utils.FirebaseService"
+            android:name="com.example.composechatexample.utils.firebase.FirebaseService"
             android:enabled="true"
             android:exported="false"
             android:showOnLockScreen="true">

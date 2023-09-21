@@ -29,6 +29,10 @@ class PreferencesManager @Inject constructor(
         get() = sharedPreferences.getBoolean(NOTIFICATION, true)
         set(value) = sharedPreferences.edit().putBoolean(NOTIFICATION, value).apply()
 
+    var notificationScreenOpen: Boolean
+        get() = sharedPreferences.getBoolean(NOTIFICATION_SCREEN_OPEN, false)
+        set(value) = sharedPreferences.edit().putBoolean(NOTIFICATION_SCREEN_OPEN, value).apply()
+
     var support: String
         get() = sharedPreferences.getString(SUPPORT, "___@gmail.com").toString()
         set(value) = sharedPreferences.edit().putString(SUPPORT, value).apply()
@@ -74,6 +78,7 @@ class PreferencesManager @Inject constructor(
         private const val THEME = "theme"
         private const val PRIVACY = "privacy"
         private const val NOTIFICATION = "notification"
+        private const val NOTIFICATION_SCREEN_OPEN = "notification_screen_open"
         private const val SUPPORT = "support"
         private const val UUID = "uuid"
         private const val LANGUAGE_ARG = "user_language_arg"

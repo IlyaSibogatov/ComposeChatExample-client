@@ -8,7 +8,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -63,6 +62,7 @@ import androidx.navigation.NavHostController
 import com.example.composechatexample.R
 import com.example.composechatexample.components.CircularLoader
 import com.example.composechatexample.components.CustomIconButton
+import com.example.composechatexample.components.EmptyOrErrorView
 import com.example.composechatexample.components.ShowMenu
 import com.example.composechatexample.domain.model.Chat
 import com.example.composechatexample.screens.chat.chatlist.model.ChatListScreenEvent
@@ -190,49 +190,56 @@ fun ChatListScreen(
                         )
                     }
                 }
-                OutlinedButton(
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .constrainAs(createChatBtn) {
-                            bottom.linkTo(parent.bottom)
-                            end.linkTo(parent.end)
-                        },
-                    shape = CircleShape,
-                    onClick = viewModel::showCreateDialog,
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_new_chat),
-                        contentDescription = Constants.CONTENT_DESCRIPTION,
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                }
             }
 
             ScreenState.ERROR -> {
-                Column(
+                EmptyOrErrorView(
                     modifier = Modifier
                         .constrainAs(errorView) {
-                            top.linkTo(searchRow.bottom)
+                            top.linkTo(parent.top)
                             start.linkTo(parent.start)
                             end.linkTo(parent.end)
                             bottom.linkTo(parent.bottom)
-                        }
-                ) {
-                    Icon(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        painter = painterResource(id = R.drawable.ic_alert),
-                        contentDescription = Constants.CONTENT_DESCRIPTION,
-                    )
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = stringResource(id = R.string.try_again_later),
-                        textAlign = TextAlign.Center
-                    )
+                        },
+                    isError = true
+                )
+            }
+
+            ScreenState.EMPTY_DATA -> {
+                when {
+                    uiState.value.dialogs.createDialog -> CreateChatDialog()
                 }
+                EmptyOrErrorView(
+                    modifier = Modifier
+                        .constrainAs(errorView) {
+                            top.linkTo(parent.top)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                            bottom.linkTo(parent.bottom)
+                        },
+                    screen = Constants.CHAT_TITLE
+                )
             }
 
             else -> {}
+        }
+        if (uiState.value.screenState == ScreenState.EMPTY_DATA || uiState.value.screenState == ScreenState.SUCCESS) {
+            OutlinedButton(
+                modifier = Modifier
+                    .padding(8.dp)
+                    .constrainAs(createChatBtn) {
+                        bottom.linkTo(parent.bottom)
+                        end.linkTo(parent.end)
+                    },
+                shape = CircleShape,
+                onClick = viewModel::showCreateDialog,
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_new_chat),
+                    contentDescription = Constants.CONTENT_DESCRIPTION,
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            }
         }
     }
     LaunchedEffect(key1 = Unit) {
