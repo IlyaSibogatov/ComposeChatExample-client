@@ -7,6 +7,9 @@ import com.example.composechatexample.data.model.UserNotification
 import com.example.composechatexample.data.preferences.PreferencesManager
 import com.example.composechatexample.data.remote.UserService
 import com.example.composechatexample.screens.notifications.model.NotificationsUIState
+import com.example.composechatexample.utils.ScreenState
+import com.example.composechatexample.utils.firebase.FirebaseService
+import com.example.composechatexample.utils.firebase.NotificationEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,11 +26,39 @@ class NotificationsViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(NotificationsUIState())
     val uiState: StateFlow<NotificationsUIState> = _uiState
 
+    init {
+        viewModelScope.launch {
+            FirebaseService.subscribeEvent().collect { event ->
+                when (event) {
+                    is NotificationEvent.AddNotification -> {
+                        val list = _uiState.value.notifications.toMutableList()
+                        list.add(0, event.notification)
+                        _uiState.value = uiState.value.copy(
+                            screenState = ScreenState.SUCCESS,
+                            notifications = list
+                        )
+                    }
+                }
+            }
+        }
+    }
+
     fun getNotifications() {
         viewModelScope.launch {
-            userService.getNotifications(preferencesManager.uuid!!)?.let {
+            _uiState.value = uiState.value.copy(
+                screenState = ScreenState.INIT
+            )
+            val result = userService.getNotifications(preferencesManager.uuid!!)
+            if (result != null) {
                 _uiState.value = uiState.value.copy(
-                    notifications = it
+                    notifications = result
+                )
+                _uiState.value = uiState.value.copy(
+                    screenState = if (result.isNotEmpty()) ScreenState.SUCCESS else ScreenState.EMPTY_DATA
+                )
+            } else {
+                _uiState.value = uiState.value.copy(
+                    screenState = ScreenState.ERROR
                 )
             }
         }
@@ -49,5 +80,9 @@ class NotificationsViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun notificationScreenOpen(open: Boolean) {
+        preferencesManager.notificationScreenOpen = open
     }
 }

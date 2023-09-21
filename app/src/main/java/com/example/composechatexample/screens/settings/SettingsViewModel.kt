@@ -23,6 +23,7 @@ import com.example.composechatexample.utils.SettingsDialogs
 import com.example.composechatexample.utils.TypeLang
 import com.example.composechatexample.utils.TypeLang.ENG
 import com.example.composechatexample.utils.TypeLang.RU
+import com.example.composechatexample.utils.TypeNotification
 import com.example.composechatexample.utils.TypeTheme
 import com.example.composechatexample.utils.Validator
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -96,7 +97,10 @@ class SettingsViewModel @Inject constructor(
                 }
             }
 
-            NOTIFICATION -> {}
+            NOTIFICATION -> {
+                enableNotification(type.second as TypeNotification)
+            }
+
             PERS_DATA -> {}
             CONFIDENTIALITY -> {}
             EDIT_PASSWORD -> {
@@ -155,6 +159,13 @@ class SettingsViewModel @Inject constructor(
             theme = type.name
         )
         sendEvent(SettingsScreenEvent.ThemeEvent(type))
+    }
+
+    private fun enableNotification(type: TypeNotification) {
+        preferencesManager.notification = type.value
+        _uiState.value = uiState.value.copy(
+            notification = type.value
+        )
     }
 
     fun showChangePassDialog() {

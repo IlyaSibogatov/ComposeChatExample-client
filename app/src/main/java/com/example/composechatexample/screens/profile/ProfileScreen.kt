@@ -10,7 +10,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -61,6 +60,7 @@ import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.example.composechatexample.R
 import com.example.composechatexample.components.CircularLoader
+import com.example.composechatexample.components.EmptyOrErrorView
 import com.example.composechatexample.screens.dialogs.EditInfoDialog
 import com.example.composechatexample.screens.dialogs.FriendAddRemoveDialog
 import com.example.composechatexample.screens.profile.model.ProfileScreenEvent
@@ -501,27 +501,16 @@ fun ProfileScreen(
             }
 
             ScreenState.ERROR -> {
-                Column(
+                EmptyOrErrorView(
                     modifier = Modifier
                         .constrainAs(errorView) {
                             top.linkTo(parent.top)
                             start.linkTo(parent.start)
                             end.linkTo(parent.end)
                             bottom.linkTo(parent.bottom)
-                        }
-                ) {
-                    Icon(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        painter = painterResource(id = R.drawable.ic_alert),
-                        contentDescription = Constants.CONTENT_DESCRIPTION,
-                    )
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = stringResource(id = R.string.try_again_later),
-                        textAlign = TextAlign.Center
-                    )
-                }
+                        },
+                    isError = true
+                )
             }
 
             else -> {}

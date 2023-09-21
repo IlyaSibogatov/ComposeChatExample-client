@@ -399,7 +399,16 @@ private fun ShowMenuSetting(
             )
         }
 
-        NOTIFICATION -> {}
+        NOTIFICATION -> {
+            ShowMenu(
+                expanded = expanded,
+                data = Constants.listTypeNotifications,
+                onCLick = {
+                    onClick(Pair(type, it))
+                }
+            )
+        }
+
         PERS_DATA -> {}
         CONFIDENTIALITY -> {}
         EDIT_PASSWORD -> {}
