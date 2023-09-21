@@ -51,6 +51,10 @@ object Constants {
         Type(nameType = TypeLang.RU, str = R.string.languages_text_ru),
         Type(nameType = TypeLang.ENG, str = R.string.languages_text_eng)
     )
+    val listTypeNotifications = listOf(
+        Type(nameType = TypeNotification.ENABLE, str = R.string.enabled_label),
+        Type(nameType = TypeNotification.DISABLE, str = R.string.disabled_label)
+    )
 
     // Use 10.0.2.2:8080 if emulator is used
     const val BASE_URL = "http://10.0.2.2:8080"

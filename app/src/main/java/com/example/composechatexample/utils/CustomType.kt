@@ -23,6 +23,11 @@ enum class SendType {
     REMOVE, SEND, EDIT
 }
 
+enum class TypeNotification(val value: Boolean) {
+    ENABLE(true),
+    DISABLE(false)
+}
+
 enum class ChatEvent {
     EDIT, REMOVE
 }
@@ -43,6 +48,7 @@ enum class ScreenState {
     INIT,
     ERROR,
     SUCCESS,
+    EMPTY_DATA,
 }
 
 enum class ResponseStatus(val value: String) {

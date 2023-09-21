@@ -49,8 +49,12 @@
 
     <!--  Notifications Screen  -->
     <string name="request_friendship">%1$s sent you a friend request</string>
+
     <string name="accepted_friendship">You accepted a friend request from</string>
     <string name="declined_friendship">You rejected a friend request from %1$s</string>
+
+    <string name="user_accepted_friendship">%1$s accept your friend request from</string>
+    <string name="user_declined_friendship">%1$s rejected your friend request</string>
 
     <!--  Chat List Screen  -->
     <string name="find_chat">Find chat</string>
@@ -123,6 +127,7 @@
     <string name="error_toast">Failed to process request</string>
     <string name="exception_toast">Unforeseen error</string>
     <string name="try_again_later">Something went wrong. Try again later</string>
+    <string name="empty_data">The list %1$s is currently empty.</string>
 
     <!--  Actions  -->
     <string name="decline">Decline</string>
@@ -130,5 +135,9 @@
     <string name="cancel_label">Cancel</string>
     <string name="enabled_label">Enabled</string>
     <string name="disabled_label">Disabled</string>
+
+    <!-- Other -->
+    <string name="notifications">notifications</string>
+    <string name="chats">chats</string>
 
 </resources>

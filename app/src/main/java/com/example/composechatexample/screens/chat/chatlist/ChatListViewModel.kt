@@ -64,7 +64,7 @@ class ChatListViewModel @Inject constructor(
                 _uiState.value = uiState.value.copy(
                     chats = result,
                     newChats = result,
-                    screenState = ScreenState.SUCCESS
+                    screenState = if (result.isNotEmpty()) ScreenState.SUCCESS else ScreenState.EMPTY_DATA
                 )
             } else {
                 _uiState.value = uiState.value.copy(
