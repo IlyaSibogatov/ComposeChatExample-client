@@ -168,11 +168,17 @@ fun NotificationItem(
             /** Friend request action buttons */
             if (item.type == NotificationType.REQUEST_FRIENDSHIP) {
                 CustomIconButton(
+                    modifier = Modifier
+                        .padding(horizontal = 8.dp)
+                        .size(24.dp),
                     imageId = R.drawable.ic_accept,
                     color = Color(0xFF1C631F),
                     onClick = { acceptClick() },
                 )
                 CustomIconButton(
+                    modifier = Modifier
+                        .padding(horizontal = 8.dp)
+                        .size(24.dp),
                     imageId = R.drawable.ic_declined,
                     color = Color(0xFFC81F1F),
                     onClick = { declinedClick() },
