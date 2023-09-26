@@ -49,14 +49,12 @@ class NotificationsViewModel @Inject constructor(
                 screenState = ScreenState.INIT
             )
             val result = userService.getNotifications(preferencesManager.uuid!!)
-            if (result != null) {
+            result?.let {
                 _uiState.value = uiState.value.copy(
-                    notifications = result
-                )
-                _uiState.value = uiState.value.copy(
+                    notifications = result,
                     screenState = if (result.isNotEmpty()) ScreenState.SUCCESS else ScreenState.EMPTY_DATA
                 )
-            } else {
+            } ?: run {
                 _uiState.value = uiState.value.copy(
                     screenState = ScreenState.ERROR
                 )

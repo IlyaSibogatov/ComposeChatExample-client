@@ -1,11 +1,14 @@
 package com.example.composechatexample.navigation
 
+import android.content.Intent
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import com.example.composechatexample.data.preferences.PreferencesManager
 import com.example.composechatexample.screens.chat.chatdetails.ChatScreen
 import com.example.composechatexample.screens.chat.chatlist.ChatListScreen
@@ -28,6 +31,7 @@ fun NavGraph(
             Constants.CHAT_LIST_ROUTE
         else Constants.ONBOARD_ROUTE
     ) {
+
         composable(route = BottomNavBar.ChatList.route) {
             ChatListScreen(navController)
         }
@@ -39,13 +43,33 @@ fun NavGraph(
         }
         composable(
             route = "${Constants.PROFILE_ROUTE}/{${Constants.USER_UID}}",
+            deepLinks = listOf(
+                navDeepLink {
+                    uriPattern = "http://open_profile/uuid={${Constants.USER_UID}}"
+                    action = Intent.ACTION_VIEW
+                }
+            ),
             arguments = listOf(
-                navArgument(Constants.USER_UID) { type = NavType.StringType })
-        ) { backStackEntry ->
-            ProfileScreen(
-                navController,
-                backStackEntry.arguments?.getString(Constants.USER_UID)
+                navArgument(Constants.USER_UID) {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                }
             )
+        ) { backStackEntry ->
+            if (
+                backStackEntry.arguments?.getString(Constants.USER_UID) == preferencesManager.uuid ||
+                backStackEntry.arguments?.getString(Constants.USER_UID) == null
+            )
+                navController.navigate(BottomNavBar.Profile.route) {
+                    popUpTo(navController.graph.findStartDestination().id)
+                    launchSingleTop = true
+                }
+            else
+                ProfileScreen(
+                    navController,
+                    backStackEntry.arguments?.getString(Constants.USER_UID)
+                )
         }
         composable(route = Constants.ONBOARD_ROUTE) {
             OnBoardingScreen(navController)

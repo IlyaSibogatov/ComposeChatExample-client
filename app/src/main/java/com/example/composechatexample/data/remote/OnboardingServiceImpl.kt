@@ -50,6 +50,18 @@ class OnboardingServiceImpl(
                 url.parameters.append("new", new)
             }
         } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    override suspend fun deleteAccount(uuid: String): DefaultResponse? {
+        return try {
+            client.post<DefaultResponse>(OnboardingService.EndPoint.DeleteAcc.url){
+                url.parameters.append("uuid", uuid)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
             null
         }
     }

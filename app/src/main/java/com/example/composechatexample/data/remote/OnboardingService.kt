@@ -13,10 +13,13 @@ interface OnboardingService {
 
     suspend fun changePass(current: String, new: String, uuid: String): String?
 
+    suspend fun deleteAccount(uuid: String): DefaultResponse?
+
     sealed class EndPoint(val url: String) {
         object Login : EndPoint("${Constants.BASE_URL}/login")
         object SignUp : EndPoint("${Constants.BASE_URL}/signup")
         object Logout : EndPoint("${Constants.BASE_URL}/logout")
         object ChangePass : EndPoint("${Constants.BASE_URL}/change_pass")
+        object DeleteAcc: EndPoint("${Constants.BASE_URL}/delete_acc")
     }
 }

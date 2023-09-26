@@ -47,14 +47,17 @@
     <string name="count_requests">%1$s requests</string>
     <string name="count_followers">%1$s followers</string>
 
+    <string name="share_label">Share profile</string>
+    <string name="edit_profile">Edit profile</string>
+
     <!--  Notifications Screen  -->
     <string name="request_friendship">%1$s sent you a friend request</string>
 
     <string name="accepted_friendship">You accepted a friend request from</string>
     <string name="declined_friendship">You rejected a friend request from %1$s</string>
 
-    <string name="user_accepted_friendship">%1$s accept your friend request from</string>
-    <string name="user_declined_friendship">%1$s rejected your friend request</string>
+    <string name="user_accepted_friendship">%1$s accept your friend request</string>
+    <string name="user_declined_friendship">%1$s rejected your friend</string>
 
     <!--  Chat List Screen  -->
     <string name="find_chat">Find chat</string>
@@ -89,6 +92,7 @@
     <string name="privacy_settings">Privacy</string>
     <string name="notifications_settings">Notification</string>
     <string name="change_password_settings">Change password</string>
+    <string name="delete_an_account">Delete an account</string>
     <string name="bug_report_label">Bug report</string>
     <string name="send_report_label">Send report email</string>
     <string name="tech_support_label">Tech.Support</string>
@@ -98,7 +102,8 @@
     <string name="account_label">Account</string>
     <string name="personal_data">Personal data</string>
 
-    <string name="check_exit">Do you really want to get out?</string>
+    <string name="exit_warning">Do you really want to get out?</string>
+    <string name="delete_account_warning">Are you sure you want to delete your account?</string>
 
     <!--  Change password dialog  -->
     <string name="empty_field_error">Fill the field</string>
