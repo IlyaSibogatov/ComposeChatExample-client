@@ -58,6 +58,8 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.navigation.NavDeepLink
+import androidx.navigation.NavDeepLinkBuilder
 import androidx.navigation.NavHostController
 import com.example.composechatexample.R
 import com.example.composechatexample.components.CircularLoader
@@ -245,7 +247,16 @@ fun ChatListScreen(
     LaunchedEffect(key1 = Unit) {
         viewModel.eventsFlow.collectLatest { value ->
             when (value) {
-                is ChatListScreenEvent.NavigateTo -> navController.navigate(value.route)
+                is ChatListScreenEvent.NavigateTo -> {
+                    if (value.route == Constants.ONBOARD_ROUTE) {
+                        navController.navigate(value.route) {
+                            popUpTo(0)
+                        }
+                    } else {
+                        navController.navigate(value.route)
+                    }
+                }
+
                 is ChatListScreenEvent.ToastEvent -> {
                     Toast.makeText(
                         context,
@@ -263,8 +274,7 @@ fun ChatListScreen(
     DisposableEffect(key1 = lifeCycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_START) {
-                viewModel.loadChatList()
-                viewModel.updateToken()
+                viewModel.checkSelfState()
             }
         }
         lifeCycleOwner.lifecycle.addObserver(observer)

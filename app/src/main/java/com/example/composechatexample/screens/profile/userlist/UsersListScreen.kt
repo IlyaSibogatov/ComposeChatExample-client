@@ -44,6 +44,7 @@ import com.example.composechatexample.components.CustomIconButton
 import com.example.composechatexample.screens.profile.userlist.model.UsersListEvent
 import com.example.composechatexample.utils.Constants
 import com.example.composechatexample.utils.Constants.FRIENDSHIPS_REQUESTS
+import com.example.composechatexample.utils.Constants.POP_BACK_STACK
 import com.example.composechatexample.utils.Ext.showToast
 import com.example.composechatexample.utils.ResponseStatus
 import kotlinx.coroutines.flow.collectLatest
@@ -168,10 +169,10 @@ fun UsersListScreen(
         viewModel.eventsFlow.collectLatest { value ->
             when (value) {
                 is UsersListEvent.NavigateTo -> {
-                    if (value.route == "popBackStack")
-                        navController.popBackStack()
-                    else
-                        navController.navigate(value.route)
+                    when (value.route) {
+                        POP_BACK_STACK -> navController.popBackStack()
+                        else -> navController.navigate(value.route)
+                    }
                 }
 
                 is UsersListEvent.ToastEvent -> {

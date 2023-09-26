@@ -97,25 +97,31 @@ fun SettingsScreen(
                 SettingItem(
                     title = R.string.exit_label,
                     icon = { SettingIcon(id = R.drawable.ic_logout) },
-                    onClick = { viewModel.showVerificationDialog() }
+                    onClick = { viewModel.showDialog(SettingsDialogs.LOG_OUT) }
                 )
             }
         }
     ) { padding ->
-        when {
-            uiState.value.dialogs == SettingsDialogs.LOG_OUT -> {
+        when (uiState.value.dialogs) {
+            SettingsDialogs.LOG_OUT -> {
                 VerificationDialog(
-                    text = stringResource(id = R.string.check_exit),
+                    text = stringResource(id = R.string.exit_warning),
                     acceptOnClick = (
                             viewModel::userLogOut
                             ),
-                    declinedOnClick = (
-                            viewModel::showVerificationDialog
-                            )
+                    declinedOnClick = ({ viewModel.showDialog() })
                 )
             }
 
-            uiState.value.dialogs == SettingsDialogs.PASS -> {
+            SettingsDialogs.DELETE_ACCOUNT -> {
+                VerificationDialog(
+                    text = stringResource(id = R.string.delete_account_warning),
+                    acceptOnClick = (viewModel::deleteAccount),
+                    declinedOnClick = ({ viewModel.showDialog() })
+                )
+            }
+
+            SettingsDialogs.PASS -> {
                 ChangePasswordDialog()
             }
 
@@ -209,19 +215,27 @@ fun SettingsScreen(
                         Pair(R.string.change_password_settings, "")
                     }
 
+                    DELETE_AN_ACCOUNT -> {
+                        Pair(R.string.delete_an_account, "")
+                    }
+
                     else -> Pair(0, "")
                 }
                 SettingItem(
                     title = result.first,
                     value = result.second,
                     onClick = {
-                        if (result.first == R.string.change_password_settings)
-                            viewModel.showChangePassDialog()
+                        when (result.first) {
+                            R.string.change_password_settings -> {
+                                viewModel.showDialog(SettingsDialogs.PASS)
+                            }
+
+                            R.string.delete_an_account -> {
+                                viewModel.showDialog(SettingsDialogs.DELETE_ACCOUNT)
+                            }
+                        }
                     }
                 )
-            }
-            item {
-
             }
         }
     }
@@ -231,9 +245,8 @@ fun SettingsScreen(
             when (value) {
                 is SettingsScreenEvent.NavigateTo -> {
                     if (value.route == Constants.ONBOARD_ROUTE) {
-                        navController.navigate(value.route) {
-                            popUpTo(0)
-                        }
+                        navController.navigate(value.route)
+                        navController.clearBackStack(value.route)
                     } else {
                         navController.navigate(value.route)
                     }
@@ -350,7 +363,11 @@ private fun SettingItem(
             ) {
                 HeaderSetting(
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
-                    id = title
+                    id = title,
+                    colorText = if (title == R.string.delete_an_account)
+                        MaterialTheme.colorScheme.error
+                    else
+                        MaterialTheme.colorScheme.onBackground
                 )
                 if (value.isNotEmpty()) {
                     Text(
@@ -412,5 +429,6 @@ private fun ShowMenuSetting(
         PERS_DATA -> {}
         CONFIDENTIALITY -> {}
         EDIT_PASSWORD -> {}
+        DELETE_AN_ACCOUNT -> {}
     }
 }
