@@ -3,8 +3,6 @@ package com.example.composechatexample.screens.profile.userlist
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,12 +30,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -46,6 +40,7 @@ import coil.compose.AsyncImage
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.example.composechatexample.R
+import com.example.composechatexample.components.CustomIconButton
 import com.example.composechatexample.screens.profile.userlist.model.UsersListEvent
 import com.example.composechatexample.utils.Constants
 import com.example.composechatexample.utils.Constants.FRIENDSHIPS_REQUESTS
@@ -80,19 +75,16 @@ fun UsersListScreen(
                 ),
                 onClick = { viewModel.openProfile(item.id) }
             ) {
-                ConstraintLayout(
-                    modifier = Modifier.fillMaxWidth()
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    val (
-                        profilePhoto, friendName, onlineStatus, chatWithFriend
-                    ) = createRefs()
                     Card(
                         modifier = Modifier
-                            .padding(8.dp)
-                            .size(24.dp)
-                            .constrainAs(profilePhoto) {
-                                start.linkTo(parent.start)
-                            },
+                            .padding(horizontal = 8.dp)
+                            .size(24.dp),
                         shape = CircleShape,
                     ) {
                         AsyncImage(
@@ -111,63 +103,37 @@ fun UsersListScreen(
                     }
                     Text(
                         modifier = Modifier
-                            .padding(8.dp)
-                            .constrainAs(friendName) {
-                                start.linkTo(profilePhoto.end)
-                                end.linkTo(onlineStatus.start)
-                                width = Dimension.fillToConstraints
-                            },
+                            .padding(horizontal = 8.dp)
+                            .weight(1f),
                         text = item.username,
                         fontSize = 16.sp,
                         maxLines = 1,
                     )
                     when (uiState.value.screenType) {
                         FRIENDSHIPS_REQUESTS -> {
-                            Row(
+                            CustomIconButton(
                                 modifier = Modifier
-                                    .constrainAs(chatWithFriend) {
-                                        top.linkTo(parent.top)
-                                        bottom.linkTo(parent.bottom)
-                                        start.linkTo(friendName.end)
-                                        end.linkTo(parent.end)
-                                        height = Dimension.fillToConstraints
-                                        width = Dimension.fillToConstraints
-                                    },
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceEvenly
-                            ) {
-                                Text(
-                                    modifier = Modifier
-                                        .clickable {
-                                            viewModel.friendshipsAccept(item.id, true)
-                                        },
-                                    text = stringResource(id = R.string.accept_label),
-                                    color = Color(0XFF304f00),
-                                    textAlign = TextAlign.Center,
-                                )
-                                Text(
-                                    modifier = Modifier
-                                        .clickable {
-                                            viewModel.friendshipsAccept(item.id, false)
-                                        },
-                                    text = stringResource(id = R.string.decline),
-                                    color = Color(0xFF93000a),
-                                    textAlign = TextAlign.Center,
-                                )
-                            }
+                                    .padding(horizontal = 8.dp)
+                                    .size(24.dp),
+                                imageId = R.drawable.ic_accept,
+                                color = Color(0xFF1C631F),
+                                onClick = { viewModel.friendshipsAccept(item.id, true) },
+                            )
+                            CustomIconButton(
+                                modifier = Modifier
+                                    .padding(horizontal = 8.dp)
+                                    .size(24.dp),
+                                imageId = R.drawable.ic_declined,
+                                color = Color(0xFFC81F1F),
+                                onClick = { viewModel.friendshipsAccept(item.id, false) },
+                            )
                         }
 
                         else -> {
                             Image(
                                 modifier = Modifier
                                     .size(24.dp)
-                                    .border(2.dp, Color.Gray, CircleShape)
-                                    .constrainAs(onlineStatus) {
-                                        top.linkTo(parent.top)
-                                        bottom.linkTo(parent.bottom)
-                                        start.linkTo(friendName.end)
-                                        end.linkTo(chatWithFriend.start)
-                                    },
+                                    .border(2.dp, Color.Gray, CircleShape),
                                 painter = painterResource(
                                     id =
                                     if (item.onlineStatus) R.drawable.ic_user_online
@@ -181,13 +147,7 @@ fun UsersListScreen(
                                     .padding(horizontal = 8.dp)
                                     .padding(start = 4.dp)
                                     .size(24.dp)
-                                    .clipToBounds()
-                                    .constrainAs(chatWithFriend) {
-                                        top.linkTo(parent.top)
-                                        bottom.linkTo(parent.bottom)
-                                        end.linkTo(parent.end)
-                                        height = Dimension.fillToConstraints
-                                    },
+                                    .clipToBounds(),
                                 onClick = { }
                             ) {
                                 Icon(
