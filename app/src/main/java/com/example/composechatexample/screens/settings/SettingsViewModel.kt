@@ -14,6 +14,7 @@ import com.example.composechatexample.utils.PassUpdateState
 import com.example.composechatexample.utils.ResponseStatus
 import com.example.composechatexample.utils.SettingType
 import com.example.composechatexample.utils.SettingType.CONFIDENTIALITY
+import com.example.composechatexample.utils.SettingType.DELETE_AN_ACCOUNT
 import com.example.composechatexample.utils.SettingType.EDIT_PASSWORD
 import com.example.composechatexample.utils.SettingType.LANG
 import com.example.composechatexample.utils.SettingType.NOTIFICATION
@@ -50,7 +51,7 @@ class SettingsViewModel @Inject constructor(
     val eventsFlow = eventChannel.receiveAsFlow()
 
     val listAppSetting = listOf(LANG, THEME, NOTIFICATION)
-    val listAccSetting = listOf(CONFIDENTIALITY, PERS_DATA, EDIT_PASSWORD)
+    val listAccSetting = listOf(CONFIDENTIALITY, PERS_DATA, EDIT_PASSWORD, DELETE_AN_ACCOUNT)
 
     fun init() {
         with(preferencesManager) {
@@ -104,7 +105,11 @@ class SettingsViewModel @Inject constructor(
             PERS_DATA -> {}
             CONFIDENTIALITY -> {}
             EDIT_PASSWORD -> {
-                showChangePassDialog()
+                showDialog(SettingsDialogs.PASS)
+            }
+
+            DELETE_AN_ACCOUNT -> {
+                showDialog(SettingsDialogs.DELETE_ACCOUNT)
             }
         }
     }
@@ -122,34 +127,22 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun userLogOut() {
-        viewModelScope.launch {
-            onboardingService.logout(preferencesManager.uuid!!)?.let {
-                when (it.status) {
-                    HttpStatusCode.OK.value -> {
-                        preferencesManager.clearData()
-                        sendEvent(
-                            SettingsScreenEvent.NavigateTo(
-                                Constants.ONBOARD_ROUTE
-                            )
-                        )
-                    }
+        preferencesManager.clearData()
+        sendEvent(
+            SettingsScreenEvent.NavigateTo(
+                Constants.ONBOARD_ROUTE
+            )
+        )
+    }
 
-                    HttpStatusCode.NoContent.value -> {
-                        sendEvent(
-                            SettingsScreenEvent.ToastEvent(
-                                ResponseStatus.FAILED.value
-                            )
-                        )
-                    }
-                }
-            } ?: sendEvent(
-                SettingsScreenEvent.ToastEvent(
-                    ResponseStatus.FAILED.value
-                )
-            )
-            _uiState.value = uiState.value.copy(
-                dialogs = null
-            )
+    fun deleteAccount() {
+        viewModelScope.launch {
+            onboardingService.deleteAccount(preferencesManager.uuid!!)?.let{
+                if (it.status == HttpStatusCode.OK.value) {
+                    showDialog()
+                    userLogOut()
+                } else sendEvent(SettingsScreenEvent.ToastEvent(ResponseStatus.FAILED.value))
+            } ?: sendEvent(SettingsScreenEvent.ToastEvent(ResponseStatus.FAILED.value))
         }
     }
 
@@ -168,12 +161,14 @@ class SettingsViewModel @Inject constructor(
         )
     }
 
-    fun showChangePassDialog() {
-        if (uiState.value.dialogs == null) {
-            _uiState.value = uiState.value.copy(
-                dialogs = SettingsDialogs.PASS
-            )
-        } else {
+    fun showDialog(dialog: SettingsDialogs? = null) {
+        dialog?.let {
+            if (uiState.value.dialogs == null || uiState.value.dialogs != dialog) {
+                _uiState.value = uiState.value.copy(
+                    dialogs = it
+                )
+            }
+        } ?: run {
             _uiState.value = uiState.value.copy(
                 dialogs = null,
                 pass = PassState(),
@@ -247,18 +242,6 @@ class SettingsViewModel @Inject constructor(
                 repeatedField = PassUpdateState.FIELD_CORRECTLY,
             )
         )
-    }
-
-    fun showVerificationDialog() {
-        if (uiState.value.dialogs == null) {
-            _uiState.value = uiState.value.copy(
-                dialogs = SettingsDialogs.LOG_OUT
-            )
-        } else {
-            _uiState.value = uiState.value.copy(
-                dialogs = null
-            )
-        }
     }
 
     private fun checkFields() {
@@ -352,7 +335,7 @@ class SettingsViewModel @Inject constructor(
                                         ResponseStatus.SUCCESS.value
                                     )
                                 )
-                                showChangePassDialog()
+                                showDialog()
                             }
 
                             else -> {

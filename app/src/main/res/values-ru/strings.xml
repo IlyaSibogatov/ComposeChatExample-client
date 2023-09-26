@@ -48,10 +48,17 @@
     <string name="count_requests">%1$s запросов</string>
     <string name="count_followers">%1$s подписчиков</string>
 
+    <string name="share_label">Поделиться профилем</string>
+    <string name="edit_profile">Изменить профиль</string>
+
     <!--  Notifications Screen  -->
     <string name="request_friendship">%1$s отправил Вам запрос в друзья</string>
+
     <string name="accepted_friendship">Вы приняли запрос в друзья от %1$s</string>
     <string name="declined_friendship">Вы отклонили запрос в друзья от %1$s</string>
+
+    <string name="user_accepted_friendship">%1$s принял Ваш запрос в друзья</string>
+    <string name="user_declined_friendship">%1$s отклонил Ваш запрос в друзья</string>
 
     <!--  Chat List Screen  -->
     <string name="find_chat">Найти чат</string>
@@ -84,6 +91,7 @@
     <string name="privacy_settings">Конфиденциальность</string>
     <string name="notifications_settings">Уведомления</string>
     <string name="change_password_settings">Изменить пароль</string>
+    <string name="delete_an_account">Удалить аккаунт</string>
     <string name="bug_report_label">Сообщение об ошибке</string>
     <string name="send_report_label">Отправить отчет на почту</string>
     <string name="tech_support_label">Тех.поддержка</string>
@@ -98,7 +106,8 @@
     <string name="new_pass">Новый пароль</string>
     <string name="repeat_new_pass">Повторите новый пароль</string>
 
-    <string name="check_exit">Вы действительно хотите выйти?</string>
+    <string name="exit_warning">Вы действительно хотите выйти?</string>
+    <string name="delete_account_warning">Вы действительно хотите удалить аккаунт?</string>
 
     <!--  Change password dialog  -->
     <string name="empty_field_error">Заполните поле</string>

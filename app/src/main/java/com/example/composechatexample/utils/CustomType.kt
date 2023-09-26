@@ -8,7 +8,7 @@ data class Type<T>(
 )
 
 enum class SettingType {
-    LANG, THEME, NOTIFICATION, PERS_DATA, CONFIDENTIALITY, EDIT_PASSWORD
+    LANG, THEME, NOTIFICATION, PERS_DATA, CONFIDENTIALITY, EDIT_PASSWORD, DELETE_AN_ACCOUNT
 }
 
 enum class TypeLang {
@@ -28,6 +28,11 @@ enum class TypeNotification(val value: Boolean) {
     DISABLE(false)
 }
 
+enum class TypeMenuItem() {
+    SHARE,
+    EDIT,
+}
+
 enum class ChatEvent {
     EDIT, REMOVE
 }
@@ -41,7 +46,8 @@ enum class ProfileDialogs {
 
 enum class SettingsDialogs {
     PASS,
-    LOG_OUT
+    LOG_OUT,
+    DELETE_ACCOUNT,
 }
 
 enum class ScreenState {

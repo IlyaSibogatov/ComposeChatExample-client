@@ -1,6 +1,8 @@
 package com.example.composechatexample.screens.profile
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -34,6 +36,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -60,7 +64,9 @@ import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.example.composechatexample.R
 import com.example.composechatexample.components.CircularLoader
+import com.example.composechatexample.components.CustomIconButton
 import com.example.composechatexample.components.EmptyOrErrorView
+import com.example.composechatexample.components.ShowMenu
 import com.example.composechatexample.screens.dialogs.EditInfoDialog
 import com.example.composechatexample.screens.dialogs.FriendAddRemoveDialog
 import com.example.composechatexample.screens.profile.model.ProfileScreenEvent
@@ -73,6 +79,7 @@ import com.example.composechatexample.utils.Ext.showToast
 import com.example.composechatexample.utils.ProfileDialogs
 import com.example.composechatexample.utils.ResponseStatus
 import com.example.composechatexample.utils.ScreenState
+import com.example.composechatexample.utils.TypeMenuItem
 import kotlinx.coroutines.flow.collectLatest
 
 @SuppressLint("CheckResult")
@@ -102,8 +109,8 @@ fun ProfileScreen(
     ) {
 
         val (
-            photo, username, friendListEt, friendListLc, selfInfoPreview, errorView,
-            editBtn, showMore, selfInfo, addToFriend, userStatus, followerAndRequests
+            photo, username, friendListEt, friendListLc, selfInfoPreview, errorView, shareBtn,
+            profileMenu, showMore, selfInfo, addToFriend, userStatus, followerAndRequests
         ) = createRefs()
 
         when (uiState.value.screenState) {
@@ -166,21 +173,21 @@ fun ProfileScreen(
                         error = painterResource(id = R.drawable.ic_user),
                     )
                 }
-                Image(
-                    modifier = Modifier
-                        .padding(top = 25.dp, end = 25.dp)
-                        .size(16.dp)
-                        .border(2.dp, Color.Gray, CircleShape)
-                        .constrainAs(userStatus) {
-                            top.linkTo(photo.top)
-                            end.linkTo(photo.end)
-                        },
-                    painter = painterResource(
-                        id = if (uiState.value.onlineStatus) R.drawable.ic_user_online
-                        else R.drawable.ic_user_offline
-                    ),
-                    contentDescription = Constants.CONTENT_DESCRIPTION
-                )
+//                Image(
+//                    modifier = Modifier
+//                        .padding(top = 25.dp, end = 25.dp)
+//                        .size(16.dp)
+//                        .border(2.dp, Color.Gray, CircleShape)
+//                        .constrainAs(userStatus) {
+//                            top.linkTo(photo.top)
+//                            end.linkTo(photo.end)
+//                        },
+//                    painter = painterResource(
+//                        id = if (uiState.value.onlineStatus) R.drawable.ic_user_online
+//                        else R.drawable.ic_user_offline
+//                    ),
+//                    contentDescription = Constants.CONTENT_DESCRIPTION
+//                )
                 Text(
                     modifier = Modifier
                         .padding(8.dp)
@@ -464,21 +471,40 @@ fun ProfileScreen(
                     }
                 }
                 if (viewModel.isMyProfile()) {
-                    IconButton(
+                    Row(
                         modifier = Modifier
-                            .constrainAs(editBtn) {
+                            .constrainAs(profileMenu) {
                                 top.linkTo(parent.top)
                                 end.linkTo(parent.end)
                             },
-                        onClick = {
-                            viewModel.showEditDialog()
-                        }
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_edit_data),
-                            contentDescription = Constants.CONTENT_DESCRIPTION
+                        ) {
+                        val expanded = remember { mutableStateOf(false) }
+                        CustomIconButton(
+                            imageId = R.drawable.ic_menu_dots,
+                            onClick = { expanded.value = true }
+                        )
+
+                        ShowMenu(
+                            expanded = expanded,
+                            data = Constants.profileMenu,
+                            onCLick = {
+                                if (it.name == TypeMenuItem.EDIT.name)
+                                    viewModel.showEditDialog()
+                                else {
+                                    shareProfile(viewModel.uiState.value.uid, context)
+                                }
+                            },
                         )
                     }
+                } else {
+                    CustomIconButton(
+                        modifier = Modifier
+                            .constrainAs(shareBtn) {
+                                top.linkTo(parent.top)
+                                end.linkTo(parent.end)
+                            },
+                        imageId = R.drawable.ic_share,
+                        onClick = { shareProfile(viewModel.uiState.value.uid, context) })
                 }
                 if (viewModel.isFriend() || viewModel.isNotInFriendRequest() && !viewModel.isMyProfile()) {
                     IconButton(
@@ -563,4 +589,16 @@ fun ProfileScreen(
             lifeCycleOwner.lifecycle.removeObserver(observer)
         }
     }
+}
+
+fun shareProfile(uuid: String, context: Context) {
+
+    val sendIntent: Intent = Intent().apply {
+        action = Intent.ACTION_SEND
+        putExtra(Intent.EXTRA_TEXT, "http://open_profile/uuid=$uuid")
+        type = "text/plain"
+    }
+
+    val shareIntent = Intent.createChooser(sendIntent, null)
+    context.startActivity(shareIntent)
 }

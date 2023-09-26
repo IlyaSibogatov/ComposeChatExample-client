@@ -9,7 +9,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.composechatexample.R
@@ -31,13 +33,15 @@ fun VerificationDialog(
         modifier = Modifier
             .padding(horizontal = 15.dp),
         properties = DialogProperties(usePlatformDefaultWidth = false),
-        onDismissRequest = { viewModel.showVerificationDialog() },
+        onDismissRequest = { viewModel.showDialog() },
         text = {
             Column() {
                 text?.let {
                     Text(
                         modifier = Modifier,
                         text = it,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                 }
