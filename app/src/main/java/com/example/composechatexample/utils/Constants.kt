@@ -38,6 +38,8 @@ object Constants {
     const val FRIENDSHIPS_REQUESTS = "friendship_requests"
     const val FRIENDS = "friends"
 
+    const val POP_BACK_STACK = "popBackStack"
+
     val listLanguages = listOf(
         LanguageEntity("Русский", "ru"),
         LanguageEntity("English", "en"),
@@ -54,6 +56,11 @@ object Constants {
     val listTypeNotifications = listOf(
         Type(nameType = TypeNotification.ENABLE, str = R.string.enabled_label),
         Type(nameType = TypeNotification.DISABLE, str = R.string.disabled_label)
+    )
+
+    val profileMenu = listOf(
+        Type(nameType = TypeMenuItem.SHARE , str = R.string.share_label),
+        Type(nameType = TypeMenuItem.EDIT , str = R.string.edit_profile)
     )
 
     // Use 10.0.2.2:8080 if emulator is used

@@ -100,18 +100,6 @@ fun MainEntryPoint(
                 ) {
                     screensToShowBottomBar.forEach { screen ->
                         NavigationBarItem(
-//                            label = {
-//                                Text(
-//                                    text = stringResource(id = screen.title),
-//                                    color = if (isCurrentDestination(
-//                                            currentDestination,
-//                                            screen.route
-//                                        )
-//                                    )
-//                                        MaterialTheme.colorScheme.onPrimary
-//                                    else MaterialTheme.colorScheme.surface
-//                                )
-//                            },
                             icon = {
                                 Icon(
                                     painterResource(id = screen.icon),
@@ -120,8 +108,7 @@ fun MainEntryPoint(
                                             currentDestination,
                                             screen.route
                                         )
-                                    )
-                                        MaterialTheme.colorScheme.onPrimaryContainer
+                                    ) MaterialTheme.colorScheme.onPrimaryContainer
                                     else MaterialTheme.colorScheme.surface
                                 )
                             },
@@ -153,6 +140,8 @@ fun MainEntryPoint(
     }
 }
 
-private fun isCurrentDestination(currentDestination: NavDestination?, route: String): Boolean {
+private fun isCurrentDestination(
+    currentDestination: NavDestination?, route: String
+): Boolean {
     return currentDestination?.hierarchy?.any { it.route == route } == true
 }

@@ -68,6 +68,7 @@ import com.example.composechatexample.data.model.UserChatInfo
 import com.example.composechatexample.domain.model.Message
 import com.example.composechatexample.screens.chat.chatdetails.model.ChatScreenEvent
 import com.example.composechatexample.utils.Constants
+import com.example.composechatexample.utils.Constants.POP_BACK_STACK
 import com.example.composechatexample.utils.SendType
 import com.example.composechatexample.utils.Type
 import kotlinx.coroutines.flow.collectLatest
@@ -188,7 +189,12 @@ fun ChatScreen(
     LaunchedEffect(key1 = Unit) {
         viewModel.eventsFlow.collectLatest { value ->
             when (value) {
-                is ChatScreenEvent.NavigateTo -> navController.navigate(value.route)
+                is ChatScreenEvent.NavigateTo -> {
+                    when (value.route) {
+                        POP_BACK_STACK -> navController.popBackStack()
+                        else -> navController.navigate(value.route)
+                    }
+                }
                 is ChatScreenEvent.ToastEvent -> {
                     Toast.makeText(context, value.msg, Toast.LENGTH_SHORT).show()
                 }

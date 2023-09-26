@@ -8,6 +8,7 @@ import com.example.composechatexample.screens.profile.userlist.model.FriendListU
 import com.example.composechatexample.screens.profile.userlist.model.UsersListEvent
 import com.example.composechatexample.utils.Constants
 import com.example.composechatexample.utils.Constants.FRIENDS
+import com.example.composechatexample.utils.Constants.POP_BACK_STACK
 import com.example.composechatexample.utils.ResponseStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -61,7 +62,7 @@ class UsersListViewModel @Inject constructor(
                     loadingStatus = false
                 )
                 if (uiState.value.usersList.isEmpty()) {
-                    sendEvent(UsersListEvent.NavigateTo("popBackStack"))
+                    sendEvent(UsersListEvent.NavigateTo(POP_BACK_STACK))
                 }
             } ?: sendEvent(UsersListEvent.ToastEvent(ResponseStatus.ERROR.value))
         }

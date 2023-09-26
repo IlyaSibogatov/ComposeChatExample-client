@@ -9,6 +9,7 @@ import com.example.composechatexample.domain.model.Message
 import com.example.composechatexample.screens.chat.chatdetails.model.ChatScreenEvent
 import com.example.composechatexample.screens.chat.chatdetails.model.ChatUIState
 import com.example.composechatexample.utils.Constants
+import com.example.composechatexample.utils.Constants.POP_BACK_STACK
 import com.example.composechatexample.utils.Resources
 import com.example.composechatexample.utils.SendType
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -37,6 +38,10 @@ class ChatViewModel @Inject constructor(
         _uiState.value = uiState.value.copy(
             chatId = id.replace("chat_id", "")
         )
+    }
+
+    fun checkChatExist() {
+
     }
 
     fun connectToChat() {
@@ -106,7 +111,7 @@ class ChatViewModel @Inject constructor(
                 }
 
                 is Resources.Error -> {
-                    sendEvent(ChatScreenEvent.ToastEvent(result.message ?: "Unknown error"))
+                    sendEvent(ChatScreenEvent.NavigateTo(POP_BACK_STACK))
                 }
             }
             _uiState.value = uiState.value.copy(

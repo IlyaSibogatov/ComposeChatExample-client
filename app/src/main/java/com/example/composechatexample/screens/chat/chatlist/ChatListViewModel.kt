@@ -46,7 +46,20 @@ class ChatListViewModel @Inject constructor(
         println("TOKEN LENGTH ---> ${preferencesManager.tokenFcm!!.length}")
     }
 
-    fun updateToken() {
+    fun checkSelfState() {
+        viewModelScope.launch {
+            userService.getUserById(preferencesManager.uuid!!)?.let {
+                updateToken()
+                loadChatList()
+            } ?: run {
+                _uiState.value = uiState.value.copy(
+                    screenState = ScreenState.ERROR
+                )
+            }
+        }
+    }
+
+    private fun updateToken() {
         with(preferencesManager) {
             viewModelScope.launch {
                 userService.updateToken(uuid!!, tokenFcm!!, deviceId!!, deviceType!!)
@@ -54,19 +67,19 @@ class ChatListViewModel @Inject constructor(
         }
     }
 
-    fun loadChatList() {
+    private fun loadChatList() {
         _uiState.value = uiState.value.copy(
             screenState = ScreenState.INIT
         )
         viewModelScope.launch {
             val result = messageService.getAllChats()?.toMutableList()
-            if (result != null) {
+            result?.let {
                 _uiState.value = uiState.value.copy(
                     chats = result,
                     newChats = result,
                     screenState = if (result.isNotEmpty()) ScreenState.SUCCESS else ScreenState.EMPTY_DATA
                 )
-            } else {
+            } ?: run {
                 _uiState.value = uiState.value.copy(
                     chats = mutableListOf(),
                     newChats = mutableListOf(),

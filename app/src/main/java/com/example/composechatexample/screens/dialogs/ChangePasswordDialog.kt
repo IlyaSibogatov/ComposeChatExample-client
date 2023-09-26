@@ -155,11 +155,11 @@ fun ChangePasswordDialog() {
                 )
             }
         },
-        onDismissRequest = viewModel::showChangePassDialog,
+        onDismissRequest = { viewModel.showDialog() },
         dismissButton = {
             ActionButton(
                 text = stringResource(id = R.string.cancel_label),
-                onClick = viewModel::showChangePassDialog
+                onClick = { viewModel.showDialog() }
             )
         },
         confirmButton = {
