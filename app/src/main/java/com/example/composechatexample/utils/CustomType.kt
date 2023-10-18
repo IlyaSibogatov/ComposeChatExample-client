@@ -57,6 +57,11 @@ enum class ScreenState {
     EMPTY_DATA,
 }
 
+enum class ChatActionType {
+    CREATE,
+    UPDATE
+}
+
 enum class ResponseStatus(val value: String) {
     SUCCESS("success"),
     FAILED("failed"),

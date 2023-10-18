@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -58,8 +58,6 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import androidx.navigation.NavDeepLink
-import androidx.navigation.NavDeepLinkBuilder
 import androidx.navigation.NavHostController
 import com.example.composechatexample.R
 import com.example.composechatexample.components.CircularLoader
@@ -151,7 +149,8 @@ fun ChatListScreen(
                             height = Dimension.fillToConstraints
                         },
                 ) {
-                    items(uiState.value.newChats) { item ->
+                    itemsIndexed(uiState.value.newChats) { index, item ->
+                        if (index == uiState.value.chats.size - 3) viewModel.loadChatList()
                         val expandedMenu = remember { mutableStateOf(false) }
                         ItemChat(
                             data = item,
@@ -273,8 +272,9 @@ fun ChatListScreen(
     val lifeCycleOwner = LocalLifecycleOwner.current
     DisposableEffect(key1 = lifeCycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_START) {
-                viewModel.checkSelfState()
+            when (event) {
+                Lifecycle.Event.ON_CREATE -> viewModel.checkSelfState()
+                else -> println(event.name)
             }
         }
         lifeCycleOwner.lifecycle.addObserver(observer)

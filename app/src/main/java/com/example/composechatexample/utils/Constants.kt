@@ -40,6 +40,12 @@ object Constants {
 
     const val POP_BACK_STACK = "popBackStack"
 
+    const val SUCCESS_TAG = "\uD83D\uDFE2\n"
+    const val FAILED_TAG = "\uD83D\uDD34\n"
+
+    const val ELEMENT_LIMIT = 6
+    const val ENDLESS_LIST_INIT_PAGE = 1
+
     val listLanguages = listOf(
         LanguageEntity("Русский", "ru"),
         LanguageEntity("English", "en"),
