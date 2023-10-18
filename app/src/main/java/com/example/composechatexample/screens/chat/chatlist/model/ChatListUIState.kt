@@ -9,7 +9,7 @@ data class ChatListUIState(
     val roomPassword: String = "",
     val searchQuery: String = "",
     var username: String = "",
-    val chats: MutableList<Chat> = mutableListOf(),
+    val chats: List<Chat> = listOf(),
     val newChats: List<Chat> = listOf(),
     var chatInfo: Chat? = null,
     val dialogs: DisplayDialog = DisplayDialog(),

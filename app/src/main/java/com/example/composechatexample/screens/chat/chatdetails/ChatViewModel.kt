@@ -40,10 +40,6 @@ class ChatViewModel @Inject constructor(
         )
     }
 
-    fun checkChatExist() {
-
-    }
-
     fun connectToChat() {
         _uiState.value = uiState.value.copy(
             username = preferencesManager.userName,
@@ -52,7 +48,7 @@ class ChatViewModel @Inject constructor(
             _uiState.value = uiState.value.copy(
                 isLoading = true,
             )
-            when (val result =
+            when (
                 socketService.initSession(
                     preferencesManager.userName,
                     preferencesManager.uuid!!,

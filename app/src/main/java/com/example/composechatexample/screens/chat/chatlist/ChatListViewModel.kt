@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.composechatexample.data.preferences.PreferencesManager
 import com.example.composechatexample.data.remote.MessageService
 import com.example.composechatexample.data.remote.UserService
-import com.example.composechatexample.data.response.DefaultResponse
 import com.example.composechatexample.domain.model.Chat
 import com.example.composechatexample.domain.model.NewChat
 import com.example.composechatexample.screens.chat.chatlist.model.ChatListErrors
@@ -13,11 +12,13 @@ import com.example.composechatexample.screens.chat.chatlist.model.ChatListScreen
 import com.example.composechatexample.screens.chat.chatlist.model.ChatListUIState
 import com.example.composechatexample.screens.chat.chatlist.model.CreatedChat
 import com.example.composechatexample.screens.chat.chatlist.model.DisplayDialog
+import com.example.composechatexample.utils.ChatActionType
 import com.example.composechatexample.utils.Constants
+import com.example.composechatexample.utils.Constants.ELEMENT_LIMIT
+import com.example.composechatexample.utils.Constants.ENDLESS_LIST_INIT_PAGE
 import com.example.composechatexample.utils.ResponseStatus
 import com.example.composechatexample.utils.ScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,23 +33,34 @@ class ChatListViewModel @Inject constructor(
     private val userService: UserService,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(ChatListUIState())
+    private var _uiState = MutableStateFlow(ChatListUIState())
     val uiState: StateFlow<ChatListUIState> = _uiState
 
     private val eventChannel = Channel<ChatListScreenEvent>(Channel.BUFFERED)
     val eventsFlow = eventChannel.receiveAsFlow()
+
+    private var pageCount = ENDLESS_LIST_INIT_PAGE
+    private var onLoad = false
 
     init {
         _uiState.value = uiState.value.copy(
             userLogged = preferencesManager.userLogged,
             username = preferencesManager.userName
         )
-        println("TOKEN LENGTH ---> ${preferencesManager.tokenFcm!!.length}")
     }
 
     fun checkSelfState() {
+        pageCount = ENDLESS_LIST_INIT_PAGE
+        _uiState.value = ChatListUIState()
         viewModelScope.launch {
+            _uiState.value = uiState.value.copy(
+                screenState = ScreenState.INIT
+            )
+            _uiState.value = uiState.value.copy()
             userService.getUserById(preferencesManager.uuid!!)?.let {
+                _uiState.value = uiState.value.copy(
+                    username = it.username
+                )
                 updateToken()
                 loadChatList()
             } ?: run {
@@ -67,24 +79,29 @@ class ChatListViewModel @Inject constructor(
         }
     }
 
-    private fun loadChatList() {
-        _uiState.value = uiState.value.copy(
-            screenState = ScreenState.INIT
-        )
-        viewModelScope.launch {
-            val result = messageService.getAllChats()?.toMutableList()
-            result?.let {
-                _uiState.value = uiState.value.copy(
-                    chats = result,
-                    newChats = result,
-                    screenState = if (result.isNotEmpty()) ScreenState.SUCCESS else ScreenState.EMPTY_DATA
-                )
-            } ?: run {
-                _uiState.value = uiState.value.copy(
-                    chats = mutableListOf(),
-                    newChats = mutableListOf(),
-                    screenState = ScreenState.ERROR
-                )
+    fun loadChatList() {
+        if (!onLoad) {
+            viewModelScope.launch {
+                onLoad = true
+                val result = messageService.getAllChats(pageCount, ELEMENT_LIMIT)
+                val chats = uiState.value.chats.toMutableList()
+                result?.let {
+                    chats.addAll(result)
+                    _uiState.value = uiState.value.copy(
+                        chats = chats,
+                        newChats = chats,
+                        screenState = if (result.isEmpty() && pageCount == ENDLESS_LIST_INIT_PAGE)
+                            ScreenState.EMPTY_DATA else ScreenState.SUCCESS
+                    )
+                    if (result.isNotEmpty()) pageCount++
+                } ?: run {
+                    _uiState.value = uiState.value.copy(
+                        chats = mutableListOf(),
+                        newChats = mutableListOf(),
+                        screenState = ScreenState.ERROR
+                    )
+                }
+                onLoad = false
             }
         }
     }
@@ -106,15 +123,24 @@ class ChatListViewModel @Inject constructor(
     }
 
     fun deleteChat() {
-        uiState.value.chatInfo?.id?.let {
+        uiState.value.chatInfo?.let { chat ->
             viewModelScope.launch {
-                messageService.deleteChat(it).let {
-                    when (it) {
+                messageService.deleteChat(chat.id).let { response ->
+                    when (response) {
                         true -> {
-                            loadChatList()
+                            val chats = _uiState.value.chats.toMutableList()
+                            chats.remove(chat)
+                            _uiState.value = uiState.value.copy(
+                                chats = chats,
+                                newChats = chats
+                            )
+                            if (chats.isEmpty())
+                                _uiState.value = uiState.value.copy(
+                                    screenState = ScreenState.EMPTY_DATA
+                                )
                         }
 
-                        false -> {
+                        else -> {
                             sendEvent(ChatListScreenEvent.ToastEvent(ResponseStatus.ERROR.value))
                         }
                     }
@@ -272,46 +298,62 @@ class ChatListViewModel @Inject constructor(
         } else {
             viewModelScope.launch {
                 if (uiState.value.updateChat) {
-                    messageService.updateChat(
-                        NewChat(
-                            name = uiState.value.createdChat.chatName,
-                            password = if (
-                                uiState.value.createdChat.passEnable
-                            ) uiState.value.createdChat.chatPass
-                            else "",
-                            owner = uiState.value.username,
-                            ownerId = preferencesManager.uuid!!,
-                        )
-                    )?.let {
-                        createOrEditSuccess(it)
+                    val chat = NewChat(
+                        name = uiState.value.createdChat.chatName,
+                        password = if (
+                            uiState.value.createdChat.passEnable
+                        ) uiState.value.createdChat.chatPass
+                        else "",
+                        owner = uiState.value.username,
+                        ownerId = preferencesManager.uuid!!,
+                    )
+                    messageService.updateChat(chat)?.let {
+                        createOrEditSuccess(it, ChatActionType.UPDATE)
                     } ?: sendEvent(ChatListScreenEvent.ToastEvent(ResponseStatus.ERROR.value))
                 } else {
-                    messageService.createChat(
-                        NewChat(
-                            name = uiState.value.createdChat.chatName,
-                            password = if (
-                                uiState.value.createdChat.passEnable
-                            ) uiState.value.createdChat.chatPass
-                            else "",
-                            owner = uiState.value.username,
-                            ownerId = preferencesManager.uuid!!,
-                        )
-                    )?.let {
-                        createOrEditSuccess(it)
+                    val chat = NewChat(
+                        name = uiState.value.createdChat.chatName,
+                        password = if (
+                            uiState.value.createdChat.passEnable
+                        ) uiState.value.createdChat.chatPass
+                        else "",
+                        owner = uiState.value.username,
+                        ownerId = preferencesManager.uuid!!,
+                    )
+                    messageService.createChat(chat)?.let {
+                        createOrEditSuccess(it, ChatActionType.CREATE)
                     } ?: sendEvent(ChatListScreenEvent.ToastEvent(ResponseStatus.ERROR.value))
                 }
             }
         }
     }
 
-    private fun createOrEditSuccess(response: DefaultResponse) {
-        when (response.status) {
-            HttpStatusCode.OK.value -> {
-                showCreateDialog()
-                loadChatList()
+    private fun createOrEditSuccess(
+        response: Chat?,
+        actionType: ChatActionType
+    ) {
+        response?.let { chat ->
+            showCreateDialog()
+            val chats = _uiState.value.chats.toMutableList()
+            when (actionType) {
+                ChatActionType.CREATE -> {
+                    chats.add(chat)
+                    if (uiState.value.screenState == ScreenState.EMPTY_DATA)
+                        _uiState.value = uiState.value.copy(
+                            screenState = ScreenState.SUCCESS
+                        )
+                }
+
+                else -> {
+                    val prevChat = chats.find { it.id == chat.id }
+                    chats[chats.indexOf(prevChat)] = chat
+                }
             }
-        }
-        sendEvent(ChatListScreenEvent.ToastEvent(response.msg))
+            _uiState.value = uiState.value.copy(
+                chats = chats,
+                newChats = chats
+            )
+        } ?: sendEvent(ChatListScreenEvent.ToastEvent(ResponseStatus.ERROR.value))
     }
 
     fun updateSearchQuery(search: String) {

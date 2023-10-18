@@ -38,7 +38,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.BottomEnd
 import androidx.compose.ui.Alignment.Companion.BottomStart
@@ -138,7 +137,7 @@ fun ChatScreen(
                 verticalArrangement = Arrangement.Bottom,
                 horizontalAlignment = Alignment.End
             ) {
-                items(uiState.value.messages.toMutableStateList()) { item ->
+                items(uiState.value.messages) { item ->
                     if (item.myMessage) {
                         val expandedMenu = remember { mutableStateOf(false) }
                         MyMessage(
