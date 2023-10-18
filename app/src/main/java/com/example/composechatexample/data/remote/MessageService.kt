@@ -1,7 +1,6 @@
 package com.example.composechatexample.data.remote
 
 import com.example.composechatexample.data.model.UserChatInfo
-import com.example.composechatexample.data.response.DefaultResponse
 import com.example.composechatexample.domain.model.Chat
 import com.example.composechatexample.domain.model.Message
 import com.example.composechatexample.domain.model.NewChat
@@ -12,11 +11,11 @@ interface MessageService {
 
     suspend fun getFollowers(chatId: String): List<UserChatInfo>
 
-    suspend fun getAllChats(): List<Chat>?
+    suspend fun getAllChats(page: Int, limit: Int): List<Chat>?
 
-    suspend fun createChat(chat: NewChat): DefaultResponse?
+    suspend fun createChat(chat: NewChat): Chat?
 
-    suspend fun updateChat(chat: NewChat): DefaultResponse?
+    suspend fun updateChat(chat: NewChat): Chat?
 
     suspend fun deleteChat(chatId: String): Boolean
 
