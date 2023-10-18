@@ -11,7 +11,7 @@ The project used:
 - Jetpack Compose
 - Hilt
 - Coroutines/Flow
-- Event providers
+- Event providers (Channels)
 - Shared Preferences
 
   Also used mongoDB and ktor server side
