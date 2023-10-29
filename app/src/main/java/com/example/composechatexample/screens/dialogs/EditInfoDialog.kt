@@ -25,6 +25,7 @@ import com.example.composechatexample.R
 import com.example.composechatexample.components.ActionButton
 import com.example.composechatexample.screens.profile.ProfileViewModel
 import com.example.composechatexample.utils.Constants
+import com.example.composechatexample.utils.Constants.EMPTY_VALUE
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
@@ -60,7 +61,7 @@ fun EditInfoDialog() {
                         IconButton(
                             onClick = {
                                 if (uiState.value.newInfo.username.isNotBlank())
-                                    viewModel.updateNameValue("")
+                                    viewModel.updateNameValue(EMPTY_VALUE)
                             }
                         ) {
                             Icon(
@@ -106,7 +107,7 @@ fun EditInfoDialog() {
                         IconButton(
                             onClick = {
                                 if (uiState.value.newInfo.selfInfo.isNotBlank())
-                                    viewModel.updateInfoValue("")
+                                    viewModel.updateInfoValue(EMPTY_VALUE)
                             }
                         ) {
                             Icon(

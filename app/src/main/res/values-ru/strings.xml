@@ -50,6 +50,14 @@
 
     <string name="share_label">Поделиться профилем</string>
     <string name="edit_profile">Изменить профиль</string>
+    <string name="upload_image">Загрузить фото</string>
+    <string name="upload_video">Загрузить видео</string>
+
+    <!-- Upload Screen -->
+    <string name="upload_video_name">Название видео</string>
+    <string name="upload_description">Описание</string>
+    <string name="upload_name_count">%1$s/50</string>
+    <string name="upload_description_count">%1$s/100</string>
 
     <!--  Notifications Screen  -->
     <string name="request_friendship">%1$s отправил Вам запрос в друзья</string>
@@ -139,9 +147,11 @@
     <string name="cancel_label">Отменить</string>
     <string name="enabled_label">Включено</string>
     <string name="disabled_label">Выключено</string>
+    <string name="ready_label">Готово</string>
 
     <!-- Other -->
     <string name="notifications">уведомлений</string>
     <string name="chats">чатов</string>
+    <string name="empty_label">пуст</string>
 
 </resources>

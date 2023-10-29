@@ -34,8 +34,6 @@ interface UserService {
 
     suspend fun updateUserInfo(newInfo: NewUserInfo): Boolean
 
-    suspend fun setAvatar(userId: String, img: ByteArray): DefaultResponse?
-
     sealed class EndPoint(val url: String) {
         object GetUserById : EndPoint("${Constants.BASE_URL}/get_user")
         object UpdateUser : EndPoint("${Constants.BASE_URL}/update_user")
@@ -44,7 +42,6 @@ interface UserService {
         object FriendshipAction : EndPoint("${Constants.BASE_URL}/friendship")
 
         object RemoveFriend : EndPoint("${Constants.BASE_URL}/remove_friend")
-        object UploadAvatar : EndPoint("${Constants.BASE_URL}/upload_avatar")
 
         object UpdateToken : EndPoint("${Constants.BASE_URL}/update_token")
 
