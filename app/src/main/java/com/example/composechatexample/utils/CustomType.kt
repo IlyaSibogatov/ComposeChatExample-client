@@ -31,6 +31,19 @@ enum class TypeNotification(val value: Boolean) {
 enum class TypeMenuItem() {
     SHARE,
     EDIT,
+    UPLOAD_IMAGE,
+    UPLOAD_VIDEO
+}
+
+enum class UploadType {
+    IMAGE,
+    VIDEO
+}
+
+enum class UploadState {
+    ON_LOAD,
+    NOT_READY_FOR_UPLOAD,
+    READY_FOR_UPLOAD,
 }
 
 enum class ChatEvent {

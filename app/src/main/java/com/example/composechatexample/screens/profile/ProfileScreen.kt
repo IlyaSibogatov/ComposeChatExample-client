@@ -74,13 +74,17 @@ import com.example.composechatexample.utils.Constants
 import com.example.composechatexample.utils.Constants.FOLLOWERS
 import com.example.composechatexample.utils.Constants.FRIENDS
 import com.example.composechatexample.utils.Constants.FRIENDSHIPS_REQUESTS
-import com.example.composechatexample.utils.Ext.getCompressedFile
+import com.example.composechatexample.utils.Ext
 import com.example.composechatexample.utils.Ext.showToast
 import com.example.composechatexample.utils.ProfileDialogs
 import com.example.composechatexample.utils.ResponseStatus
 import com.example.composechatexample.utils.ScreenState
 import com.example.composechatexample.utils.TypeMenuItem
+import com.example.composechatexample.utils.UploadType
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @SuppressLint("CheckResult")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -93,12 +97,14 @@ fun ProfileScreen(
     val viewModel: ProfileViewModel = hiltViewModel()
     val uiState = viewModel.uiState.collectAsState()
 
-    val launcher = rememberLauncherForActivityResult(
+    val imagePicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let {
-            viewModel.updateImage(it)
-            viewModel.setAvatar(getCompressedFile(it, context))
+            CoroutineScope(Dispatchers.IO).launch {
+                viewModel.updateImage(it)
+                viewModel.sendAvatar(Ext.getCompressedImage(it, context))
+            }
         }
     }
 
@@ -109,7 +115,7 @@ fun ProfileScreen(
     ) {
 
         val (
-            photo, username, friendListEt, friendListLc, selfInfoPreview, errorView, shareBtn,
+            photo, username, friendListLc, selfInfoPreview, errorView, shareBtn,
             profileMenu, showMore, selfInfo, addToFriend, userStatus, followerAndRequests
         ) = createRefs()
 
@@ -154,13 +160,13 @@ fun ProfileScreen(
                             .fillMaxSize()
                             .clickable {
                                 if (viewModel.isMyProfile())
-                                    launcher.launch("image/*")
+                                    imagePicker.launch("image/*")
                             },
                         model = ImageRequest.Builder(LocalContext.current)
                             .data(
                                 if (uiState.value.updateImage)
                                     uiState.value.imageUri
-                                else Constants.BASE_URL + "/images/" + uiState.value.uid + ".jpeg"
+                                else Constants.BASE_URL + "/uploads/upload_photos/${uiState.value.uid}/${uiState.value.avatarId}.jpeg"
                             )
                             .networkCachePolicy(CachePolicy.READ_ONLY)
                             .diskCachePolicy(CachePolicy.DISABLED)
@@ -258,24 +264,6 @@ fun ProfileScreen(
                 }
                 Row(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 8.dp)
-                        .constrainAs(friendListEt) {
-                            start.linkTo(parent.start)
-                            top.linkTo(followerAndRequests.bottom)
-                        },
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.friend_list),
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center,
-                    )
-                }
-                Row(
-                    modifier = Modifier
                         .constrainAs(followerAndRequests) {
                             start.linkTo(parent.start)
                             end.linkTo(parent.end)
@@ -340,20 +328,39 @@ fun ProfileScreen(
                     modifier = Modifier
                         .padding(bottom = 8.dp)
                         .constrainAs(friendListLc) {
-                            top.linkTo(friendListEt.bottom)
+                            top.linkTo(followerAndRequests.bottom)
                             start.linkTo(parent.start)
                             end.linkTo(parent.end)
                             bottom.linkTo(parent.bottom)
                             height = Dimension.fillToConstraints
                         }
                 ) {
+                    item {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 8.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = stringResource(id = R.string.friend_list) +
+                                        if (uiState.value.friends.isEmpty()) {
+                                            " " +
+                                                    stringResource(id = R.string.empty_label)
+                                        } else "",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                textAlign = TextAlign.Center,
+                            )
+                        }
+                    }
                     items(uiState.value.friends.take(5)) { item ->
                         Card(
                             modifier = Modifier
                                 .padding(bottom = 1.dp),
                             colors = CardDefaults.cardColors(
-                                containerColor =
-                                MaterialTheme.colorScheme.primaryContainer
+                                containerColor = MaterialTheme.colorScheme.primaryContainer
                             ),
                             onClick = {
                                 viewModel.openProfile(item.id)
@@ -443,30 +450,28 @@ fun ProfileScreen(
                             }
                         }
                     }
-                    item {
-                        Card(
-                            modifier = Modifier
-                                .padding(bottom = 5.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.primaryContainer
-                            ),
-                            onClick = {
-                                if (uiState.value.friends.isNotEmpty()) viewModel.openUsersList(
-                                    FRIENDS
-                                )
-                            },
-                            elevation = CardDefaults.cardElevation(3.dp),
-                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground)
-                        ) {
-                            Text(
+                    if (uiState.value.friends.isNotEmpty() && uiState.value.friends.size > 5) {
+                        item {
+                            Card(
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(8.dp),
-                                text = stringResource(id = R.string.view_friends),
-                                textAlign = TextAlign.Center,
-                                fontSize = 16.sp,
-                                maxLines = 1,
-                            )
+                                    .padding(bottom = 5.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                                ),
+                                onClick = { viewModel.openUsersList(FRIENDS) },
+                                elevation = CardDefaults.cardElevation(3.dp),
+                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground)
+                            ) {
+                                Text(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(8.dp),
+                                    text = stringResource(id = R.string.view_friends),
+                                    textAlign = TextAlign.Center,
+                                    fontSize = 16.sp,
+                                    maxLines = 1,
+                                )
+                            }
                         }
                     }
                 }
@@ -477,7 +482,7 @@ fun ProfileScreen(
                                 top.linkTo(parent.top)
                                 end.linkTo(parent.end)
                             },
-                        ) {
+                    ) {
                         val expanded = remember { mutableStateOf(false) }
                         CustomIconButton(
                             imageId = R.drawable.ic_menu_dots,
@@ -488,10 +493,24 @@ fun ProfileScreen(
                             expanded = expanded,
                             data = Constants.profileMenu,
                             onCLick = {
-                                if (it.name == TypeMenuItem.EDIT.name)
-                                    viewModel.showEditDialog()
-                                else {
-                                    shareProfile(viewModel.uiState.value.uid, context)
+                                when (it.name) {
+                                    TypeMenuItem.EDIT.name -> viewModel.showEditDialog()
+                                    TypeMenuItem.SHARE.name -> shareProfile(
+                                        viewModel.uiState.value.uid,
+                                        context
+                                    )
+
+                                    TypeMenuItem.UPLOAD_IMAGE.name -> {
+                                        navController.navigate(
+                                            Constants.UPLOAD_ROUTE + "/${UploadType.IMAGE.name}"
+                                        )
+                                    }
+
+                                    TypeMenuItem.UPLOAD_VIDEO.name -> {
+                                        navController.navigate(
+                                            Constants.UPLOAD_ROUTE + "/${UploadType.VIDEO.name}"
+                                        )
+                                    }
                                 }
                             },
                         )

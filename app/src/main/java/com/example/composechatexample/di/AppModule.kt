@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.example.composechatexample.data.remote.ChatSocketService
 import com.example.composechatexample.data.remote.ChatSocketServiceImpl
+import com.example.composechatexample.data.remote.MediaService
+import com.example.composechatexample.data.remote.MediaServiceImpl
 import com.example.composechatexample.data.remote.MessageService
 import com.example.composechatexample.data.remote.MessageServiceImpl
 import com.example.composechatexample.data.remote.OnboardingService
@@ -79,5 +81,11 @@ object AppModule {
     @Singleton
     fun provideUserService(client: HttpClient): UserService {
         return UserServiceImpl(client)
+    }
+
+    @Provides
+    @Singleton
+    fun provideMediaService(client: HttpClient): MediaService {
+        return MediaServiceImpl(client)
     }
 }

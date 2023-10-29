@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.composechatexample.data.preferences.PreferencesManager
 import com.example.composechatexample.data.remote.UserService
-import com.example.composechatexample.screens.profile.userlist.model.FriendListUIState
+import com.example.composechatexample.screens.profile.model.FriendListUIState
 import com.example.composechatexample.screens.profile.userlist.model.UsersListEvent
 import com.example.composechatexample.utils.Constants
 import com.example.composechatexample.utils.Constants.FRIENDS
