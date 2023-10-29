@@ -49,6 +49,14 @@
 
     <string name="share_label">Share profile</string>
     <string name="edit_profile">Edit profile</string>
+    <string name="upload_image">Upload image</string>
+    <string name="upload_video">Upload video</string>
+
+    <!-- Upload Screen -->
+    <string name="upload_video_name">Video name</string>
+    <string name="upload_description">Description</string>
+    <string name="upload_name_count">%1$s/50</string>
+    <string name="upload_description_count">%1$s/100</string>
 
     <!--  Notifications Screen  -->
     <string name="request_friendship">%1$s sent you a friend request</string>
@@ -140,9 +148,11 @@
     <string name="cancel_label">Cancel</string>
     <string name="enabled_label">Enabled</string>
     <string name="disabled_label">Disabled</string>
+    <string name="ready_label">Ready</string>
 
     <!-- Other -->
     <string name="notifications">notifications</string>
     <string name="chats">chats</string>
+    <string name="empty_label">is empty</string>
 
 </resources>

@@ -4,13 +4,15 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.composechatexample.data.model.FriendShipRequest
+import com.example.composechatexample.data.model.PhotoSource
 import com.example.composechatexample.data.model.UserFromId
 import com.example.composechatexample.data.preferences.PreferencesManager
+import com.example.composechatexample.data.remote.MediaService
 import com.example.composechatexample.data.remote.UserService
 import com.example.composechatexample.domain.model.NewUserInfo
+import com.example.composechatexample.screens.profile.model.ProfileErrors
 import com.example.composechatexample.screens.profile.model.ProfileScreenEvent
-import com.example.composechatexample.screens.profile.userlist.model.ProfileErrors
-import com.example.composechatexample.screens.profile.userlist.model.ProfileUIState
+import com.example.composechatexample.screens.profile.model.ProfileUIState
 import com.example.composechatexample.utils.Constants
 import com.example.composechatexample.utils.ProfileDialogs
 import com.example.composechatexample.utils.ResponseStatus
@@ -28,6 +30,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val userService: UserService,
+    private val mediaService: MediaService,
     private val preferencesManager: PreferencesManager,
     private val validator: Validator
 ) : ViewModel() {
@@ -51,6 +54,7 @@ class ProfileViewModel @Inject constructor(
             if (response != null) {
                 _uiState.value = uiState.value.copy(
                     uid = response.id,
+                    avatarId = response.avatarId,
                     username = response.username,
                     selfInfo = response.selfInfo,
                     onlineStatus = response.onlineStatus,
@@ -196,9 +200,9 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    fun setAvatar(img: ByteArray) {
+    fun sendAvatar(img: ByteArray) {
         viewModelScope.launch {
-            userService.setAvatar(uiState.value.uid, img)?.let {
+            mediaService.sendPhoto(uiState.value.uid, PhotoSource(image = img), true)?.let {
                 _uiState.value = uiState.value.copy(
                     updateImage = it.status == HttpStatusCode.OK.value
                 )

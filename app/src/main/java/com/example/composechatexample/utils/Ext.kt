@@ -4,13 +4,14 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.media.ExifInterface
+import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import android.widget.Toast
+import com.example.composechatexample.data.model.VideoSource
 import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.InputStream
 import java.util.Locale
 
 object Ext {
@@ -32,15 +33,44 @@ object Ext {
         return resources.configuration.locale.language
     }
 
-    fun getCompressedFile(uri: Uri, context: Context): ByteArray {
-        val inputStream: InputStream = context.contentResolver.openInputStream(uri)!!
+    fun getVideoStream(context: Context, uri: Uri): VideoSource {
+        val inputStream = context.contentResolver.openInputStream(uri)
+        val baos = ByteArrayOutputStream()
+        val file = createTempFile()
+
+        inputStream.use { input ->
+            file.outputStream().use { output ->
+                input?.copyTo(output)
+            }
+        }
+        inputStream?.close()
+
+        val mMMR = MediaMetadataRetriever()
+        mMMR.setDataSource(context, uri)
+        mMMR.frameAtTime?.compress(Bitmap.CompressFormat.JPEG, 25, baos)
+
+        val videoItem = VideoSource(
+            name = "",
+            description = "",
+            video = file.readBytes(),
+            image = baos.toByteArray()
+        )
+
+        file.delete()
+        mMMR.release()
+        baos.reset()
+        return videoItem
+    }
+
+    fun getCompressedImage(uri: Uri, context: Context): ByteArray {
+        val inputStream = context.contentResolver.openInputStream(uri)
         val file = createTempFile()
         inputStream.use { input ->
             file.outputStream().use { output ->
-                input.copyTo(output)
+                input?.copyTo(output)
             }
         }
-        inputStream.close()
+        inputStream?.close()
         val baos = ByteArrayOutputStream()
         val image = MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
