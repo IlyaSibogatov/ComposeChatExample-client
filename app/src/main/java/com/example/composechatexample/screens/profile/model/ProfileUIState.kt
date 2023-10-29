@@ -1,4 +1,4 @@
-package com.example.composechatexample.screens.profile.userlist.model
+package com.example.composechatexample.screens.profile.model
 
 import android.net.Uri
 import com.example.composechatexample.data.model.FriendShipRequest
@@ -9,6 +9,7 @@ import com.example.composechatexample.utils.ScreenState
 
 data class ProfileUIState(
     val uid: String = "",
+    val avatarId: String = "",
     val imageUri: Uri? = null,
     val username: String = "",
     val selfInfo: String = "",

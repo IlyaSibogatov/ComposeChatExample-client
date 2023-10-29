@@ -31,6 +31,7 @@ data class UserDTO(
 @Serializable
 data class UserFromId(
     val id: String,
+    val avatarId: String,
     val username: String,
     val avatar: String? = null,
     val selfInfo: String,
@@ -38,6 +39,8 @@ data class UserFromId(
     var lastActionTime: Long,
     val friends: List<Friend>,
     val followers: List<String>,
+    val listPhotos: List<PhotoItem>,
+    val listVideos: List<VideoItem>,
     val friendshipRequests: List<FriendShipRequest>,
 )
 

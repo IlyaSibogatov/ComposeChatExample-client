@@ -10,6 +10,9 @@ object Constants {
     const val PROFILE_ROUTE = "profile_screen"
     const val PROFILE_TITLE = "Profile"
 
+    const val UPLOAD_ROUTE = "Upload_screen"
+    const val UPLOAD_TITLE = "Upload"
+
     const val NOTIFICATIONS_ROUTE = "notifications_screen"
     const val NOTIFICATION_TITLE = "Notification"
 
@@ -31,6 +34,8 @@ object Constants {
     const val CONTENT_DESCRIPTION = "Content description"
     const val CHAT_ID = "chat_id"
 
+    const val UPLOAD_TYPE = "upload_type"
+
     const val USER_UID = "user_uid"
     const val USERS_TYPE = "users_type"
 
@@ -39,6 +44,8 @@ object Constants {
     const val FRIENDS = "friends"
 
     const val POP_BACK_STACK = "popBackStack"
+    const val EMPTY_VALUE = ""
+    const val ZERO_VALUE = 0
 
     const val SUCCESS_TAG = "\uD83D\uDFE2\n"
     const val FAILED_TAG = "\uD83D\uDD34\n"
@@ -65,8 +72,10 @@ object Constants {
     )
 
     val profileMenu = listOf(
-        Type(nameType = TypeMenuItem.SHARE , str = R.string.share_label),
-        Type(nameType = TypeMenuItem.EDIT , str = R.string.edit_profile)
+        Type(nameType = TypeMenuItem.SHARE, str = R.string.share_label),
+        Type(nameType = TypeMenuItem.EDIT, str = R.string.edit_profile),
+        Type(nameType = TypeMenuItem.UPLOAD_IMAGE, str = R.string.upload_image),
+        Type(nameType = TypeMenuItem.UPLOAD_VIDEO, str = R.string.upload_video)
     )
 
     // Use 10.0.2.2:8080 if emulator is used

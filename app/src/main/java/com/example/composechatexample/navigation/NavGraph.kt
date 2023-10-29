@@ -17,6 +17,7 @@ import com.example.composechatexample.screens.onboarding.OnBoardingScreen
 import com.example.composechatexample.screens.profile.ProfileScreen
 import com.example.composechatexample.screens.profile.userlist.UsersListScreen
 import com.example.composechatexample.screens.settings.SettingsScreen
+import com.example.composechatexample.screens.upload.UploadScreen
 import com.example.composechatexample.utils.Constants
 
 @Composable
@@ -37,6 +38,15 @@ fun NavGraph(
         }
         composable(route = BottomNavBar.Profile.route) {
             ProfileScreen(navController)
+        }
+        composable(
+            route = "${Constants.UPLOAD_ROUTE}/{${Constants.UPLOAD_TYPE}}",
+            arguments = listOf(navArgument(Constants.UPLOAD_TYPE) { type = NavType.StringType })
+        ) { backStackEntry ->
+            UploadScreen(
+                navController = navController,
+                uploadType = backStackEntry.arguments?.getString(Constants.UPLOAD_TYPE)
+            )
         }
         composable(route = BottomNavBar.Notifications.route) {
             NotificationsScreen(navController)
