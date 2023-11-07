@@ -45,6 +45,7 @@ object Constants {
 
     const val POP_BACK_STACK = "popBackStack"
     const val EMPTY_VALUE = ""
+    const val SPACE_VALUE = " "
     const val ZERO_VALUE = 0
 
     const val SUCCESS_TAG = "\uD83D\uDFE2\n"

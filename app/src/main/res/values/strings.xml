@@ -21,7 +21,7 @@
     <string name="name_label">Name: </string>
     <string name="number_label">Number: </string>
     <string name="email_label">Email: </string>
-    <string name="friend_list">Friend`s list</string>
+    <string name="friend_list">Friend list</string>
     <string name="string_open">Open</string>
     <string name="add_to_friend">Add to friend</string>
     <string name="info_dont_filled">The information is not filled out</string>
@@ -51,6 +51,12 @@
     <string name="edit_profile">Edit profile</string>
     <string name="upload_image">Upload image</string>
     <string name="upload_video">Upload video</string>
+
+    <string name="photo_label">%1$s photos</string>
+    <string name="video_label">%1$s videos</string>
+
+    <string name="photo_media_label">photo</string>
+    <string name="video_media_label">video</string>
 
     <!-- Upload Screen -->
     <string name="upload_video_name">Video name</string>
@@ -154,5 +160,6 @@
     <string name="notifications">notifications</string>
     <string name="chats">chats</string>
     <string name="empty_label">is empty</string>
+    <string name="see_all_label">see all</string>
 
 </resources>

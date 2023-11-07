@@ -1,6 +1,7 @@
 package com.example.composechatexample.utils
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.media.ExifInterface
@@ -106,5 +107,17 @@ object Ext {
         val size = this.length()
         val kbSize = (size / 1024).toString().toDouble()
         return (kbSize / 1024).toString().toDouble()
+    }
+
+    fun shareProfile(uuid: String, context: Context) {
+
+        val sendIntent: Intent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, "http://open_profile/uuid=$uuid")
+            type = "text/plain"
+        }
+
+        val shareIntent = Intent.createChooser(sendIntent, null)
+        context.startActivity(shareIntent)
     }
 }

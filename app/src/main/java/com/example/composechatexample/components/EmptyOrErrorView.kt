@@ -2,6 +2,7 @@ package com.example.composechatexample.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -16,7 +17,7 @@ import com.example.composechatexample.utils.Constants
 
 @Composable
 fun EmptyOrErrorView(
-    modifier: Modifier,
+    modifier: Modifier = Modifier.fillMaxSize(),
     screen: String? = null,
     isError: Boolean = false
 ) {
