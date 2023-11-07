@@ -1,11 +1,11 @@
 package com.example.composechatexample.screens.upload.model
 
+import com.example.composechatexample.utils.MediaType
 import com.example.composechatexample.utils.UploadState
-import com.example.composechatexample.utils.UploadType
 
 data class UploadUIState(
     var name: String? = null,
-    var uploadType: UploadType? = null,
+    var uploadType: MediaType? = null,
     var description: String? = null,
     var video: ByteArray? = null,
     var image: ByteArray? = null,
