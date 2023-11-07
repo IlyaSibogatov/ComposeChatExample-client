@@ -26,6 +26,7 @@ data class Friend(
     val id: String = "",
     val username: String = "",
     var onlineStatus: Boolean = false,
+    var avatarId: String = ""
 )
 
 @Serializable

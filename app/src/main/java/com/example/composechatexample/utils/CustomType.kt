@@ -35,7 +35,7 @@ enum class TypeMenuItem() {
     UPLOAD_VIDEO
 }
 
-enum class UploadType {
+enum class MediaType {
     IMAGE,
     VIDEO
 }

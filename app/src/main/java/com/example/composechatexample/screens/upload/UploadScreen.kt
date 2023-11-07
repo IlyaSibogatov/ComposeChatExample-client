@@ -20,10 +20,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -31,17 +29,16 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavHostController
-import coil.compose.AsyncImage
 import com.example.composechatexample.R
 import com.example.composechatexample.components.ActionButton
+import com.example.composechatexample.components.CoilImage
 import com.example.composechatexample.components.CustomIconButton
 import com.example.composechatexample.screens.dialogs.ClearFieldIcon
-import com.example.composechatexample.utils.Constants
 import com.example.composechatexample.utils.Constants.EMPTY_VALUE
 import com.example.composechatexample.utils.Constants.ZERO_VALUE
 import com.example.composechatexample.utils.Ext
+import com.example.composechatexample.utils.MediaType
 import com.example.composechatexample.utils.UploadState
-import com.example.composechatexample.utils.UploadType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -97,7 +94,7 @@ fun UploadScreen(
             onClick = { navController.popBackStack() }
         )
 
-        if (uploadType == UploadType.VIDEO.name) {
+        if (uploadType == MediaType.VIDEO.name) {
             //Video name length (max50)
             Text(
                 modifier = Modifier
@@ -144,7 +141,7 @@ fun UploadScreen(
                 .padding(top = 12.dp)
                 .constrainAs(descriptionLength) {
                     top.linkTo(
-                        if (uploadType == UploadType.VIDEO.name) videoName.bottom
+                        if (uploadType == MediaType.VIDEO.name) videoName.bottom
                         else arrowBack.bottom
                     )
                     end.linkTo(parent.end)
@@ -183,15 +180,16 @@ fun UploadScreen(
         )
 
         //Display image
-        AsyncImage(
+        CoilImage(
+            data = uiState.value.image,
             modifier = Modifier
                 .padding(top = 12.dp)
                 .clip(MaterialTheme.shapes.small)
                 .clickable(
                     onClick = {
                         when (uploadType) {
-                            UploadType.VIDEO.name -> videoPicker.launch("video/*")
-                            UploadType.IMAGE.name -> imagePicker.launch("image/*")
+                            MediaType.VIDEO.name -> videoPicker.launch("video/*")
+                            MediaType.IMAGE.name -> imagePicker.launch("image/*")
                         }
                     }
                 )
@@ -203,11 +201,7 @@ fun UploadScreen(
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 },
-            model = uiState.value.image,
-            contentDescription = Constants.CONTENT_DESCRIPTION,
-            placeholder = painterResource(id = R.drawable.ic_upload_files),
-            error = painterResource(id = R.drawable.ic_upload_files),
-            contentScale = ContentScale.Crop
+            placeholder = R.drawable.ic_upload_files
         )
 
         //Action button
@@ -220,7 +214,7 @@ fun UploadScreen(
                     bottom.linkTo(parent.bottom)
                 },
             text = stringResource(
-                id = if (uploadType == UploadType.VIDEO.name) R.string.upload_video
+                id = if (uploadType == MediaType.VIDEO.name) R.string.upload_video
                 else R.string.upload_image
             ),
             onClick = {

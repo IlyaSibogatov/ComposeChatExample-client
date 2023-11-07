@@ -65,7 +65,9 @@ class ProfileViewModel @Inject constructor(
                     newInfo = NewUserInfo(
                         username = response.username,
                         selfInfo = response.selfInfo,
-                    )
+                    ),
+                    photoList = response.listPhotos,
+                    videoList = response.listVideos
                 )
                 if (response.id == preferencesManager.uuid)
                     preferencesManager.userName = response.username
