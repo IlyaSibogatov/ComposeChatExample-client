@@ -53,6 +53,12 @@
     <string name="upload_image">Загрузить фото</string>
     <string name="upload_video">Загрузить видео</string>
 
+    <string name="photo_label">%1$s фото</string>
+    <string name="video_label">%1$s видео</string>
+
+    <string name="photo_media_label">фото</string>
+    <string name="video_media_label">видео</string>
+
     <!-- Upload Screen -->
     <string name="upload_video_name">Название видео</string>
     <string name="upload_description">Описание</string>
@@ -153,5 +159,6 @@
     <string name="notifications">уведомлений</string>
     <string name="chats">чатов</string>
     <string name="empty_label">пуст</string>
+    <string name="see_all_label">см.всё</string>
 
 </resources>

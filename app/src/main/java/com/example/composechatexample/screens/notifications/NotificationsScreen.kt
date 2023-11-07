@@ -18,21 +18,17 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
-import coil.request.CachePolicy
-import coil.request.ImageRequest
 import com.example.composechatexample.R
 import com.example.composechatexample.components.CircularLoader
+import com.example.composechatexample.components.CoilImage
 import com.example.composechatexample.components.CustomIconButton
 import com.example.composechatexample.components.EmptyOrErrorView
 import com.example.composechatexample.data.model.NotificationType
@@ -125,18 +121,10 @@ fun NotificationItem(
                     .size(24.dp),
                 shape = CircleShape,
             ) {
-                AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(Constants.BASE_URL + "/images/" + item.senderId + ".jpeg")
-                        .networkCachePolicy(CachePolicy.READ_ONLY)
-                        .diskCachePolicy(CachePolicy.DISABLED)
-                        .memoryCachePolicy(CachePolicy.WRITE_ONLY)
-                        .build(),
-                    alignment = Alignment.Center,
-                    contentScale = ContentScale.Crop,
-                    contentDescription = Constants.CONTENT_DESCRIPTION,
-                    placeholder = painterResource(id = R.drawable.ic_user),
-                    error = painterResource(id = R.drawable.ic_user),
+                val url = Constants.BASE_URL + "/images/" + item.senderId + ".jpeg"
+                CoilImage(
+                    data = url,
+                    placeholder = R.drawable.ic_user
                 )
             }
             /** Notification text */

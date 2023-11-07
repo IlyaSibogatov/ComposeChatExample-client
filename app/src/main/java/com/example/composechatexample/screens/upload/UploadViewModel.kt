@@ -9,8 +9,8 @@ import com.example.composechatexample.data.remote.MediaService
 import com.example.composechatexample.screens.upload.model.UploadUIState
 import com.example.composechatexample.utils.Constants.EMPTY_VALUE
 import com.example.composechatexample.utils.Constants.ZERO_VALUE
+import com.example.composechatexample.utils.MediaType
 import com.example.composechatexample.utils.UploadState
-import com.example.composechatexample.utils.UploadType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,7 +28,7 @@ class UploadViewModel @Inject constructor(
 
     fun setUploadType(uploadType: String) {
         _uiState.value = uiState.value.copy(
-            uploadType = UploadType.valueOf(uploadType),
+            uploadType = MediaType.valueOf(uploadType),
         )
     }
 
@@ -40,7 +40,7 @@ class UploadViewModel @Inject constructor(
                 _uiState.value = uiState.value.copy(
                     name = value,
                 )
-                if (value.isNotEmpty() && uiState.value.uploadType == UploadType.VIDEO && uiState.value.video != null) {
+                if (value.isNotEmpty() && uiState.value.uploadType == MediaType.VIDEO && uiState.value.video != null) {
                     _uiState.value = uiState.value.copy(
                         uploadState = UploadState.READY_FOR_UPLOAD
                     )
@@ -83,7 +83,7 @@ class UploadViewModel @Inject constructor(
 
     fun sendSource(uploadType: String) {
         when (uploadType) {
-            UploadType.IMAGE.name -> {
+            MediaType.IMAGE.name -> {
                 viewModelScope.launch(Dispatchers.IO) {
                     _uiState.value = uiState.value.copy(
                         uploadState = UploadState.ON_LOAD
@@ -100,7 +100,7 @@ class UploadViewModel @Inject constructor(
                 }
             }
 
-            UploadType.VIDEO.name -> {
+            MediaType.VIDEO.name -> {
                 viewModelScope.launch(Dispatchers.IO) {
                     _uiState.value = uiState.value.copy(
                         uploadState = UploadState.ON_LOAD

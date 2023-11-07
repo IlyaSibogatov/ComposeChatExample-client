@@ -2,6 +2,8 @@ package com.example.composechatexample.screens.profile.model
 
 import android.net.Uri
 import com.example.composechatexample.data.model.FriendShipRequest
+import com.example.composechatexample.data.model.PhotoItem
+import com.example.composechatexample.data.model.VideoItem
 import com.example.composechatexample.domain.model.Friend
 import com.example.composechatexample.domain.model.NewUserInfo
 import com.example.composechatexample.utils.ProfileDialogs
@@ -22,6 +24,8 @@ data class ProfileUIState(
     val newInfo: NewUserInfo = NewUserInfo(),
     val friends: List<Friend> = listOf(),
     val followers: List<String> = listOf(),
+    val photoList: List<PhotoItem> = listOf(),
+    val videoList: List<VideoItem> = listOf(),
     val friendshipRequests: MutableList<FriendShipRequest> = mutableListOf(),
     val displayingView: ProfileDialogs? = null,
     val screenState: ScreenState? = null,
