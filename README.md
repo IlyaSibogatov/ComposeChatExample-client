@@ -45,6 +45,7 @@ The project used:
 - Remove an account
 - Switch notification enabled
 - User logout from the account
+  
   ![settings_page](https://github.com/IlyaSibogatov/ComposeChatExample-client/assets/95710591/0d211e93-6e64-4395-9060-26c9752c9a69)
   ![settings_dark_theme_on](https://github.com/IlyaSibogatov/ComposeChatExample-client/assets/95710591/a24adfb8-471a-4b5b-ac35-790154f1f0e3)
   ![settings_ru_page](https://github.com/IlyaSibogatov/ComposeChatExample-client/assets/95710591/eb18e6e9-9cc6-4fe2-a275-f2762c1475b6)
