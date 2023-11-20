@@ -10,12 +10,12 @@ plugins {
 
 android {
     namespace 'com.example.composechatexample'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.example.composechatexample"
         minSdk 24
-        targetSdk 33
+        targetSdk 34
         versionCode 1
         versionName "1.0"
 
@@ -58,6 +58,10 @@ dependencies {
     def lifecycle_version = "2.6.0-alpha02"
     def nav_version = "2.6.0-alpha04"
     def ktor_version = "1.6.3"
+
+    //ExoPlayer
+    implementation 'androidx.media3:media3-exoplayer:1.2.0-rc01'
+    implementation 'androidx.media3:media3-ui:1.2.0-rc01'
 
     //Image loader
     implementation "io.coil-kt:coil-compose:2.2.2"

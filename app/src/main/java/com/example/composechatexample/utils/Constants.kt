@@ -13,6 +13,9 @@ object Constants {
     const val UPLOAD_ROUTE = "Upload_screen"
     const val UPLOAD_TITLE = "Upload"
 
+    const val VIDEO_ROUTE = "Video_screen"
+    const val VIDEO_TITLE = "Video"
+
     const val NOTIFICATIONS_ROUTE = "notifications_screen"
     const val NOTIFICATION_TITLE = "Notification"
 
@@ -35,6 +38,8 @@ object Constants {
     const val CHAT_ID = "chat_id"
 
     const val UPLOAD_TYPE = "upload_type"
+    const val UUID = "uuid"
+    const val MEDIA_ID = "media_id"
 
     const val USER_UID = "user_uid"
     const val USERS_TYPE = "users_type"
@@ -53,6 +58,9 @@ object Constants {
 
     const val ELEMENT_LIMIT = 6
     const val ENDLESS_LIST_INIT_PAGE = 1
+
+    const val PLAYER_SEEK_BACK_INCREMENT = 5 * 1000L // 5 seconds
+    const val PLAYER_SEEK_FORWARD_INCREMENT = 10 * 1000L // 10 seconds
 
     val listLanguages = listOf(
         LanguageEntity("Русский", "ru"),

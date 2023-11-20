@@ -42,6 +42,7 @@ fun CustomIconButton(
         onClick = { onClick() }
     ) {
         Icon(
+            modifier = modifier,
             painter = painterResource(id = imageId),
             contentDescription = Constants.CONTENT_DESCRIPTION,
             tint = color
