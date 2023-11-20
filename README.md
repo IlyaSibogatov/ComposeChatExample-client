@@ -25,29 +25,26 @@ The project used:
   # Chat list screen
   Display of the list of available rooms, creation of public and private chats, search through the list is implemented.
   
-  ![empty_chat_list_screen](https://github.com/IlyaSibogatov/ComposeChatExample-client/assets/95710591/a324496e-3b09-4453-ba2f-149aef40eb99)
-  ![create_chat_dialog](https://github.com/IlyaSibogatov/ComposeChatExample-client/assets/95710591/d9363a0c-ed13-4171-8e33-90fffaaef6bc)
-  ![chat_list_screen_with_room](https://github.com/IlyaSibogatov/ComposeChatExample-client/assets/95710591/bc98f421-e731-4855-addd-d5b3c4df739a)
+  ![chat_list_page](https://github.com/IlyaSibogatov/ComposeChatExample-client/assets/95710591/57246da9-dd55-4387-82ac-c7bafd64f9e3)
 
   # Chat detail screen
   Realised messaging using websocket's, possibility to delete or edit own messages.
   
-  ![receive_messages](https://github.com/IlyaSibogatov/ComposeChatExample-client/assets/95710591/6add33af-cbfa-44aa-b76e-847090bc0f57)
-  ![long_click_own_message](https://github.com/IlyaSibogatov/ComposeChatExample-client/assets/95710591/36a43552-ff18-4870-a0f2-84b570d13de0)
-  ![edit_message_process](https://github.com/IlyaSibogatov/ComposeChatExample-client/assets/95710591/09c5ac9e-d028-4126-80b5-943001c0171a)
-  ![message_was_edited](https://github.com/IlyaSibogatov/ComposeChatExample-client/assets/95710591/f8cd7954-852e-47b3-a4c3-9ab08b09b6ed)
+  ![chat_page](https://github.com/IlyaSibogatov/ComposeChatExample-client/assets/95710591/d1f23ab1-2db3-46d4-aeb9-1765ab4d359e)
 
   # Profile screen
   Display user's online status, self information, friends list.
   
-  ![user_profile_screen](https://github.com/IlyaSibogatov/ComposeChatExample-client/assets/95710591/b9b9e2f8-4191-429a-bdee-7245b448157b)
+  ![profile_page](https://github.com/IlyaSibogatov/ComposeChatExample-client/assets/95710591/3f44eda1-c76b-475d-9d29-67abe2b2816d)
 
   # Settings screen
   Currently implemented:
 - Language change. Available in two languages - Russian - English
 - Themes change. System, Light, Dark
 - Communication with technical support (Send email)
+- Remove an account
+- Switch notification enabled
 - User logout from the account
-  
-  ![settings_screen](https://github.com/IlyaSibogatov/ComposeChatExample-client/assets/95710591/722c935b-7d13-4e10-a745-4c21ed0284b7)
-  ![ru_language_selected](https://github.com/IlyaSibogatov/ComposeChatExample-client/assets/95710591/eba5b0f6-18b5-4317-bb66-4e2c00051be8)
+  ![settings_page](https://github.com/IlyaSibogatov/ComposeChatExample-client/assets/95710591/0d211e93-6e64-4395-9060-26c9752c9a69)
+  ![settings_dark_theme_on](https://github.com/IlyaSibogatov/ComposeChatExample-client/assets/95710591/a24adfb8-471a-4b5b-ac35-790154f1f0e3)
+  ![settings_ru_page](https://github.com/IlyaSibogatov/ComposeChatExample-client/assets/95710591/eb18e6e9-9cc6-4fe2-a275-f2762c1475b6)
