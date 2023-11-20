@@ -12,12 +12,13 @@ import androidx.navigation.navDeepLink
 import com.example.composechatexample.data.preferences.PreferencesManager
 import com.example.composechatexample.screens.chat.chatdetails.ChatScreen
 import com.example.composechatexample.screens.chat.chatlist.ChatListScreen
+import com.example.composechatexample.screens.media.upload.UploadScreen
+import com.example.composechatexample.screens.media.videos.VideosScreen
 import com.example.composechatexample.screens.notifications.NotificationsScreen
 import com.example.composechatexample.screens.onboarding.OnBoardingScreen
 import com.example.composechatexample.screens.profile.ProfileScreen
 import com.example.composechatexample.screens.profile.userlist.UsersListScreen
 import com.example.composechatexample.screens.settings.SettingsScreen
-import com.example.composechatexample.screens.upload.UploadScreen
 import com.example.composechatexample.utils.Constants
 
 @Composable
@@ -46,6 +47,19 @@ fun NavGraph(
             UploadScreen(
                 navController = navController,
                 uploadType = backStackEntry.arguments?.getString(Constants.UPLOAD_TYPE)
+            )
+        }
+        composable(
+            route = "${Constants.VIDEO_ROUTE}/{${Constants.UUID}}/{${Constants.MEDIA_ID}}",
+            arguments = listOf(
+                navArgument(Constants.UUID) { type = NavType.StringType },
+                navArgument(Constants.MEDIA_ID) { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            VideosScreen(
+                navController = navController,
+                uuid = backStackEntry.arguments?.getString(Constants.UUID),
+                mediaId = backStackEntry.arguments?.getString(Constants.MEDIA_ID)
             )
         }
         composable(route = BottomNavBar.Notifications.route) {
