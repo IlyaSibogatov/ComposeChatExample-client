@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,7 +20,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
@@ -189,10 +189,12 @@ fun ProfileScreen(
                         uiState.value.uid,
                         uiState.value.photoList.map { it.id },
                         uiState.value.videoList.map { it.id },
-                        viewModel.isMyProfile()
-                    ) {
-
-                    }
+                        {},
+                        { uuid, mediaId, type ->
+                            if (type == MediaType.VIDEO)
+                                viewModel.openVideo(uuid, mediaId)
+                        }
+                    )
                 }
                 friendList(
                     uiState.value.friends,
@@ -324,8 +326,7 @@ fun MainAvatar(
     ) {
         val url = Constants.BASE_URL + "/uploads/upload_photos/${uuid}/${avatarId}.jpeg"
         CoilImage(
-            data = imageUrl
-                ?: (url),
+            data = imageUrl ?: (url),
             modifier = Modifier
                 .fillMaxSize()
                 .clickable {
@@ -476,22 +477,22 @@ fun MediaLayout(
     uuid: String,
     photoList: List<String>,
     videoList: List<String>,
-    isMyProfile: Boolean,
-    addMoreClicked: (type: MediaType) -> Unit
+    addMoreClicked: (type: MediaType) -> Unit,
+    onCardClick: (uuid: String, mediaId: String, type: MediaType) -> Unit
 ) {
     if (photoList.isNotEmpty()) MediaItemsRow(
         uuid,
         photoList,
         MediaType.IMAGE,
-        isMyProfile,
+        {},
         {}
     )
     if (videoList.isNotEmpty()) MediaItemsRow(
         uuid,
         videoList,
         MediaType.VIDEO,
-        isMyProfile,
-        {}
+        {},
+        { mediaId -> onCardClick(uuid, mediaId, MediaType.VIDEO) }
     )
 }
 
@@ -500,8 +501,8 @@ fun MediaItemsRow(
     uuid: String,
     mediaList: List<String>,
     mediaType: MediaType,
-    isMyProfile: Boolean,
     openMedia: () -> Unit,
+    onCardClick: (uri: String) -> Unit
 ) {
     Column() {
         Row(
@@ -532,32 +533,62 @@ fun MediaItemsRow(
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            LazyRow(
-                modifier = Modifier
-                    .padding(bottom = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(mediaList.take(6)) { item -> MediaItem(uuid, item, mediaType) }
+
+            // Take only first five images to display and fill other place with spacer
+            mediaList.take(5).forEach {
+                MediaItem(
+                    uuid,
+                    it,
+                    mediaType,
+                    { onCardClick(it) }
+                )
             }
+            if (mediaList.size < 5) {
+                Spacer(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight((5 - mediaList.size).toFloat())
+                )
+            }
+//            LazyRow(
+//                modifier = Modifier
+//                    .padding(bottom = 8.dp),
+//                horizontalArrangement = Arrangement.spacedBy(8.dp)
+//            ) {
+//                items(mediaList.take(6)) { item ->
+//                    MediaItem(
+//                        uuid,
+//                        item,
+//                        mediaType,
+//                        { onCardClick(it) }
+//                    )
+//                }
+//            }
         }
     }
 }
 
 @Composable
-fun MediaItem(
+fun RowScope.MediaItem(
     uuid: String,
     item: String,
     mediaType: MediaType,
+    onCardClick: (uuid: String) -> Unit
 ) {
+    val route =
+        if (mediaType == MediaType.IMAGE) "upload_photos" else "upload_videos"
+    val url = Constants.BASE_URL + "/uploads/$route/$uuid/${item}.jpeg"
     Card(
         modifier = Modifier
-            .size(50.dp),
+            .size(75.dp)
+            .weight(1f)
+            .clickable(
+                onClick = { onCardClick(item) }
+            ),
         shape = MaterialTheme.shapes.small
     ) {
-        val route =
-            if (mediaType == MediaType.IMAGE) "upload_photos" else "upload_videos"
-        val url = Constants.BASE_URL + "/uploads/$route/$uuid/${item}.jpeg"
         CoilImage(url)
     }
 }

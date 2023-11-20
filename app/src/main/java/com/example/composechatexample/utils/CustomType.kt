@@ -24,26 +24,23 @@ enum class SendType {
 }
 
 enum class TypeNotification(val value: Boolean) {
-    ENABLE(true),
-    DISABLE(false)
+    ENABLE(true), DISABLE(false)
 }
 
 enum class TypeMenuItem() {
-    SHARE,
-    EDIT,
-    UPLOAD_IMAGE,
-    UPLOAD_VIDEO
+    SHARE, EDIT, UPLOAD_IMAGE, UPLOAD_VIDEO
 }
 
-enum class MediaType {
-    IMAGE,
-    VIDEO
+enum class MediaType(val value: String) {
+    IMAGE("image"), VIDEO("video")
+}
+
+enum class VideoState {
+    ON_LOAD, PLAYING, STOPPED, ENDED
 }
 
 enum class UploadState {
-    ON_LOAD,
-    NOT_READY_FOR_UPLOAD,
-    READY_FOR_UPLOAD,
+    ON_LOAD, NOT_READY_FOR_UPLOAD, READY_FOR_UPLOAD,
 }
 
 enum class ChatEvent {
@@ -51,10 +48,7 @@ enum class ChatEvent {
 }
 
 enum class ProfileDialogs {
-    ADD_FRIEND,
-    REMOVE_FRIEND,
-    PROGRESS_LINEAR,
-    EDIT_INFO,
+    ADD_FRIEND, REMOVE_FRIEND, PROGRESS_LINEAR, EDIT_INFO,
 }
 
 enum class SettingsDialogs {
@@ -64,15 +58,11 @@ enum class SettingsDialogs {
 }
 
 enum class ScreenState {
-    INIT,
-    ERROR,
-    SUCCESS,
-    EMPTY_DATA,
+    INIT, ERROR, SUCCESS, EMPTY_DATA,
 }
 
 enum class ChatActionType {
-    CREATE,
-    UPDATE
+    CREATE, UPDATE
 }
 
 enum class ResponseStatus(val value: String) {
