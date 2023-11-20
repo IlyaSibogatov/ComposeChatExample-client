@@ -276,6 +276,14 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
+    fun openVideo(uuid: String, mediaId: String) {
+        sendEvent(
+            ProfileScreenEvent.NavigateTo(
+                Constants.VIDEO_ROUTE + "/$uuid" + "/$mediaId"
+            )
+        )
+    }
+
     fun openUsersList(type: String) {
         sendEvent(
             ProfileScreenEvent.NavigateTo(

@@ -1,4 +1,4 @@
-package com.example.composechatexample.screens.upload
+package com.example.composechatexample.screens.media.upload
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult

@@ -1,11 +1,13 @@
 package com.example.composechatexample.data.remote
 
+import com.example.composechatexample.data.model.MediaDescription
 import com.example.composechatexample.data.model.PhotoSource
 import com.example.composechatexample.data.model.VideoSource
 import com.example.composechatexample.data.response.DefaultResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
+import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
@@ -13,6 +15,23 @@ import io.ktor.http.HttpHeaders
 class MediaServiceImpl(
     private val client: HttpClient
 ) : MediaService {
+    override suspend fun getMediaDescription(
+        uuid: String,
+        mediaId: String,
+        type: String
+    ): MediaDescription? {
+        return try {
+            client.get<MediaDescription>(MediaService.EndPoint.GetMediaDescription.url) {
+                url.parameters.append("userId", uuid)
+                url.parameters.append("mediaId", mediaId)
+                url.parameters.append("type", type)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
     override suspend fun sendPhoto(
         userId: String,
         source: PhotoSource,

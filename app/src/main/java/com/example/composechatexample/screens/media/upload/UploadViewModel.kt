@@ -1,4 +1,4 @@
-package com.example.composechatexample.screens.upload
+package com.example.composechatexample.screens.media.upload
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -6,7 +6,7 @@ import com.example.composechatexample.data.model.PhotoSource
 import com.example.composechatexample.data.model.VideoSource
 import com.example.composechatexample.data.preferences.PreferencesManager
 import com.example.composechatexample.data.remote.MediaService
-import com.example.composechatexample.screens.upload.model.UploadUIState
+import com.example.composechatexample.screens.media.upload.model.UploadUIState
 import com.example.composechatexample.utils.Constants.EMPTY_VALUE
 import com.example.composechatexample.utils.Constants.ZERO_VALUE
 import com.example.composechatexample.utils.MediaType

@@ -1,4 +1,4 @@
-package com.example.composechatexample.screens.upload.model
+package com.example.composechatexample.screens.media.upload.model
 
 import com.example.composechatexample.utils.MediaType
 import com.example.composechatexample.utils.UploadState
