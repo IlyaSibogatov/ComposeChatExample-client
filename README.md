@@ -12,6 +12,7 @@ The project used:
 - Hilt
 - Coroutines/Flow
 - Event providers (Channels)
+- Media Player
 - Shared Preferences
 
   Also used mongoDB and ktor server side
