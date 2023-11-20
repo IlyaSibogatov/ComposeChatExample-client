@@ -37,6 +37,16 @@ The project used:
   
   ![profile_page](https://github.com/IlyaSibogatov/ComposeChatExample-client/assets/95710591/3f44eda1-c76b-475d-9d29-67abe2b2816d)
 
+  # Video player screen
+  
+  ![video_player_page](https://github.com/IlyaSibogatov/ComposeChatExample-client/assets/95710591/e4b3e783-e4d3-4a43-99db-0f43b6d7b925)
+
+
+  # Notification screen
+  
+  ![notification_page](https://github.com/IlyaSibogatov/ComposeChatExample-client/assets/95710591/a93f44a1-5811-4995-9585-0f6e660d55e8)
+
+
   # Settings screen
   Currently implemented:
 - Language change. Available in two languages - Russian - English
