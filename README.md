@@ -40,7 +40,6 @@ The project used:
   # Upload media screen`s
 
   ![upload_image_page](https://github.com/IlyaSibogatov/ComposeChatExample-client/assets/95710591/3a69cdb7-8f12-4bb6-8018-c096c34cc9eb)
-  
   ![upload_video_page](https://github.com/IlyaSibogatov/ComposeChatExample-client/assets/95710591/2661e6f8-025c-42e2-8f68-3c26ce8e99a2)
 
 
